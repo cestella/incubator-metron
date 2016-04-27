@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
@@ -14,10 +15,21 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
----
-- include: pcap.yml
-  when: pcap_replay
-- include: yaf.yml
-  when: install_yaf
-- include: snort.yml
-  when: install_snort
+from cabby import create_client
+
+try:
+
+    # create a connection
+    client = create_client('{{ opentaxii_domain }}', discovery_path='/services/discovery')
+
+    # iterate through each defined collection
+    collections = client.get_collections(uri='/services/collection')
+    for collection in collections:
+
+        # how many records in each collection?
+        count = client.get_content_count(collection_name=collection.name)
+        print "%-50s %-10d" % (collection.name, count.count)
+
+except:
+
+    print "Services not defined"

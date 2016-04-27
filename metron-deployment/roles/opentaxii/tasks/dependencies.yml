@@ -15,9 +15,23 @@
 #  limitations under the License.
 #
 ---
-- include: pcap.yml
-  when: pcap_replay
-- include: yaf.yml
-  when: install_yaf
-- include: snort.yml
-  when: install_snort
+- name: Install yum repositories
+  yum: name={{ item }} update_cache=yes
+  with_items:
+    - epel-release
+    - centos-release-scl
+
+- name: Install dependencies
+  yum: name={{ item }}
+  with_items:
+    - "@Development tools"
+    - python27
+    - python27-scldevel
+    - python27-python-virtualenv
+    - libxml2-devel
+    - libxslt-devel
+    - libselinux-python
+  register: result
+  until: result.rc == 0
+  retries: 5
+  delay: 10

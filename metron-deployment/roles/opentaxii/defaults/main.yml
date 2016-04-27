@@ -15,9 +15,27 @@
 #  limitations under the License.
 #
 ---
-- include: pcap.yml
-  when: pcap_replay
-- include: yaf.yml
-  when: install_yaf
-- include: snort.yml
-  when: install_snort
+opentaxii_domain: localhost:9000
+opentaxii_home: /usr/local/opentaxii
+opentaxii_venv: opentaxii-venv
+opentaxii_bin: "{{ opentaxii_home }}/{{ opentaxii_venv }}/bin"
+opentaxii_user: guest
+opentaxii_pass: guest
+opentaxii_workers: 2
+opentaxii_loglevel: info
+opentaxii_timeout: 300
+opentaxii_bind: localhost:9000
+opentaxii_auth_db: "{{ opentaxii_home }}/data/auth.db"
+opentaxii_data_db: "{{ opentaxii_home }}/data/data.db"
+opentaxii_salt: "@#L:KJDASLKJASD@"
+python27_home: /opt/rh/python27/root
+opentaxii_available_collections:
+  - guest.phishtank_com
+  - guest.Abuse_ch
+  - guest.CyberCrime_Tracker
+  - guest.EmergingThreats_rules
+  - guest.Lehigh_edu
+  - guest.MalwareDomainList_Hostlist
+  - guest.blutmagie_de_torExits
+  - guest.dataForLast_7daysOnly
+  - guest.dshield_BlockList

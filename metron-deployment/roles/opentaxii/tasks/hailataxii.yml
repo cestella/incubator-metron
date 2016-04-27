@@ -15,22 +15,31 @@
 #  limitations under the License.
 #
 ---
-- name: Install yum repositories
-  yum: name={{ item }} update_cache=yes
+- name: Deploy service/collection definitions for hailataxii.com
+  template: src={{ item }} dest={{ opentaxii_home }}/etc mode=0400
   with_items:
-    - epel-release
-    - centos-release-scl
+    - services.yml
+    - collections.yml
 
-- name: Install dependencies
-  yum: name={{ item }}
-  with_items:
-    - "@Development tools"
-    - python27
-    - python27-scldevel
-    - python27-python-virtualenv
-    - libpcap-devel
-    - libselinux-python
-  register: result
-  until: result.rc == 0
-  retries: 5
-  delay: 10
+- name: Add collection definitions for hailataxii.com
+  blockinfile:
+    dest: "{{ opentaxii_home }}/etc/collections.yml"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
+    block: |
+      - name: {{ item }}
+        type: DATA_SET
+        available: true
+        accept_all_content: true
+        supported_content:
+          - urn:stix.mitre.org:xml:1.1.1
+        service_ids:
+          - inbox
+          - collection
+          - poll
+  with_items: "{{ opentaxii_available_collections }}"
+
+- name: Setup opentaxii
+  shell: /etc/init.d/opentaxii setup
+
+- name: Start opentaxii
+  service: name=opentaxii state=restarted

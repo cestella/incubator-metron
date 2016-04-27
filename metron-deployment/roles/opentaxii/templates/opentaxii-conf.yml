@@ -15,9 +15,24 @@
 #  limitations under the License.
 #
 ---
-- include: pcap.yml
-  when: pcap_replay
-- include: yaf.yml
-  when: install_yaf
-- include: snort.yml
-  when: install_snort
+domain: "{{ opentaxii_domain }}"
+support_basic_auth: yes
+
+persistence_api:
+  class: opentaxii.persistence.sqldb.SQLDatabaseAPI
+  parameters:
+    db_connection: "sqlite:///{{ opentaxii_data_db }}"
+    create_tables: yes
+
+auth_api:
+  class: opentaxii.auth.sqldb.SQLDatabaseAPI
+  parameters:
+    db_connection: "sqlite:///{{ opentaxii_auth_db }}"
+    create_tables: yes
+    secret: "{{ opentaxii_salt }}"
+
+logging:
+  opentaxii: debug
+  root: info
+
+hooks:
