@@ -29,6 +29,6 @@ fi
 
 export METRON_VERSION=${project.version}
 export METRON_HOME=/usr/metron/$METRON_VERSION
-export TOPOLOGIES_JAR=${project-artifactId}-$METRON_VERSION.jar
+export TOPOLOGIES_JAR=${project.artifactId}-$METRON_VERSION.jar
 
 yarn jar $METRON_HOME/lib/$TOPOLOGIES_JAR org.apache.metron.utils.PcapInspector "$@"
