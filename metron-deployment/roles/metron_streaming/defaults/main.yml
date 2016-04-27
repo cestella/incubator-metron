@@ -22,13 +22,13 @@ metron_pcap_jar_name: metron-pcap-backend-{{ metron_version }}.jar
 metron_parsers_jar_name: metron-parsers-{{ metron_version }}.jar
 
 metron_common_bundle_name: metron-common-{{ metron_version }}-archive.tar.gz
-metron_pcap_bundle_name: metron-pcap-backend{{ metron_version }}-archive.tar.gz
+metron_pcap_bundle_name: metron-pcap-backend-{{ metron_version }}-archive.tar.gz
 metron_data_management_bundle_name: metron-data-management-{{ metron_version }}-archive.tar.gz
 metron_enrichment_bundle_name: metron-enrichment-{{ metron_version }}-archive.tar.gz
 metron_solr_bundle_name: metron-solr-{{ metron_version }}-archive.tar.gz
 metron_elasticsearch_bundle_name: metron-elasticsearch-{{ metron_version }}-archive.tar.gz
 metron_parsers_bundle_name: metron-parsers-{{ metron_version }}-archive.tar.gz
-metron_pcap_bundle_path: "{{ playbook_dir }}/../../metron-platform/metron-pcap-backend/target/{{ metron_common_bundle_name }}"
+metron_pcap_bundle_path: "{{ playbook_dir }}/../../metron-platform/metron-pcap-backend/target/{{ metron_pcap_bundle_name }}"
 metron_common_bundle_path: "{{ playbook_dir }}/../../metron-platform/metron-common/target/{{ metron_common_bundle_name }}"
 metron_data_management_bundle_path: "{{ playbook_dir }}/../../metron-platform/metron-data-management/target/{{ metron_data_management_bundle_name }}"
 metron_enrichment_bundle_path: "{{ playbook_dir }}/../../metron-platform/metron-enrichment/target/{{ metron_enrichment_bundle_name }}"
@@ -59,12 +59,10 @@ bro_topic: bro
 yaf_topic: yaf
 snort_topic: snort
 enrichments_topic: enrichments
-storm_enrichment_topology:
-    - "{{ metron_directory }}/flux/enrichment/remote.yaml"
 storm_parser_topologies:
-    - "{{ metron_directory }}/flux/bro/remote.yaml"
-    - "{{ metron_directory }}/flux/snort/remote.yaml"
-    - "{{ metron_directory }}/flux/yaf/remote.yaml"
+    - "bro"
+    - "snort"
+    - "yaf"
 
 hdfs_retention_days: 30
 hdfs_bro_purge_cronjob: "{{ metron_directory }}/bin/prune_hdfs_files.sh -f {{ hdfs_url }} -g '/apps/metron/enrichment/indexed/bro_doc/*enrichment-*' -s $(date -d '{{ hdfs_retention_days }} days ago' +%m/%d/%Y) -n 1 >> /var/log/bro-purge/cron-hdfs-bro-purge.log 2>&1"
