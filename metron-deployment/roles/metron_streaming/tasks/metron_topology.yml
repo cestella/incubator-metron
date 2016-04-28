@@ -16,14 +16,14 @@
 #
 ---
 - name: Submit Metron Parser topologies
-  command: {{ metron_directory }}/bin/start_parser_topology.sh {{ item }}
+  command: "{{ metron_directory }}/bin/start_parser_topology.sh {{ item }}"
   with_items:
       - "{{ storm_parser_topologies }}"
 
 - name: Submit Solr Metron Enrichment topology
-  command: {{ metron_directory }}/bin/start_solr_topology.sh
+  command: "{{ metron_directory }}/bin/start_solr_topology.sh"
   when: install_solr | default(False) == True
 
 - name: Submit Elasticsearch Metron Enrichment topology
-  command: {{ metron_directory }}/bin/start_elasticsearch_topology.sh
+  command: "{{ metron_directory }}/bin/start_elasticsearch_topology.sh"
   when: install_elasticsearch | default(False) == True

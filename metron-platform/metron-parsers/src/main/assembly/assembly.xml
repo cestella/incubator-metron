@@ -60,7 +60,7 @@
         <exclude>**/*.formatted</exclude>
         <exclude>**/*.filtered</exclude>
       </excludes>
-      <fileMode>0644</fileMode>
+      <fileMode>0755</fileMode>
       <lineEnding>unix</lineEnding>
       <filtered>true</filtered>
     </fileSet>
