@@ -20,4 +20,4 @@ export METRON_VERSION=${project.version}
 export METRON_HOME=/usr/metron/$METRON_VERSION
 export TOPOLOGIES_JAR=${project.artifactId}-$METRON_VERSION.jar
 
-storm jar $METRON_HOME/lib/$TOPOLOGIES_JAR org.apache.storm.flux.Flux --remote $METRON_HOME/config/topologies/pcap/remote.yaml --filter $METRON_HOME/config/etc/env/pcap.properties
+storm jar $METRON_HOME/lib/$TOPOLOGIES_JAR org.apache.storm.flux.Flux --remote $METRON_HOME/flux/pcap/remote.yaml --filter $METRON_HOME/config/pcap.properties
