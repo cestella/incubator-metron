@@ -51,6 +51,7 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
     JSONObject ret = super.joinMessages(streamMessageMap);
     for(Object key : ret.keySet()) {
       if(key.toString().startsWith("threatintels") && !key.toString().endsWith(".ts")) {
+        // triage
         ret.put("is_alert" , "true");
         break;
       }
