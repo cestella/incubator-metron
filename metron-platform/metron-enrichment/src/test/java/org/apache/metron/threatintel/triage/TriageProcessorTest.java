@@ -19,10 +19,12 @@
 package org.apache.metron.threatintel.triage;
 
 import org.adrianwalker.multilinestring.Multiline;
+import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
 import org.apache.metron.common.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class TriageProcessorTest {
@@ -39,9 +41,14 @@ public class TriageProcessorTest {
   @Multiline
   public static String smokeTestProcessorConfig;
 
+  private static Processor getProcessor(String config) throws IOException {
+    ThreatTriageConfig c = JSONUtils.INSTANCE.load(config, ThreatTriageConfig.class);
+    return new Processor(c);
+  }
+
   @Test
   public void smokeTest() throws Exception {
-    Processor processor = JSONUtils.INSTANCE.load(smokeTestProcessorConfig, Processor.class);
+    Processor processor = getProcessor(smokeTestProcessorConfig);
     Assert.assertEquals("Expected a score of 10"
                        , 10d
                        , processor.apply( new HashMap<Object, Object>() {{
@@ -87,7 +94,7 @@ public class TriageProcessorTest {
   @Test
   public void positiveMeanAggregationTest() throws Exception {
 
-    Processor processor = JSONUtils.INSTANCE.load(positiveMeanProcessorConfig, Processor.class);
+    Processor processor = getProcessor(positiveMeanProcessorConfig);
     Assert.assertEquals("Expected a score of 0"
                        , 5d
                        , processor.apply( new HashMap<Object, Object>() {{

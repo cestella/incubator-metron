@@ -62,29 +62,33 @@ public class ThreatIntelAdapterTest {
   private EnrichmentLookup lookup;
 
   /**
-   * {
-   * "10.0.2.3":"alert"
-   * }
+    {
+    "10.0.2.3":"alert"
+    }
    */
   @Multiline
   private String expectedMessageString;
 
   /**
-   * {
-   * "index": "bro",
-   * "batchSize": 5,
-   * "enrichmentFieldMap": {
-   * "geo": ["ip_dst_addr", "ip_src_addr"],
-   * "host": ["host"]
-   * },
-   * "threatIntelFieldMap": {
-   * "hbaseThreatIntel": ["ip_dst_addr", "ip_src_addr"]
-   * },
-   * "fieldToThreatIntelTypeMap": {
-   * "ip_dst_addr" : [ "10.0.2.3" ],
-   * "ip_src_addr" : [ "malicious_ip" ]
-   * }
-   * }
+    {
+      "index": "bro",
+      "batchSize": 5,
+      "enrichment": {
+        "fieldMap": {
+          "geo": ["ip_dst_addr", "ip_src_addr"],
+          "host": ["host"]
+        }
+      },
+      "threatIntel" : {
+        "fieldMap": {
+          "hbaseThreatIntel": ["ip_dst_addr", "ip_src_addr"]
+        },
+        "fieldToTypeMap": {
+          "ip_dst_addr" : [ "10.0.2.3" ],
+          "ip_src_addr" : [ "malicious_ip" ]
+        }
+      }
+    }
    */
   @Multiline
   private static String sourceConfigStr;

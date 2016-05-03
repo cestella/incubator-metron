@@ -52,26 +52,28 @@ public class SimpleHBaseAdapterTest {
   }};
 
   /**
-   * {
-   * "10.0.2.3.orientation":"north"
-   * }
+    {
+    "10.0.2.3.orientation":"north"
+    }
    */
   @Multiline
   private String expectedMessageString;
 
   /**
-   * {
-   * "index": "bro",
-   * "batchSize": 5,
-   * "enrichmentFieldMap": {
-   * "geo": ["ip_dst_addr", "ip_src_addr"],
-   * "host": ["host"]
-   * },
-   * "fieldToEnrichmentTypeMap": {
-   * "ip_dst_addr" : [ "10.0.2.3" ],
-   * "ip_src_addr" : [ "10.3.30.120" ]
-   * }
-   * }
+    {
+      "index": "bro",
+      "batchSize": 5,
+      "enrichment": {
+        "fieldMap": {
+          "geo": ["ip_dst_addr", "ip_src_addr"],
+          "host": ["host"]
+        },
+      "fieldToTypeMap": {
+        "ip_dst_addr" : [ "10.0.2.3" ],
+        "ip_src_addr" : [ "10.3.30.120" ]
+        }
+      }
+   }
    */
   @Multiline
   private String sourceConfigStr;

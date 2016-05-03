@@ -28,7 +28,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Map;
 
-public class SensorSensorEnrichmentUpdateConfigTest {
+public class SensorEnrichmentConfigTest {
 
   @Test
   public void test() throws IOException {

@@ -17,7 +17,10 @@
  */
 package org.apache.metron.enrichment.bolt;
 
+import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
+import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
+import org.apache.metron.threatintel.triage.Processor;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +56,22 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
       if(key.toString().startsWith("threatintels") && !key.toString().endsWith(".ts")) {
         // triage
         ret.put("is_alert" , "true");
+
+        if(ret.containsKey(Constants.SENSOR_TYPE)) {
+          String sourceType = ret.get(Constants.SENSOR_TYPE).toString();
+          SensorEnrichmentConfig config = configurations.getSensorEnrichmentConfig(sourceType);
+          ThreatTriageConfig triageConfig = null;
+          if(config != null) {
+            triageConfig = config.getThreatIntel().getTriageConfig();
+          }
+          if(triageConfig != null) {
+            Processor processor = new Processor(triageConfig);
+            Double triageLevel = processor.apply(ret);
+            if(triageLevel != null && triageLevel > 0) {
+              ret.put("threat.triage.level", triageLevel);
+            }
+          }
+        }
         break;
       }
     }

@@ -66,10 +66,12 @@ public abstract class JoinBolt<V> extends ConfiguredBolt {
   public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
     super.prepare(map, topologyContext, outputCollector);
     this.collector = outputCollector;
-    if (this.maxCacheSize == null)
+    if (this.maxCacheSize == null) {
       throw new IllegalStateException("maxCacheSize must be specified");
-    if (this.maxTimeRetain == null)
+    }
+    if (this.maxTimeRetain == null) {
       throw new IllegalStateException("maxTimeRetain must be specified");
+    }
     loader = new CacheLoader<String, Map<String, V>>() {
       public Map<String, V> load(String key) throws Exception {
         return new HashMap<>();
@@ -96,11 +98,16 @@ public abstract class JoinBolt<V> extends ConfiguredBolt {
       streamMessageMap.put(streamId, message);
       Set<String> streamIds = getStreamIds(message);
       Set<String> streamMessageKeys = streamMessageMap.keySet();
-      if (streamMessageKeys.size() == streamIds.size() && Sets.symmetricDifference
-              (streamMessageKeys, streamIds)
-              .isEmpty()) {
-        collector.emit("message", tuple, new Values(key, joinMessages
-                (streamMessageMap)));
+      if ( streamMessageKeys.size() == streamIds.size()
+        && Sets.symmetricDifference(streamMessageKeys, streamIds)
+               .isEmpty()
+         ) {
+        collector.emit( "message"
+                      , tuple
+                      , new Values( key
+                                  , joinMessages(streamMessageMap)
+                                  )
+                      );
         collector.ack(tuple);
         cache.invalidate(key);
       } else {

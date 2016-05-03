@@ -33,17 +33,21 @@ public class SensorEnrichmentUpdateConfigTest {
    {
       "index": "bro",
       "batchSize": 5,
-      "enrichmentFieldMap": {
+      "enrichment" : {
+        "fieldMap": {
         "geo": ["ip_dst_addr", "ip_src_addr"],
         "host": ["host"]
-                            },
-      "threatIntelFieldMap": {
-        "hbaseThreatIntel": ["ip_dst_addr", "ip_src_addr"]
+                    }
+      },
+      "threatIntel": {
+        "fieldMap": {
+          "hbaseThreatIntel": ["ip_dst_addr", "ip_src_addr"]
                              },
-      "fieldToThreatIntelTypeMap": {
-        "ip_dst_addr" : [ "malicious_ip" ]
-       ,"ip_src_addr" : [ "malicious_ip" ]
-                                   }
+        "fieldToTypeMap": {
+          "ip_dst_addr" : [ "malicious_ip" ]
+         ,"ip_src_addr" : [ "malicious_ip" ]
+                          }
+      }
     }
    */
   @Multiline
