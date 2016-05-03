@@ -1,6 +1,7 @@
-// Generated from org/apache/metron/threatintel/triage/generated/Predicate.g4 by ANTLR 4.5
-package org.apache.metron.threatintel.triage.generated;
+// Generated from org/apache/metron/common/query/generated/Predicate.g4 by ANTLR 4.5
+package org.apache.metron.common.query.generated;
 
+//CHECKSTYLE:OFF
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

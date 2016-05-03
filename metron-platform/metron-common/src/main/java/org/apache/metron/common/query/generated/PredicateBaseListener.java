@@ -1,6 +1,7 @@
-// Generated from org/apache/metron/threatintel/triage/generated/Predicate.g4 by ANTLR 4.5
-package org.apache.metron.threatintel.triage.generated;
+// Generated from org/apache/metron/common/query/generated/Predicate.g4 by ANTLR 4.5
+package org.apache.metron.common.query.generated;
 
+//CHECKSTYLE:OFF
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -175,18 +176,6 @@ public class PredicateBaseListener implements PredicateListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitExistsFunc(PredicateParser.ExistsFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLogicalFunc(PredicateParser.LogicalFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLogicalFunc(PredicateParser.LogicalFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

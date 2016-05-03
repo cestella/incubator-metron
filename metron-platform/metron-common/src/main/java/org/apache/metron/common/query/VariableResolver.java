@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-package org.apache.metron.threatintel.triage;
+package org.apache.metron.common.query;
 
-import java.util.List;
-import java.util.Map;
-
-public interface Aggregator {
-  Double aggregate(List<Number> scores, Map<String, Object> config);
+public interface VariableResolver {
+  String resolve(String variable);
 }

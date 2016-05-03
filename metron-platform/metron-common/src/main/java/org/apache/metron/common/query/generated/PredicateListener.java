@@ -1,6 +1,7 @@
-// Generated from org/apache/metron/threatintel/triage/generated/Predicate.g4 by ANTLR 4.5
-package org.apache.metron.threatintel.triage.generated;
+// Generated from org/apache/metron/common/query/generated/Predicate.g4 by ANTLR 4.5
+package org.apache.metron.common.query.generated;
 
+//CHECKSTYLE:OFF
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -169,18 +170,6 @@ public interface PredicateListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExistsFunc(PredicateParser.ExistsFuncContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code LogicalFunc}
-	 * labeled alternative in {@link PredicateParser#logical_entity}.
-	 * @param ctx the parse tree
-	 */
-	void enterLogicalFunc(PredicateParser.LogicalFuncContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code LogicalFunc}
-	 * labeled alternative in {@link PredicateParser#logical_entity}.
-	 * @param ctx the parse tree
-	 */
-	void exitLogicalFunc(PredicateParser.LogicalFuncContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PredicateParser#list_entity}.
 	 * @param ctx the parse tree

@@ -16,11 +16,18 @@
  * limitations under the License.
  */
 
-package org.apache.metron.threatintel.triage;
+package org.apache.metron.common.query;
 
-import java.util.List;
 import java.util.Map;
 
-public interface Aggregator {
-  Double aggregate(List<Number> scores, Map<String, Object> config);
+public class MapVariableResolver implements VariableResolver {
+  Map variableMapping;
+  public MapVariableResolver(Map variableMapping) {
+    this.variableMapping = variableMapping;
+  }
+  @Override
+  public String resolve(String variable) {
+    Object o = variableMapping.get(variable);
+    return o == null?null:o.toString();
+  }
 }
