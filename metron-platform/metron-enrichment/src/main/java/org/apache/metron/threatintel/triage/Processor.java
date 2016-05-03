@@ -19,44 +19,20 @@
 package org.apache.metron.threatintel.triage;
 
 import com.google.common.base.Function;
-import org.apache.metron.threatintel.triage.aggregator.Aggregators;
+import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
 import org.apache.metron.common.query.MapVariableResolver;
 import org.apache.metron.common.query.PredicateProcessor;
 import org.apache.metron.common.query.VariableResolver;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Processor implements Function<Map, Double> {
-  private Map<String, Number> riskLevelRules;
-  private Aggregator aggregator = Aggregators.MAX;
-  private Map<String, Object> aggregationConfig = new HashMap<>();
-
-  public Map<String, Number> getRiskLevelRules() {
-    return riskLevelRules;
-  }
-
-  public void setRiskLevelRules(Map<String, Number> riskLevelRules) {
-    this.riskLevelRules = riskLevelRules;
-  }
-
-  public Aggregator getAggregator() {
-    return aggregator;
-  }
-
-  public void setAggregator(String aggregator) {
-    this.aggregator = Aggregators.valueOf(aggregator);
-  }
-
-  public Map<String, Object> getAggregationConfig() {
-    return aggregationConfig;
-  }
-
-  public void setAggregationConfig(Map<String, Object> aggregationConfig) {
-    this.aggregationConfig = aggregationConfig;
+  private ThreatTriageConfig config;
+  public Processor(ThreatTriageConfig config) {
+    this.config = config;
   }
 
   @Nullable
@@ -65,7 +41,7 @@ public class Processor implements Function<Map, Double> {
     List<Number> scores = new ArrayList<>();
     PredicateProcessor predicateProcessor = new PredicateProcessor();
     VariableResolver resolver = new MapVariableResolver(input);
-    for(Map.Entry<String, Number> kv : getRiskLevelRules().entrySet()) {
+    for(Map.Entry<String, Number> kv : config.getRiskLevelRules().entrySet()) {
       try {
         if(predicateProcessor.parse(kv.getKey(), resolver)) {
           scores.add(kv.getValue());
@@ -75,6 +51,6 @@ public class Processor implements Function<Map, Double> {
         //skip if there's a problem
       }
     }
-    return getAggregator().aggregate(scores, getAggregationConfig());
+    return config.getAggregator().aggregate(scores, config.getAggregationConfig());
   }
 }

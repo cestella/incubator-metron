@@ -17,7 +17,7 @@
  */
 package org.apache.metron.enrichment.bolt;
 
-import org.apache.metron.common.configuration.SensorEnrichmentConfig;
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
   public Map<String, List<String>> getFieldMap(String sourceType) {
     SensorEnrichmentConfig config = configurations.getSensorEnrichmentConfig(sourceType);
     if(config != null) {
-      return config.getThreatIntelFieldMap();
+      return config.getThreatIntel().getFieldMap();
     }
     else {
       LOG.error("Unable to retrieve sensor config: " + sourceType);

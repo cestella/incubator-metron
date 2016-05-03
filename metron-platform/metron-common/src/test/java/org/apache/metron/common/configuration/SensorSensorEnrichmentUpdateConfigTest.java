@@ -22,12 +22,13 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.apache.metron.TestConstants;
 import org.apache.metron.common.cli.ConfigurationsUtils;
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class SensorEnrichmentConfigTest {
+public class SensorSensorEnrichmentUpdateConfigTest {
 
   @Test
   public void test() throws IOException {

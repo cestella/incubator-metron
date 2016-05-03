@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.metron.threatintel.triage;
+package org.apache.metron.common.aggregator;
 
 import java.util.List;
 import java.util.Map;

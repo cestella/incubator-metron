@@ -16,17 +16,12 @@
  * limitations under the License.
  */
 
-package org.apache.metron.threatintel.triage.aggregator;
+package org.apache.metron.common.aggregator;
 
-import com.google.common.collect.Iterables;
-import org.apache.metron.threatintel.triage.Aggregator;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
-import java.util.stream.StreamSupport;
 
 public enum Aggregators implements Aggregator {
    MAX( (numbers, config) -> accumulate(0d, (x,y) -> Math.max(x.doubleValue(),y.doubleValue()), numbers))

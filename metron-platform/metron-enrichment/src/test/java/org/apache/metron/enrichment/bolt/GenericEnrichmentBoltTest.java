@@ -22,7 +22,7 @@ import org.adrianwalker.multilinestring.Multiline;
 import org.apache.metron.TestConstants;
 import org.apache.metron.test.bolt.BaseEnrichmentBoltTest;
 import org.apache.metron.enrichment.configuration.Enrichment;
-import org.apache.metron.common.configuration.SensorEnrichmentConfig;
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.enrichment.interfaces.EnrichmentAdapter;
 import org.apache.metron.common.cli.ConfigurationsUtils;
 import org.hamcrest.Description;

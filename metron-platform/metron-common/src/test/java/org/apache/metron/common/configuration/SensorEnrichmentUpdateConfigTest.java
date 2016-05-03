@@ -19,6 +19,8 @@ package org.apache.metron.common.configuration;
 
 import org.adrianwalker.multilinestring.Multiline;
 import org.apache.metron.common.Constants;
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentUpdateConfig;
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +28,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnrichmentConfigTest {
+public class SensorEnrichmentUpdateConfigTest {
   /**
    {
       "index": "bro",
@@ -70,9 +72,9 @@ public class EnrichmentConfigTest {
     SensorEnrichmentConfig broSc = JSONUtils.INSTANCE.load(sourceConfigStr, SensorEnrichmentConfig.class);
 
 
-    EnrichmentConfig config = JSONUtils.INSTANCE.load(threatIntelConfigStr, EnrichmentConfig.class);
+    SensorEnrichmentUpdateConfig config = JSONUtils.INSTANCE.load(threatIntelConfigStr, SensorEnrichmentUpdateConfig.class);
     final Map<String, SensorEnrichmentConfig> outputScs = new HashMap<>();
-    EnrichmentConfig.SourceConfigHandler scHandler = new EnrichmentConfig.SourceConfigHandler() {
+    SensorEnrichmentUpdateConfig.SourceConfigHandler scHandler = new SensorEnrichmentUpdateConfig.SourceConfigHandler() {
       @Override
       public SensorEnrichmentConfig readConfig(String sensor) throws Exception {
         if(sensor.equals("bro")) {
@@ -88,46 +90,46 @@ public class EnrichmentConfigTest {
         outputScs.put(sensor, config);
       }
     };
-    EnrichmentConfig.updateSensorConfigs(scHandler, config.getSensorToFieldList());
+    SensorEnrichmentUpdateConfig.updateSensorConfigs(scHandler, config.getSensorToFieldList());
     Assert.assertNotNull(outputScs.get("bro"));
     Assert.assertNotSame(outputScs.get("bro"), broSc);
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getThreatIntelFieldMap().get(Constants.SIMPLE_HBASE_THREAT_INTEL).size()
+                       , outputScs.get("bro").getThreatIntel().getFieldMap().get(Constants.SIMPLE_HBASE_THREAT_INTEL).size()
                        , 2
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getThreatIntelFieldMap()
+                       , outputScs.get("bro").getThreatIntel().getFieldMap()
                                   .get(Constants.SIMPLE_HBASE_THREAT_INTEL)
                                   .contains("ip_src_addr")
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getThreatIntelFieldMap()
+                       , outputScs.get("bro").getThreatIntel().getFieldMap()
                                   .get(Constants.SIMPLE_HBASE_THREAT_INTEL)
                                   .contains("ip_dst_addr")
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().keySet().size()
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().keySet().size()
                        , 2
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().get("ip_src_addr").size()
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().get("ip_src_addr").size()
                        , 2
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().get("ip_src_addr").contains("playful")
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().get("ip_src_addr").contains("playful")
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().get("ip_src_addr").contains("malicious_ip")
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().get("ip_src_addr").contains("malicious_ip")
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().get("ip_dst_addr").size()
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().get("ip_dst_addr").size()
                        , 2
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().get("ip_dst_addr").contains("playful")
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().get("ip_dst_addr").contains("playful")
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToThreatIntelTypeMap().get("ip_dst_addr").contains("malicious_ip")
+                       , outputScs.get("bro").getThreatIntel().getFieldToTypeMap().get("ip_dst_addr").contains("malicious_ip")
                        );
   }
 
@@ -152,9 +154,9 @@ public class EnrichmentConfigTest {
 
     SensorEnrichmentConfig broSc = JSONUtils.INSTANCE.load(sourceConfigStr, SensorEnrichmentConfig.class);
 
-    EnrichmentConfig config = JSONUtils.INSTANCE.load(enrichmentConfigStr, EnrichmentConfig.class);
+    SensorEnrichmentUpdateConfig config = JSONUtils.INSTANCE.load(enrichmentConfigStr, SensorEnrichmentUpdateConfig.class);
     final Map<String, SensorEnrichmentConfig> outputScs = new HashMap<>();
-    EnrichmentConfig.SourceConfigHandler scHandler = new EnrichmentConfig.SourceConfigHandler() {
+    SensorEnrichmentUpdateConfig.SourceConfigHandler scHandler = new SensorEnrichmentUpdateConfig.SourceConfigHandler() {
       @Override
       public SensorEnrichmentConfig readConfig(String sensor) throws Exception {
         if(sensor.equals("bro")) {
@@ -170,41 +172,41 @@ public class EnrichmentConfigTest {
         outputScs.put(sensor, config);
       }
     };
-    EnrichmentConfig.updateSensorConfigs(scHandler, config.getSensorToFieldList());
+    SensorEnrichmentUpdateConfig.updateSensorConfigs(scHandler, config.getSensorToFieldList());
     Assert.assertNotNull(outputScs.get("bro"));
     Assert.assertNotSame(outputScs.get("bro"), broSc);
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getEnrichmentFieldMap().get(Constants.SIMPLE_HBASE_ENRICHMENT).size()
+                       , outputScs.get("bro").getEnrichment().getFieldMap().get(Constants.SIMPLE_HBASE_ENRICHMENT).size()
                        , 2
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getEnrichmentFieldMap()
+                       , outputScs.get("bro").getEnrichment().getFieldMap()
                                   .get(Constants.SIMPLE_HBASE_ENRICHMENT)
                                   .contains("ip_src_addr")
                        );
     Assert.assertTrue( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getEnrichmentFieldMap()
+                       , outputScs.get("bro").getEnrichment().getFieldMap()
                                   .get(Constants.SIMPLE_HBASE_ENRICHMENT)
                                   .contains("ip_dst_addr")
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToEnrichmentTypeMap().keySet().size()
+                       , outputScs.get("bro").getEnrichment().getFieldToTypeMap().keySet().size()
                        , 2
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToEnrichmentTypeMap().get("ip_src_addr").size()
+                       , outputScs.get("bro").getEnrichment().getFieldToTypeMap().get("ip_src_addr").size()
                        , 1
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToEnrichmentTypeMap().get("ip_src_addr").get(0)
+                       , outputScs.get("bro").getEnrichment().getFieldToTypeMap().get("ip_src_addr").get(0)
                        , "playful"
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToEnrichmentTypeMap().get("ip_dst_addr").size()
+                       , outputScs.get("bro").getEnrichment().getFieldToTypeMap().get("ip_dst_addr").size()
                        , 1
                        );
     Assert.assertEquals( outputScs.get("bro").toJSON()
-                       , outputScs.get("bro").getFieldToEnrichmentTypeMap().get("ip_dst_addr").get(0)
+                       , outputScs.get("bro").getEnrichment().getFieldToTypeMap().get("ip_dst_addr").get(0)
                        , "playful"
                        );
   }

@@ -19,7 +19,7 @@ package org.apache.metron.enrichment.adapters.simplehbase;
 
 
 import org.adrianwalker.multilinestring.Multiline;
-import org.apache.metron.common.configuration.SensorEnrichmentConfig;
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.enrichment.bolt.CacheKey;
 import org.apache.metron.enrichment.converter.EnrichmentKey;
 import org.apache.metron.enrichment.converter.EnrichmentValue;
