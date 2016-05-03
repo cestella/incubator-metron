@@ -15,7 +15,7 @@ public enum Aggregators implements Aggregator {
   ,MIN( (numbers, config) -> accumulate(0d, (x,y) -> Math.min(x.doubleValue(),y.doubleValue()), numbers))
   ,SUM( (numbers, config) -> accumulate(0d, (x,y) -> x.doubleValue() + y.doubleValue(), numbers))
   ,MEAN( (numbers, config) -> scale(SUM.aggregate(numbers, config), numbers, n -> true))
-  ,POSITIVE_MEAN( (numbers, config) -> scale(MEAN.aggregate(numbers, config), numbers, n -> n.doubleValue() > 0))
+  ,POSITIVE_MEAN( (numbers, config) -> scale(SUM.aggregate(numbers, config), numbers, n -> n.doubleValue() > 0))
   ;
   Aggregator aggregator;
   Aggregators(Aggregator agg) {
@@ -27,7 +27,7 @@ public enum Aggregators implements Aggregator {
 
   private static double accumulate(double initial, BinaryOperator<Number> op, List<Number> list) {
     if(list.isEmpty()) {
-      return -1;
+      return 0d;
     }
     return list.stream()
                .reduce(initial, op)

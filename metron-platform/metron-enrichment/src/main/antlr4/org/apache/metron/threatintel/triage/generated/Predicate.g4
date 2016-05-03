@@ -82,7 +82,6 @@ comparison_expr : comparison_operand comp_operator comparison_operand # Comparis
 
 logical_entity : (TRUE | FALSE) # LogicalConst
                | EXISTS LPAREN IDENTIFIER RPAREN #ExistsFunc
-               | IDENTIFIER LPAREN func_args RPAREN #LogicalFunc
                ;
 
 list_entity : LBRACKET op_list RBRACKET
@@ -103,6 +102,3 @@ comparison_operand : identifier_operand #IdentifierOperand
 
 comp_operator : (EQ | NEQ) # ComparisonOp
               ;
-
-
-
