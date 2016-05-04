@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Processor implements Function<Map, Double> {
+public class ThreatTriageProcessor implements Function<Map, Double> {
   private ThreatTriageConfig config;
-  public Processor(ThreatTriageConfig config) {
+  public ThreatTriageProcessor(ThreatTriageConfig config) {
     this.config = config;
   }
 

@@ -20,7 +20,7 @@ package org.apache.metron.enrichment.bolt;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
-import org.apache.metron.threatintel.triage.Processor;
+import org.apache.metron.threatintel.triage.ThreatTriageProcessor;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +65,8 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
             triageConfig = config.getThreatIntel().getTriageConfig();
           }
           if(triageConfig != null) {
-            Processor processor = new Processor(triageConfig);
-            Double triageLevel = processor.apply(ret);
+            ThreatTriageProcessor threatTriageProcessor = new ThreatTriageProcessor(triageConfig);
+            Double triageLevel = threatTriageProcessor.apply(ret);
             if(triageLevel != null && triageLevel > 0) {
               ret.put("threat.triage.level", triageLevel);
             }

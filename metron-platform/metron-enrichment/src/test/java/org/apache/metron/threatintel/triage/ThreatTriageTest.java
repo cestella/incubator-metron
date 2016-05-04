@@ -27,7 +27,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class TriageProcessorTest {
+public class ThreatTriageTest {
   /**
    {
     "riskLevelRules" : {
@@ -41,17 +41,17 @@ public class TriageProcessorTest {
   @Multiline
   public static String smokeTestProcessorConfig;
 
-  private static Processor getProcessor(String config) throws IOException {
+  private static ThreatTriageProcessor getProcessor(String config) throws IOException {
     ThreatTriageConfig c = JSONUtils.INSTANCE.load(config, ThreatTriageConfig.class);
-    return new Processor(c);
+    return new ThreatTriageProcessor(c);
   }
 
   @Test
   public void smokeTest() throws Exception {
-    Processor processor = getProcessor(smokeTestProcessorConfig);
+    ThreatTriageProcessor threatTriageProcessor = getProcessor(smokeTestProcessorConfig);
     Assert.assertEquals("Expected a score of 10"
                        , 10d
-                       , processor.apply( new HashMap<Object, Object>() {{
+                       , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
                           put("user.type", "admin");
                           put("asset.type", "web");
                                         }}
@@ -60,7 +60,7 @@ public class TriageProcessorTest {
                        );
     Assert.assertEquals("Expected a score of 5"
                        , 5d
-                       , processor.apply( new HashMap<Object, Object>() {{
+                       , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
                           put("user.type", "normal");
                           put("asset.type", "web");
                                         }}
@@ -69,7 +69,7 @@ public class TriageProcessorTest {
                        );
     Assert.assertEquals("Expected a score of 0"
                        , 0d
-                       , processor.apply( new HashMap<Object, Object>() {{
+                       , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
                           put("user.type", "foo");
                           put("asset.type", "bar");
                                         }}
@@ -94,10 +94,10 @@ public class TriageProcessorTest {
   @Test
   public void positiveMeanAggregationTest() throws Exception {
 
-    Processor processor = getProcessor(positiveMeanProcessorConfig);
+    ThreatTriageProcessor threatTriageProcessor = getProcessor(positiveMeanProcessorConfig);
     Assert.assertEquals("Expected a score of 0"
                        , 5d
-                       , processor.apply( new HashMap<Object, Object>() {{
+                       , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
                           put("user.type", "normal");
                           put("asset.type", "web");
                                         }}
@@ -106,7 +106,7 @@ public class TriageProcessorTest {
                        );
     Assert.assertEquals("Expected a score of 7.5"
                        , (10 + 5)/2.0
-                       , processor.apply( new HashMap<Object, Object>() {{
+                       , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
                           put("user.type", "admin");
                           put("asset.type", "web");
                                         }}
@@ -116,7 +116,7 @@ public class TriageProcessorTest {
 
     Assert.assertEquals("Expected a score of 0"
                        , 0d
-                       , processor.apply( new HashMap<Object, Object>() {{
+                       , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
                           put("user.type", "foo");
                           put("asset.type", "bar");
                                         }}
