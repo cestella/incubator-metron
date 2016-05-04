@@ -42,13 +42,8 @@ public class Processor implements Function<Map, Double> {
     PredicateProcessor predicateProcessor = new PredicateProcessor();
     VariableResolver resolver = new MapVariableResolver(input);
     for(Map.Entry<String, Number> kv : config.getRiskLevelRules().entrySet()) {
-      try {
-        if(predicateProcessor.parse(kv.getKey(), resolver)) {
-          scores.add(kv.getValue());
-        }
-      }
-      catch(RuntimeException re) {
-        //skip if there's a problem
+      if(predicateProcessor.parse(kv.getKey(), resolver)) {
+        scores.add(kv.getValue());
       }
     }
     return config.getAggregator().aggregate(scores, config.getAggregationConfig());

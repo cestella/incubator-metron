@@ -18,8 +18,10 @@
 
 package org.apache.metron.common.configuration.enrichment.threatintel;
 
+import com.google.common.base.Joiner;
 import org.apache.metron.common.aggregator.Aggregator;
 import org.apache.metron.common.aggregator.Aggregators;
+import org.apache.metron.common.query.PredicateProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,10 @@ public class ThreatTriageConfig {
 
   public void setRiskLevelRules(Map<String, Number> riskLevelRules) {
     this.riskLevelRules = riskLevelRules;
+    PredicateProcessor processor = new PredicateProcessor();
+    for(String rule : riskLevelRules.keySet()) {
+      processor.validate(rule);
+    }
   }
 
   public Aggregator getAggregator() {
@@ -42,7 +48,14 @@ public class ThreatTriageConfig {
   }
 
   public void setAggregator(String aggregator) {
-    this.aggregator = Aggregators.valueOf(aggregator);
+    try {
+      this.aggregator = Aggregators.valueOf(aggregator);
+    }
+    catch(IllegalArgumentException iae) {
+      throw new IllegalArgumentException("Unable to load aggregator of " + aggregator
+                                        + ".  Valid aggregators are " + Joiner.on(',').join(Aggregators.values())
+                                        );
+    }
   }
 
   public Map<String, Object> getAggregationConfig() {

@@ -65,7 +65,8 @@ public class ConfigurationsUtils {
   }
 
   public static void writeGlobalConfigToZookeeper(byte[] globalConfig, CuratorFramework client) throws Exception {
-    writeToZookeeper(Constants.ZOOKEEPER_GLOBAL_ROOT, globalConfig, client);
+    ConfigurationType.GLOBAL.deserialize(new String(globalConfig));
+    writeToZookeeper(ConfigurationType.GLOBAL.getZookeeperRoot(), globalConfig, client);
   }
 
   public static void writeSensorEnrichmentConfigToZookeeper(String sensorType, SensorEnrichmentConfig sensorEnrichmentConfig, String zookeeperUrl) throws Exception {
@@ -84,7 +85,8 @@ public class ConfigurationsUtils {
   }
 
   public static void writeSensorEnrichmentConfigToZookeeper(String sensorType, byte[] configData, CuratorFramework client) throws Exception {
-    writeToZookeeper(Constants.ZOOKEEPER_SENSOR_ROOT + "/" + sensorType, configData, client);
+    ConfigurationType.SENSOR.deserialize(new String(configData));
+    writeToZookeeper(ConfigurationType.SENSOR.getZookeeperRoot()+ "/" + sensorType, configData, client);
   }
 
   public static void writeConfigToZookeeper(String name, Map<String, Object> config, String zookeeperUrl) throws Exception {
@@ -169,20 +171,25 @@ public class ConfigurationsUtils {
   public static void visitConfigs(CuratorFramework client, ConfigurationVisitor callback) throws Exception {
     //Output global configs
     {
-      byte[] globalConfigData = client.getData().forPath(Constants.ZOOKEEPER_GLOBAL_ROOT);
-      callback.visit(ConfigurationType.GLOBAL, "global", new String(globalConfigData));
+      ConfigurationType configType = ConfigurationType.GLOBAL;
+      byte[] globalConfigData = client.getData().forPath(configType.getZookeeperRoot());
+      callback.visit(configType, "global", new String(globalConfigData));
     }
     //Output sensor specific configs
     {
-      List<String> children = client.getChildren().forPath(Constants.ZOOKEEPER_SENSOR_ROOT);
+      ConfigurationType configType = ConfigurationType.SENSOR;
+      List<String> children = client.getChildren().forPath(configType.getZookeeperRoot());
       for (String child : children) {
-        byte[] data = client.getData().forPath(Constants.ZOOKEEPER_SENSOR_ROOT + "/" + child);
-        callback.visit(ConfigurationType.SENSOR, child, new String(data));
+        byte[] data = client.getData().forPath(configType.getZookeeperRoot() + "/" + child);
+        callback.visit(configType, child, new String(data));
       }
     }
   }
   public static void dumpConfigs(PrintStream out, CuratorFramework client) throws Exception {
-    ConfigurationsUtils.visitConfigs(client, (type, name, data) -> out.println(type + " Config: " + name + "\n" + data));
+    ConfigurationsUtils.visitConfigs(client, (type, name, data) -> {
+      type.deserialize(data);
+      out.println(type + " Config: " + name + "\n" + data);
+    });
   }
   public static void dumpConfigs(String zookeeperUrl) throws Exception {
     try (CuratorFramework client = getClient(zookeeperUrl)) {

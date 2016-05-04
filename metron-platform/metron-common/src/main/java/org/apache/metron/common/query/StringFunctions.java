@@ -25,9 +25,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public enum StringFunctions implements Function<List<String>, String> {
-  TO_LOWER(strings -> strings.get(0).toLowerCase())
-  ,TO_UPPER(strings -> strings.get(0).toUpperCase())
-  ,TRIM(strings -> strings.get(0).trim())
+  TO_LOWER(strings -> strings.get(0)==null?null:strings.get(0).toLowerCase())
+  ,TO_UPPER(strings -> strings.get(0) == null?null:strings.get(0).toUpperCase())
+  ,TRIM(strings -> strings.get(0) == null?null:strings.get(0).trim())
   ;
   Function<List<String>, String> func;
   StringFunctions(Function<List<String>, String> func) {

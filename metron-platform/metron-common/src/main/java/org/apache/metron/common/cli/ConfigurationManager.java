@@ -5,7 +5,6 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import org.apache.commons.cli.*;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.ConfigurationsUtils;
 import org.apache.metron.common.configuration.ConfigurationType;
 
@@ -171,15 +170,7 @@ public class ConfigurationManager {
   }
 
   private static File getFile(File baseDir, ConfigurationType configurationType, String name) {
-    if(configurationType == ConfigurationType.GLOBAL) {
-      return new File(baseDir, name + ".json");
-    }
-    else if(configurationType == ConfigurationType.SENSOR){
-      return new File(new File(baseDir, Constants.SENSORS_CONFIG_NAME), name + ".json");
-    }
-    else {
-      throw new UnsupportedOperationException("Unable to visit type of config: " + configurationType);
-    }
+    return new File(new File(baseDir, configurationType.getDirectory()), name + ".json");
   }
 
   public static void main(String... argv) throws Exception {

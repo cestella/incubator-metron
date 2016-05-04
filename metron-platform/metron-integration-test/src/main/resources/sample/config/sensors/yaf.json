@@ -39,6 +39,12 @@
       "ip_dst_addr": [
         "malicious_ip"
       ]
+    },
+    "triageConfig" : {
+      "riskLevelRules" : {
+        "ip_src_addr == '10.0.2.3' or ip_dst_addr == '10.0.2.3'" : 10
+      },
+      "aggregator" : "MAX"
     }
   }
 }
