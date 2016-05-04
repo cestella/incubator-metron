@@ -1,0 +1,163 @@
+package org.apache.metron.common.cli;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
+import org.apache.commons.cli.*;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.metron.common.Constants;
+import org.apache.metron.common.configuration.ConfigurationsUtils;
+import org.apache.metron.common.configuration.ConfigurationType;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+public class ConfigurationManager {
+  public static enum ConfigurationOptions {
+    HELP("h", s -> new Option(s, "help", false, "Generate Help screen"))
+   ,INPUT("i", s -> OptionBuilder.isRequired(false)
+                                 .withLongOpt("input_dir")
+                                 .withArgName("DIR")
+                                 .withDescription("The input directory containing the configuration files named like \"$source.json\"")
+                                 .create(s)
+         )
+    ,OUTPUT("o", s -> OptionBuilder.isRequired(false)
+                                 .withLongOpt("output_dir")
+                                 .withArgName("DIR")
+                                 .withDescription("The output directory which will store the JSON configuration from Zookeeper")
+                                 .create(s)
+         )
+    ,ZK_QUORUM("z", s -> OptionBuilder.isRequired(true)
+                                 .withLongOpt("zk_quorum")
+                                 .withArgName("host:port,[host:port]*")
+                                 .withDescription("Zookeeper Quorum URL (zk1:port,zk2:port,...)")
+                                 .create(s)
+         )
+    ,MODE("m", s -> OptionBuilder.isRequired(true)
+                                 .withLongOpt("mode")
+                                 .withArgName("MODE")
+                                 .withDescription("The mode of operation: DUMP, PULL, PUSH")
+                                 .create(s)
+         )
+    ,FORCE("f", s -> new Option(s, "force", false, "Force operation"))
+    ;
+    Option option;
+    String shortCode;
+    ConfigurationOptions(String shortCode, Function<String, Option> optionHandler) {
+      this.shortCode = shortCode;
+      this.option = optionHandler.apply(shortCode);
+    }
+
+    public boolean has(CommandLine cli) {
+      return cli.hasOption(shortCode);
+    }
+
+    public String get(CommandLine cli) {
+      return cli.getOptionValue(shortCode);
+    }
+
+    public static CommandLine parse(CommandLineParser parser, String[] args) {
+      try {
+        CommandLine cli = parser.parse(getOptions(), args);
+        if(ConfigurationOptions.HELP.has(cli)) {
+          printHelp();
+          System.exit(0);
+        }
+        return cli;
+      } catch (ParseException e) {
+        System.err.println("Unable to parse args: " + Joiner.on(' ').join(args));
+        e.printStackTrace(System.err);
+        printHelp();
+        System.exit(-1);
+        return null;
+      }
+    }
+
+    public static void printHelp() {
+      HelpFormatter formatter = new HelpFormatter();
+      formatter.printHelp( "configuration_manager", getOptions());
+    }
+
+    public static Options getOptions() {
+      Options ret = new Options();
+      for(ConfigurationOptions o : ConfigurationOptions.values()) {
+        ret.addOption(o.option);
+      }
+      return ret;
+    }
+  }
+
+
+
+  private CuratorFramework client;
+  public ConfigurationManager(CuratorFramework client) {
+    this.client = client;
+  }
+
+
+
+  private static File getFile(File baseDir, ConfigurationType configurationType, String name) {
+    if(configurationType == ConfigurationType.GLOBAL) {
+      return new File(baseDir, name);
+    }
+    else if(configurationType == ConfigurationType.SENSOR){
+      return new File(new File(baseDir, Constants.SENSORS_CONFIG_NAME), name);
+    }
+    else {
+      throw new UnsupportedOperationException("Unable to visit type of config: " + configurationType);
+    }
+  }
+
+  public static void main(String... argv) throws Exception {
+    CommandLineParser parser = new PosixParser();
+    CommandLine cli = ConfigurationOptions.parse(parser, argv);
+    try(CuratorFramework client = ConfigurationsUtils.getClient(ConfigurationOptions.ZK_QUORUM.get(cli))) {
+      client.start();
+      ConfigurationManager instance = new ConfigurationManager(client);
+      final boolean force = ConfigurationOptions.FORCE.has(cli);
+      String mode = ConfigurationOptions.MODE.get(cli);
+      if (mode.toLowerCase().equals("push")) {
+        String inputDirStr = ConfigurationOptions.INPUT.get(cli);
+        final File inputDir = new File(inputDirStr);
+        if(inputDir.exists() && inputDir.isDirectory()) {
+          throw new IllegalStateException("Input directory: " + inputDir + " does not exist or is not a directory.");
+        }
+        ConfigurationsUtils.uploadConfigsToZookeeper(inputDirStr, client);
+      }
+      else {
+        switch (mode.toLowerCase()) {
+          case "dump":
+            ConfigurationsUtils.visitConfigs(client, (type, name, data) -> System.out.println("Type: " + name + "\n" + data));
+            break;
+          case "pull":
+            final File outputDir = new File(ConfigurationOptions.OUTPUT.get(cli));
+            if (!outputDir.exists()) {
+              if (!outputDir.mkdirs()) {
+                throw new IllegalStateException("Unable to make directories: " + outputDir.getAbsolutePath());
+              }
+            }
+            ConfigurationsUtils.visitConfigs(client, new ConfigurationsUtils.ConfigurationVisitor() {
+              @Override
+              public void visit(ConfigurationType configurationType, String name, String data) {
+                File out = getFile(outputDir, configurationType, name);
+                if (!out.exists() || force) {
+                  try {
+                    Files.write(data, out, Charset.defaultCharset());
+                  } catch (IOException e) {
+                    throw new RuntimeException("Sorry, something bad happened writing the config to " + out.getAbsolutePath() + ": " + e.getMessage(), e);
+                  }
+                }
+                else if(out.exists() && !force) {
+                  throw new IllegalStateException("Unable to overwrite existing file (" + out.getAbsolutePath() + ") without the force flag (-f or --force) being set.");
+                }
+              }
+            });
+            break;
+          default:
+            throw new RuntimeException("Invalid mode: " + mode + " expected DUMP, PULL or PUSH");
+        }
+      }
+    }
+  }
+}
