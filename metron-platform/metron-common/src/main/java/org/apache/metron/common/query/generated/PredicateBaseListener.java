@@ -181,6 +181,18 @@ public class PredicateBaseListener implements PredicateListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLogicalFunc(PredicateParser.LogicalFuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLogicalFunc(PredicateParser.LogicalFuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterList_entity(PredicateParser.List_entityContext ctx) { }
 	/**
 	 * {@inheritDoc}

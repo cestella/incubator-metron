@@ -59,7 +59,6 @@ public class PredicateProcessorTest {
       put("spaced", "metron is great");
       put("foo.bar", "casey");
     }};
-    PredicateProcessor processor = new PredicateProcessor();
     Assert.assertTrue(run("'casey' == foo.bar", v -> variableMap.get(v)));
     Assert.assertTrue(run("'casey' == foo", v -> variableMap.get(v)));
     Assert.assertFalse(run("'casey' != foo", v -> variableMap.get(v)));
@@ -77,7 +76,6 @@ public class PredicateProcessorTest {
       put("empty", "");
       put("spaced", "metron is great");
     }};
-    PredicateProcessor processor = new PredicateProcessor();
     Assert.assertTrue(run("('casey' == foo) && ( false != true )", v -> variableMap.get(v)));
     Assert.assertFalse(run("('casey' == foo) and (FALSE == TRUE)", v -> variableMap.get(v)));
     Assert.assertFalse(run("'casey' == foo and FALSE", v -> variableMap.get(v)));
@@ -90,7 +88,6 @@ public class PredicateProcessorTest {
       put("empty", "");
       put("spaced", "metron is great");
     }};
-    PredicateProcessor processor = new PredicateProcessor();
     Assert.assertTrue(run("foo in [ 'casey', 'david' ]", v -> variableMap.get(v)));
     Assert.assertTrue(run("foo in [ foo, 'david' ]", v -> variableMap.get(v)));
     Assert.assertTrue(run("foo in [ 'casey', 'david' ] and 'casey' == foo", v -> variableMap.get(v)));
@@ -106,7 +103,6 @@ public class PredicateProcessorTest {
       put("empty", "");
       put("spaced", "metron is great");
     }};
-    PredicateProcessor processor = new PredicateProcessor();
     Assert.assertTrue(run("exists(foo)", v -> variableMap.get(v)));
     Assert.assertFalse(run("exists(bar)", v -> variableMap.get(v)));
     Assert.assertTrue(run("exists(bar) or true", v -> variableMap.get(v)));
@@ -116,13 +112,30 @@ public class PredicateProcessorTest {
   public void testStringFunctions() throws Exception {
     final Map<String, String> variableMap = new HashMap<String, String>() {{
       put("foo", "casey");
+      put("ip", "192.168.0.1");
       put("empty", "");
       put("spaced", "metron is great");
     }};
-    PredicateProcessor processor = new PredicateProcessor();
     Assert.assertTrue(run("true and TO_UPPER(foo) == 'CASEY'", v -> variableMap.get(v)));
     Assert.assertTrue(run("foo in [ TO_LOWER('CASEY'), 'david' ]", v -> variableMap.get(v)));
-    Assert.assertTrue(run("TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ]", v -> variableMap.get(v)));
+    Assert.assertTrue(run("TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ] and IN_SUBNET(ip, '192.168.0.0/24')", v -> variableMap.get(v)));
     Assert.assertFalse(run("TO_LOWER(foo) in [ TO_UPPER('casey'), 'david' ]", v -> variableMap.get(v)));
+  }
+  @Test
+  public void testLogicalFunctions() throws Exception {
+    final Map<String, String> variableMap = new HashMap<String, String>() {{
+      put("foo", "casey");
+      put("ip", "192.168.0.1");
+      put("other_ip", "10.168.0.1");
+      put("empty", "");
+      put("spaced", "metron is great");
+    }};
+    Assert.assertTrue(run("IN_SUBNET(ip, '192.168.0.0/24')", v -> variableMap.get(v)));
+    Assert.assertFalse(run("IN_SUBNET(other_ip, '192.168.0.0/24')", v -> variableMap.get(v)));
+    Assert.assertFalse(run("IN_SUBNET(blah, '192.168.0.0/24')", v -> variableMap.get(v)));
+    Assert.assertTrue(run("true and STARTS_WITH(foo, 'ca')", v -> variableMap.get(v)));
+    Assert.assertTrue(run("true and STARTS_WITH(TO_UPPER(foo), 'CA')", v -> variableMap.get(v)));
+    Assert.assertTrue(run("(true and STARTS_WITH(TO_UPPER(foo), 'CA')) || true", v -> variableMap.get(v)));
+    Assert.assertTrue(run("true and ENDS_WITH(foo, 'sey')", v -> variableMap.get(v)));
   }
 }

@@ -153,14 +153,14 @@ class QueryCompiler extends PredicateBaseListener {
 
   @Override
   public void exitFunc_args(PredicateParser.Func_argsContext ctx) {
-    List<String> args = new ArrayList<>();
+    LinkedList<String> args = new LinkedList<>();
     while(true) {
       PredicateToken<?> token = popStack();
       if(token.getUnderlyingType().equals(FunctionMarker.class)) {
         break;
       }
       else {
-        args.add((String)token.getValue());
+        args.addFirst((String)token.getValue());
       }
     }
     tokenStack.push(new PredicateToken<>(args, List.class));
@@ -206,6 +206,31 @@ class QueryCompiler extends PredicateBaseListener {
       throw new ParseException("Unable to process in clause because " + right.getValue() + " is not a string");
     }
     tokenStack.push(new PredicateToken<>(!set.contains(key), Boolean.class));
+  }
+
+
+  @Override
+  public void exitLogicalFunc(PredicateParser.LogicalFuncContext ctx) {
+    String funcName = ctx.getChild(0).getText();
+    Function<List<String>, Boolean> func;
+    try {
+      func = LogicalFunctions.valueOf(funcName);
+    }
+    catch(IllegalArgumentException iae) {
+      throw new ParseException("Unable to find logical function " + funcName + ".  Valid functions are "
+              + Joiner.on(',').join(LogicalFunctions.values())
+      );
+    }
+    PredicateToken<?> left = popStack();
+    List<String> argList = null;
+    if(left.getUnderlyingType().equals(List.class)) {
+      argList = (List<String>) left.getValue();
+    }
+    else {
+      throw new ParseException("Unable to process in clause because " + left.getValue() + " is not a set");
+    }
+    Boolean result = func.apply(argList);
+    tokenStack.push(new PredicateToken<>(result, Boolean.class));
   }
 
   @Override
