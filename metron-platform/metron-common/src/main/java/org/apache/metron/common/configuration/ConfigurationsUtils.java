@@ -29,6 +29,7 @@ import org.apache.zookeeper.KeeperException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -155,7 +156,9 @@ public class ConfigurationsUtils {
   public static Map<String, byte[]> readSensorEnrichmentConfigsFromFile(String rootPath) throws IOException {
     Map<String, byte[]> sensorEnrichmentConfigs = new HashMap<>();
     for(File file: new File(rootPath, Constants.SENSORS_CONFIG_NAME).listFiles()) {
-      sensorEnrichmentConfigs.put(FilenameUtils.removeExtension(file.getName()), Files.readAllBytes(file.toPath()));
+      if(file.getName().endsWith(".json")) {
+        sensorEnrichmentConfigs.put(FilenameUtils.removeExtension(file.getName()), Files.readAllBytes(file.toPath()));
+      }
     }
     return sensorEnrichmentConfigs;
   }
@@ -178,26 +181,14 @@ public class ConfigurationsUtils {
       }
     }
   }
+  public static void dumpConfigs(PrintStream out, CuratorFramework client) throws Exception {
+    ConfigurationsUtils.visitConfigs(client, (type, name, data) -> out.println(type + " Config: " + name + "\n" + data));
+  }
   public static void dumpConfigs(String zookeeperUrl) throws Exception {
-    CuratorFramework client = getClient(zookeeperUrl);
-    client.start();
-    //Output global configs
-    {
-      System.out.println("Global config");
-      byte[] globalConfigData = client.getData().forPath(Constants.ZOOKEEPER_GLOBAL_ROOT);
-      System.out.println(new String(globalConfigData));
+    try (CuratorFramework client = getClient(zookeeperUrl)) {
+      client.start();
+      dumpConfigs(System.out, client);
     }
-    //Output sensor specific configs
-    {
-      List<String> children = client.getChildren().forPath(Constants.ZOOKEEPER_SENSOR_ROOT);
-      for (String child : children) {
-        byte[] data = client.getData().forPath(Constants.ZOOKEEPER_SENSOR_ROOT + "/" + child);
-        System.out.println("Config for source " + child);
-        System.out.println(new String(data));
-        System.out.println();
-      }
-    }
-    client.close();
   }
 
 

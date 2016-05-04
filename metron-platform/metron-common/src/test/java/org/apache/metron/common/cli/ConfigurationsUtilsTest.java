@@ -74,7 +74,7 @@ public class ConfigurationsUtilsTest {
 
   }
 
-  @Test
+  /*@Test
   public void testCmdLine() throws Exception {
     String[] args = {"-z", zookeeperUrl, "-p", TestConstants.SAMPLE_CONFIG_PATH};
     ConfigurationsUtils.main(args);
@@ -84,7 +84,7 @@ public class ConfigurationsUtilsTest {
       byte[] readSensorConfigBytes = ConfigurationsUtils.readSensorEnrichmentConfigBytesFromZookeeper(sensorType, client);
       Assert.assertTrue(Arrays.equals(testSensorConfigMap.get(sensorType), readSensorConfigBytes));
     }
-  }
+  }*/
 
   @After
   public void tearDown() throws IOException {
