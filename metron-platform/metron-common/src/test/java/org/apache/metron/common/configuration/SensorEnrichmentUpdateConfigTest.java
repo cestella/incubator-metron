@@ -46,7 +46,13 @@ public class SensorEnrichmentUpdateConfigTest {
         "fieldToTypeMap": {
           "ip_dst_addr" : [ "malicious_ip" ]
          ,"ip_src_addr" : [ "malicious_ip" ]
-                          }
+                          },
+        "triageConfig" : {
+          "riskLevelRules" : {
+            "not(IN_SUBNET(ip_dst_addr, '192.168.0.0/24'))" : 10
+                             },
+          "aggregator" : "MAX"
+                        }
       }
     }
    */
@@ -73,7 +79,7 @@ public class SensorEnrichmentUpdateConfigTest {
   @Test
   public void testThreatIntel() throws Exception {
 
-    SensorEnrichmentConfig broSc = JSONUtils.INSTANCE.load(sourceConfigStr, SensorEnrichmentConfig.class);
+    SensorEnrichmentConfig broSc = (SensorEnrichmentConfig) ConfigurationType.SENSOR.deserialize(sourceConfigStr);
 
 
     SensorEnrichmentUpdateConfig config = JSONUtils.INSTANCE.load(threatIntelConfigStr, SensorEnrichmentUpdateConfig.class);
@@ -101,6 +107,7 @@ public class SensorEnrichmentUpdateConfigTest {
                        , outputScs.get("bro").getThreatIntel().getFieldMap().get(Constants.SIMPLE_HBASE_THREAT_INTEL).size()
                        , 2
                        );
+    Assert.assertEquals(1, outputScs.get("bro").getThreatIntel().getTriageConfig().getRiskLevelRules().size());
     Assert.assertTrue( outputScs.get("bro").toJSON()
                        , outputScs.get("bro").getThreatIntel().getFieldMap()
                                   .get(Constants.SIMPLE_HBASE_THREAT_INTEL)

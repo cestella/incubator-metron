@@ -264,6 +264,12 @@ class QueryCompiler extends PredicateBaseListener {
     tokenStack.push(new PredicateToken<>(exists, Boolean.class));
   }
 
+  @Override
+  public void exitNotFunc(PredicateParser.NotFuncContext ctx) {
+    PredicateToken<Boolean> arg = (PredicateToken<Boolean>) popStack();
+    tokenStack.push(new PredicateToken<>(!arg.getValue(), Boolean.class));
+  }
+
   public boolean getResult() throws ParseException {
     if(tokenStack.empty()) {
       throw new ParseException("Invalid predicate: Empty stack.");

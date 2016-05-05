@@ -76,6 +76,8 @@ public class PredicateProcessorTest {
       put("empty", "");
       put("spaced", "metron is great");
     }};
+    Assert.assertFalse(run("not('casey' == foo and true)", v -> variableMap.get(v)));
+    Assert.assertTrue(run("not(not('casey' == foo and true))", v -> variableMap.get(v)));
     Assert.assertTrue(run("('casey' == foo) && ( false != true )", v -> variableMap.get(v)));
     Assert.assertFalse(run("('casey' == foo) and (FALSE == TRUE)", v -> variableMap.get(v)));
     Assert.assertFalse(run("'casey' == foo and FALSE", v -> variableMap.get(v)));
@@ -126,16 +128,25 @@ public class PredicateProcessorTest {
     final Map<String, String> variableMap = new HashMap<String, String>() {{
       put("foo", "casey");
       put("ip", "192.168.0.1");
+      put("ip_src_addr", "192.168.0.1");
+      put("ip_dst_addr", "10.0.0.1");
       put("other_ip", "10.168.0.1");
       put("empty", "");
       put("spaced", "metron is great");
     }};
     Assert.assertTrue(run("IN_SUBNET(ip, '192.168.0.0/24')", v -> variableMap.get(v)));
+    Assert.assertTrue(run("IN_SUBNET(ip, '192.168.0.0/24', '11.0.0.0/24')", v -> variableMap.get(v)));
+    Assert.assertFalse(run("IN_SUBNET(ip_dst_addr, '192.168.0.0/24', '11.0.0.0/24')", v -> variableMap.get(v)));
     Assert.assertFalse(run("IN_SUBNET(other_ip, '192.168.0.0/24')", v -> variableMap.get(v)));
     Assert.assertFalse(run("IN_SUBNET(blah, '192.168.0.0/24')", v -> variableMap.get(v)));
     Assert.assertTrue(run("true and STARTS_WITH(foo, 'ca')", v -> variableMap.get(v)));
     Assert.assertTrue(run("true and STARTS_WITH(TO_UPPER(foo), 'CA')", v -> variableMap.get(v)));
     Assert.assertTrue(run("(true and STARTS_WITH(TO_UPPER(foo), 'CA')) || true", v -> variableMap.get(v)));
     Assert.assertTrue(run("true and ENDS_WITH(foo, 'sey')", v -> variableMap.get(v)));
+    Assert.assertTrue(run("not(IN_SUBNET(ip_src_addr, '192.168.0.0/24') and IN_SUBNET(ip_dst_addr, '192.168.0.0/24'))", v-> variableMap.get(v)));
+    Assert.assertTrue(run("IN_SUBNET(ip_src_addr, '192.168.0.0/24')", v-> variableMap.get(v)));
+    Assert.assertFalse(run("not(IN_SUBNET(ip_src_addr, '192.168.0.0/24'))", v-> variableMap.get(v)));
+    Assert.assertFalse(run("IN_SUBNET(ip_dst_addr, '192.168.0.0/24')", v-> variableMap.get(v)));
+    Assert.assertTrue(run("not(IN_SUBNET(ip_dst_addr, '192.168.0.0/24'))", v-> variableMap.get(v)));
   }
 }

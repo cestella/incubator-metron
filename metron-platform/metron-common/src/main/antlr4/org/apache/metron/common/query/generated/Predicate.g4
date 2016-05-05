@@ -43,12 +43,18 @@ grammar Predicate;
 
 AND : 'and'
     | '&&'
+    | 'AND'
     ;
 OR  : 'or'
-    | '||';
+    | '||'
+    | 'OR';
+
+NOT : 'not'
+    | 'NOT';
 
 TRUE  : 'true'
       | 'TRUE' ;
+
 FALSE : 'false'
       | 'FALSE';
 
@@ -90,6 +96,7 @@ logical_expr
  | logical_expr OR logical_expr  # LogicalExpressionOr
  | comparison_expr               # ComparisonExpression
  | LPAREN logical_expr RPAREN    # LogicalExpressionInParen
+ | NOT LPAREN logical_expr RPAREN #NotFunc
  | logical_entity                # LogicalEntity
  ;
 

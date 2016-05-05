@@ -34,14 +34,24 @@ public enum LogicalFunctions implements Function<List<String>, Boolean> {
   })
   ,IN_SUBNET( list -> {
     if(list.size() < 2) {
-      throw new IllegalStateException("IN_SUBNET expects two args: [ip, cidr] where cidr is the subnet mask in cidr form");
+      throw new IllegalStateException("IN_SUBNET expects at least two args: [ip, cidr1, cidr2, ...]"
+                                     + " where cidr is the subnet mask in cidr form"
+                                     );
     }
-    String cidr = list.get(1);
     String ip = list.get(0);
-    if(cidr == null || ip == null) {
+    if(ip == null) {
       return false;
     }
-    return new SubnetUtils(cidr).getInfo().isInRange(ip);
+    boolean inSubnet = false;
+    for(int i = 1;i < list.size() && !inSubnet;++i) {
+      String cidr = list.get(1);
+      if(cidr == null) {
+        continue;
+      }
+      inSubnet |= new SubnetUtils(cidr).getInfo().isInRange(ip);
+    }
+
+    return inSubnet;
   })
   ,STARTS_WITH( list -> {
     if(list.size() < 2) {

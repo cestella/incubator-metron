@@ -75,6 +75,18 @@ public interface PredicateListener extends ParseTreeListener {
 	 */
 	void exitLogicalExpressionInParen(PredicateParser.LogicalExpressionInParenContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code NotFunc}
+	 * labeled alternative in {@link PredicateParser#logical_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterNotFunc(PredicateParser.NotFuncContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code NotFunc}
+	 * labeled alternative in {@link PredicateParser#logical_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitNotFunc(PredicateParser.NotFuncContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code LogicalExpressionAnd}
 	 * labeled alternative in {@link PredicateParser#logical_expr}.
 	 * @param ctx the parse tree
