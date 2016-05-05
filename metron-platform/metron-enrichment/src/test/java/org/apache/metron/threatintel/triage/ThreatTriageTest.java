@@ -49,6 +49,15 @@ public class ThreatTriageTest {
   @Test
   public void smokeTest() throws Exception {
     ThreatTriageProcessor threatTriageProcessor = getProcessor(smokeTestProcessorConfig);
+    Assert.assertEquals("Expected a score of 0"
+                       , 0d
+                       ,new ThreatTriageProcessor(new ThreatTriageConfig()).apply(new HashMap<Object, Object>() {{
+                          put("user.type", "admin");
+                          put("asset.type", "web");
+                                        }}
+                                        )
+                       , 1e-10
+                       );
     Assert.assertEquals("Expected a score of 10"
                        , 10d
                        , threatTriageProcessor.apply(new HashMap<Object, Object>() {{
