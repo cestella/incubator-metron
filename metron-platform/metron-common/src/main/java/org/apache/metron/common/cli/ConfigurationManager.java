@@ -33,7 +33,7 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
 public class ConfigurationManager {
-  public static enum ConfigurationOptions {
+  public enum ConfigurationOptions {
     HELP("h", s -> new Option(s, "help", false, "Generate Help screen"))
    ,INPUT("i", s -> OptionBuilder.isRequired(false)
                                  .withLongOpt("input_dir")

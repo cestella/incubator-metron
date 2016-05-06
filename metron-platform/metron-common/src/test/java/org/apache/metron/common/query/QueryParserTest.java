@@ -24,7 +24,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PredicateProcessorTest {
+public class QueryParserTest {
 
   @Test
   public void testValidation() throws Exception {

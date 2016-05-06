@@ -48,6 +48,10 @@ public class EnrichmentJoinBolt extends JoinBolt<JSONObject> {
   public Set<String> getStreamIds(JSONObject message) {
     Set<String> streamIds = new HashSet<>();
     String sourceType = MessageUtils.getSensorType(message);
+    if(sourceType == null) {
+      String errorMessage = "Unable to find source type for message: " + message;
+      throw new IllegalStateException(errorMessage);
+    }
     Map<String, List<String>>  fieldMap = getFieldMap(sourceType);
     if(fieldMap != null) {
       for (String enrichmentType : getFieldMap(sourceType).keySet()) {

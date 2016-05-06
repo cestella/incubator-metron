@@ -29,6 +29,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 import org.apache.metron.common.bolt.ConfiguredBolt;
+import org.apache.metron.common.utils.ErrorUtils;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
@@ -108,8 +110,8 @@ public abstract class JoinBolt<V> extends ConfiguredBolt {
                                   , joinMessages(streamMessageMap)
                                   )
                       );
-        collector.ack(tuple);
         cache.invalidate(key);
+        collector.ack(tuple);
       } else {
         cache.put(key, streamMessageMap);
         if(LOG.isDebugEnabled()) {
@@ -118,15 +120,19 @@ public abstract class JoinBolt<V> extends ConfiguredBolt {
                    );
         }
       }
-    } catch (ExecutionException e) {
+    } catch (Exception e) {
+      LOG.error("[Metron] Unable to join messages: " + message, e);
+      JSONObject error = ErrorUtils.generateErrorMessage("Joining problem: " + message, e);
+      collector.ack(tuple);
+      collector.emit("error", new Values(error));
       collector.reportError(e);
-      LOG.error(e.getMessage(), e);
     }
   }
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     declarer.declareStream("message", new Fields("key", "message"));
+    declarer.declareStream("error", new Fields("message"));
   }
 
   public abstract void prepare(Map map, TopologyContext topologyContext);

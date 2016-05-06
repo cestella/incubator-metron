@@ -97,4 +97,5 @@ public class ThreatTriageConfig {
     result = 31 * result + (getAggregationConfig() != null ? getAggregationConfig().hashCode() : 0);
     return result;
   }
+
 }

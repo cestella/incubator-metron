@@ -17,6 +17,12 @@
       {
       "ip_src_addr" : ["malicious_ip"],
       "ip_dst_addr" : ["malicious_ip"]
+    },
+    "triageConfig" : {
+      "riskLevelRules" : {
+        "not(IN_SUBNET(ip_dst_addr, '192.168.0.0/24'))" : 10
+      },
+      "aggregator" : "MAX"
     }
   }
 }
