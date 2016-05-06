@@ -43,7 +43,7 @@ The enrichment configuration contains two fields:
 
 | Field            | Description                                                                                                                                                                                                                      | Example                                                                   |
 |------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-| `fieldToTypeMap` | In the case of a simple HBase enrichment (i.e. a key/value lookup), the mapping between fields and the enrichment types associated with those fields must be known.  This enrichment type is used as part of the HBase key. | ```json "fieldToTypeMap" : { "ip_src_addr" : [ "asset_enrichment" ] }     |
+| `fieldToTypeMap` | In the case of a simple HBase enrichment (i.e. a key/value lookup), the mapping between fields and the enrichment types associated with those fields must be known.  This enrichment type is used as part of the HBase key. | ```json "fieldToTypeMap" : { "ip_src_addr" : [ "asset_enrichment" ] }```  |
 | `fieldMap`       | The map of enrichment bolts names to fields in the JSON messages.,Each field is sent to the enrichment referenced in the key.                                                                                                    | ```json "fieldMap": {"hbaseEnrichment": ["ip_src_addr","ip_dst_addr"]}``` |
 
 ###The `threatIntel` Configuration 
