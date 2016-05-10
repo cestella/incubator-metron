@@ -16,8 +16,13 @@
  * limitations under the License.
  */
 
-package org.apache.metron.parsers.integration.validation;
+package org.apache.metron.parsers.integration.parsers;
 
-@ValidationHandler(parser="squid")
-public class SquidValidation extends SampleDataValidation {
+import org.apache.metron.parsers.integration.ParserIntegrationTest;
+
+public class SnortIntegrationTest extends ParserIntegrationTest {
+  @Override
+  public String getParserName() {
+    return "snort";
+  }
 }

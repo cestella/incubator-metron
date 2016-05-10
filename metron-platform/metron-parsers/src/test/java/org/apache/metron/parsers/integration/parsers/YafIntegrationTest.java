@@ -16,8 +16,13 @@
  * limitations under the License.
  */
 
-package org.apache.metron.parsers.integration.validation;
+package org.apache.metron.parsers.integration.parsers;
 
-@ValidationHandler(parser="yaf")
-public class YafValidation extends SampleDataValidation {
+import org.apache.metron.parsers.integration.ParserIntegrationTest;
+
+public class YafIntegrationTest extends ParserIntegrationTest{
+  @Override
+  public String getParserName() {
+    return "yaf";
+  }
 }

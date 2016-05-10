@@ -16,8 +16,20 @@
  * limitations under the License.
  */
 
-package org.apache.metron.parsers.integration.validation;
+package org.apache.metron.parsers.integration.parsers;
 
-@ValidationHandler(parser="bro")
-public class BroValidation extends SampleDataValidation {
+import com.google.common.collect.ImmutableList;
+import org.apache.metron.parsers.integration.ParserIntegrationTest;
+import org.apache.metron.parsers.integration.ParserValidation;
+
+import java.util.List;
+
+public class BluecoatIntegrationTest extends ParserIntegrationTest {
+
+  @Override
+  protected String getParserName() {
+    return "bluecoat";
+  }
+
+
 }
