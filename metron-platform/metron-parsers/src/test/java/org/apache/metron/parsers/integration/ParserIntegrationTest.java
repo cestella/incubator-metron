@@ -25,6 +25,7 @@ import org.apache.metron.integration.components.ConfigUploadComponent;
 import org.apache.metron.integration.utils.TestUtils;
 import org.apache.metron.parsers.integration.components.ParserTopologyComponent;
 import org.apache.metron.parsers.integration.validation.SampleDataValidation;
+import org.apache.metron.parsers.integration.validation.ValidationHandler;
 import org.apache.metron.test.TestDataType;
 import org.apache.metron.test.utils.SampleDataUtils;
 import org.apache.metron.test.utils.UnitTestHelper;
@@ -36,10 +37,13 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class ParserIntegrationTest extends BaseIntegrationTest {
@@ -50,23 +54,25 @@ public class ParserIntegrationTest extends BaseIntegrationTest {
   private Map<String, List<ParserValidation>> sensorValidations;
 
   @Before
-  public void configureValidations() {
+  public void configureValidations() throws Exception {
     sensorValidations = new HashMap<>();
-    sensorValidations.put("bluecoat", new ArrayList<ParserValidation>() {{
-      add(new SampleDataValidation());
-    }});
-    sensorValidations.put("bro", new ArrayList<ParserValidation>() {{
-      add(new SampleDataValidation());
-    }});
-    sensorValidations.put("snort", new ArrayList<ParserValidation>() {{
-      add(new SampleDataValidation());
-    }});
-    sensorValidations.put("squid", new ArrayList<ParserValidation>() {{
-      add(new SampleDataValidation());
-    }});
-    sensorValidations.put("yaf", new ArrayList<ParserValidation>() {{
-      add(new SampleDataValidation());
-    }});
+    for(Class<?> validator : new Reflections("org.apache.metron.parsers.integration").getTypesAnnotatedWith(ValidationHandler.class)) {
+      String parserName = null;
+      for(Annotation a : validator.getAnnotations()) {
+        if(a.annotationType().equals(ValidationHandler.class)) {
+          Method m  = a.annotationType().getMethod("parser", null);
+          parserName = (String)m.invoke(null);
+          break;
+        }
+      }
+      ParserValidation v = (ParserValidation) validator.newInstance();
+      List<ParserValidation> validations = sensorValidations.get(parserName);
+      if(validations == null) {
+        validations = new ArrayList<>();
+      }
+      validations.add(v);
+      sensorValidations.put(parserName, validations);
+    }
   }
 
   @Test
