@@ -15,24 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.common.interfaces;
 
-import backtype.storm.tuple.Tuple;
-import org.apache.metron.common.configuration.Configurations;
+package org.apache.metron.common.configuration.writer;
+
 import org.apache.metron.common.configuration.EnrichmentConfigurations;
-import org.apache.metron.common.configuration.writer.WriterConfiguration;
 
-import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
-public interface BulkMessageWriter<MESSAGE_T> extends AutoCloseable, Serializable {
+public class EnrichmentWriterConfiguration implements WriterConfiguration{
+  private EnrichmentConfigurations config;
 
-  void init(Map stormConf, WriterConfiguration config) throws Exception;
-  void write( String sensorType
-            , WriterConfiguration configurations
-            , Iterable<Tuple> tuples
-            , List<MESSAGE_T> messages
-            ) throws Exception;
+  public EnrichmentWriterConfiguration(EnrichmentConfigurations config) {
+    this.config = config;
+  }
 
+  @Override
+  public int getBatchSize(String sensorName) {
+    return config.getSensorEnrichmentConfig(sensorName).getBatchSize();
+  }
+
+  @Override
+  public String getIndex(String sensorName) {
+    return config.getSensorEnrichmentConfig(sensorName).getIndex();
+  }
+
+  @Override
+  public Map<String, Object> getSensorConfig(String sensorName) {
+    return config.getSensorEnrichmentConfig(sensorName).getConfiguration();
+  }
+  @Override
+  public Map<String, Object> getGlobalConfig() {
+    return config.getGlobalConfig();
+  }
 }

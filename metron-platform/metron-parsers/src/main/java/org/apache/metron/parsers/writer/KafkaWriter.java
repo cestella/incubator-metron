@@ -22,6 +22,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.Configurations;
+import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.MessageWriter;
 import org.json.simple.JSONObject;
 
@@ -68,7 +69,7 @@ public class KafkaWriter implements MessageWriter<JSONObject>, Serializable {
 
   @SuppressWarnings("unchecked")
   @Override
-  public void write(String sourceType, Configurations configurations, Tuple tuple, JSONObject message) throws Exception {
+  public void write(String sourceType, WriterConfiguration configurations, Tuple tuple, JSONObject message) throws Exception {
     kafkaProducer.send(new ProducerRecord<String, String>(Constants.ENRICHMENT_TOPIC, message.toJSONString()));
   }
 

@@ -15,24 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.common.interfaces;
 
-import backtype.storm.tuple.Tuple;
-import org.apache.metron.common.configuration.Configurations;
-import org.apache.metron.common.configuration.EnrichmentConfigurations;
-import org.apache.metron.common.configuration.writer.WriterConfiguration;
+package org.apache.metron.common.configuration.writer;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
-public interface BulkMessageWriter<MESSAGE_T> extends AutoCloseable, Serializable {
-
-  void init(Map stormConf, WriterConfiguration config) throws Exception;
-  void write( String sensorType
-            , WriterConfiguration configurations
-            , Iterable<Tuple> tuples
-            , List<MESSAGE_T> messages
-            ) throws Exception;
-
+public interface WriterConfiguration extends Serializable {
+  int getBatchSize(String sensorName);
+  String getIndex(String sensorName);
+  Map<String, Object> getSensorConfig(String sensorName);
+  Map<String, Object> getGlobalConfig();
 }

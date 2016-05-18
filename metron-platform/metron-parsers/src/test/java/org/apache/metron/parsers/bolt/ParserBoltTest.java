@@ -17,6 +17,7 @@
  */
 package org.apache.metron.parsers.bolt;
 
+import org.apache.metron.common.configuration.writer.ParserWriterConfiguration;
 import org.apache.metron.test.bolt.BaseBoltTest;
 import org.apache.metron.common.configuration.Configurations;
 import org.apache.metron.parsers.interfaces.MessageFilter;
@@ -73,7 +74,7 @@ public class ParserBoltTest extends BaseBoltTest {
     when(parser.validate(eq(messages.get(0)))).thenReturn(true);
     when(parser.validate(eq(messages.get(1)))).thenReturn(false);
     parserBolt.execute(tuple);
-    verify(writer, times(1)).write(eq(sensorType), any(Configurations.class), eq(tuple), eq(finalMessage1));
+    verify(writer, times(1)).write(eq(sensorType), any(ParserWriterConfiguration.class), eq(tuple), eq(finalMessage1));
     verify(outputCollector, times(1)).ack(tuple);
     when(parser.validate(eq(messages.get(0)))).thenReturn(true);
     when(parser.validate(eq(messages.get(1)))).thenReturn(true);
@@ -81,9 +82,9 @@ public class ParserBoltTest extends BaseBoltTest {
     when(filter.emitTuple(messages.get(1))).thenReturn(true);
     parserBolt.withMessageFilter(filter);
     parserBolt.execute(tuple);
-    verify(writer, times(1)).write(eq(sensorType), any(Configurations.class), eq(tuple), eq(finalMessage2));
+    verify(writer, times(1)).write(eq(sensorType), any(ParserWriterConfiguration.class), eq(tuple), eq(finalMessage2));
     verify(outputCollector, times(2)).ack(tuple);
-    doThrow(new Exception()).when(writer).write(eq(sensorType), any(Configurations.class), eq(tuple), eq(finalMessage2));
+    doThrow(new Exception()).when(writer).write(eq(sensorType), any(ParserWriterConfiguration.class), eq(tuple), eq(finalMessage2));
     parserBolt.execute(tuple);
     verify(outputCollector, times(1)).reportError(any(Throwable.class));
   }

@@ -76,7 +76,7 @@ public class CSVExtractor implements Extractor {
     String[] tokens = parser.parseLine(line);
 
     LookupKey key = converter.toKey(getType(tokens), tokens[indicatorColumn]);
-    Map<String, String> values = new HashMap<>();
+    Map<String, Object> values = new HashMap<>();
     for(Map.Entry<String, Integer> kv : columnMap.entrySet()) {
       values.put(kv.getKey(), tokens[kv.getValue()]);
     }

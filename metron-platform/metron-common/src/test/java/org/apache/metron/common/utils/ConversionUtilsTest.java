@@ -15,24 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.common.interfaces;
 
-import backtype.storm.tuple.Tuple;
-import org.apache.metron.common.configuration.Configurations;
-import org.apache.metron.common.configuration.EnrichmentConfigurations;
-import org.apache.metron.common.configuration.writer.WriterConfiguration;
+package org.apache.metron.common.utils;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
 
-public interface BulkMessageWriter<MESSAGE_T> extends AutoCloseable, Serializable {
-
-  void init(Map stormConf, WriterConfiguration config) throws Exception;
-  void write( String sensorType
-            , WriterConfiguration configurations
-            , Iterable<Tuple> tuples
-            , List<MESSAGE_T> messages
-            ) throws Exception;
-
+public class ConversionUtilsTest {
+  @Test
+  public void testIntegerConversions() {
+    Object o = new Integer(1);
+    Assert.assertEquals(new Integer(1), ConversionUtils.convert(o, Integer.class));
+    Assert.assertEquals(new Integer(1), ConversionUtils.convert("1", Integer.class));
+  }
 }
