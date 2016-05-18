@@ -100,7 +100,6 @@ public class ParserBolt extends ConfiguredParserBolt implements Serializable {
     else {
       writerTransformer = config -> new SingleBatchConfigurationFacade(new ParserWriterConfiguration(config));
     }
-
     try {
       messageWriter.init(stormConf, writerTransformer.apply(getConfigurations()));
     } catch (Exception e) {
@@ -112,6 +111,7 @@ public class ParserBolt extends ConfiguredParserBolt implements Serializable {
         return new HashSet<>();
       }
     };
+    parser.configure(getConfigurations().getSensorParserConfig(sensorType).getParserConfig());
   }
 
   @SuppressWarnings("unchecked")

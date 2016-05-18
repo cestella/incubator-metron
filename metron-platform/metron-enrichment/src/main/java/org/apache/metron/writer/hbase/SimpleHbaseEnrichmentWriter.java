@@ -32,12 +32,14 @@ import org.apache.metron.common.configuration.writer.ParserWriterConfiguration;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
 import org.apache.metron.common.utils.ConversionUtils;
+import org.apache.metron.common.utils.ReflectionUtils;
 import org.apache.metron.common.writer.AbstractWriter;
 import org.apache.metron.enrichment.converter.EnrichmentConverter;
 import org.apache.metron.enrichment.converter.EnrichmentKey;
 import org.apache.metron.enrichment.converter.EnrichmentValue;
 import org.apache.metron.enrichment.converter.HbaseConverter;
 import org.apache.metron.hbase.HTableProvider;
+import org.apache.metron.hbase.TableProvider;
 import org.json.simple.JSONObject;
 
 import java.io.Closeable;
@@ -54,6 +56,7 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
     ,KEY_COLUMNS("shew.keyColumns")
     ,KEY_DELIM("shew.keyDelim")
     ,ENRICHMENT_TYPE("shew.enrichmentType")
+    ,HBASE_PROVIDER("shew.hbaseProvider")
     ;
     String key;
     Configurations(String key) {
@@ -99,11 +102,11 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
       }).collect(Collectors.joining(delim));
     }
   }
-  private EnrichmentConverter converter = new EnrichmentConverter();
+  private EnrichmentConverter converter;
   private String tableName;
   private String cf;
   private HTableInterface table;
-  private HTableProvider provider;
+  private TableProvider provider;
   private Map.Entry<Object, KeyTransformer> keyTransformer;
 
   public SimpleHbaseEnrichmentWriter() {
@@ -111,15 +114,20 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
 
   @Override
   public void configure(String sensorName, WriterConfiguration configuration) {
-
+    String hbaseProviderImpl = Configurations.HBASE_PROVIDER.getAndConvert(configuration.getSensorConfig(sensorName),String.class);
+    if(hbaseProviderImpl != null) {
+      provider = ReflectionUtils.createInstance(hbaseProviderImpl);
+    }
   }
 
   @Override
   public void init(Map stormConf, WriterConfiguration configuration) throws Exception {
+    converter = new EnrichmentConverter();
   }
 
-  protected synchronized HTableProvider getProvider() {
+  protected synchronized TableProvider getProvider() {
     if(provider == null) {
+
       provider = new HTableProvider();
     }
     return provider;
@@ -173,7 +181,7 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
   private KeyTransformer getTransformer(Map<String, Object> config) {
     Object o = Configurations.KEY_COLUMNS.get(config);
     KeyTransformer transformer = null;
-    if(keyTransformer.getKey() == o) {
+    if(keyTransformer != null && keyTransformer.getKey() == o) {
       return keyTransformer.getValue();
     }
     else {

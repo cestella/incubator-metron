@@ -27,5 +27,6 @@ public class ConversionUtilsTest {
     Object o = new Integer(1);
     Assert.assertEquals(new Integer(1), ConversionUtils.convert(o, Integer.class));
     Assert.assertEquals(new Integer(1), ConversionUtils.convert("1", Integer.class));
+    Assert.assertNull(ConversionUtils.convert("foo", Integer.class));
   }
 }
