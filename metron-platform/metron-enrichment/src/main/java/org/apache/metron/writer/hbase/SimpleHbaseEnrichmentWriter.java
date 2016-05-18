@@ -32,6 +32,7 @@ import org.apache.metron.common.configuration.writer.ParserWriterConfiguration;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
 import org.apache.metron.common.utils.ConversionUtils;
+import org.apache.metron.common.writer.AbstractWriter;
 import org.apache.metron.enrichment.converter.EnrichmentConverter;
 import org.apache.metron.enrichment.converter.EnrichmentKey;
 import org.apache.metron.enrichment.converter.EnrichmentValue;
@@ -46,7 +47,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SimpleHbaseEnrichmentWriter implements BulkMessageWriter<JSONObject>, Serializable {
+public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkMessageWriter<JSONObject>, Serializable {
   public enum Configurations {
     HBASE_TABLE("shew.table")
     ,HBASE_CF("shew.cf")
@@ -109,6 +110,11 @@ public class SimpleHbaseEnrichmentWriter implements BulkMessageWriter<JSONObject
   }
 
   @Override
+  public void configure(String sensorName, WriterConfiguration configuration) {
+
+  }
+
+  @Override
   public void init(Map stormConf, WriterConfiguration configuration) throws Exception {
   }
 
@@ -129,6 +135,9 @@ public class SimpleHbaseEnrichmentWriter implements BulkMessageWriter<JSONObject
       {
         Configuration conf = HBaseConfiguration.create();
         //new table connection
+        if(table != null) {
+          table.close();
+        }
         table = getProvider().getTable(conf, tableName);
         this.tableName = tableName;
         this.cf = cf;
