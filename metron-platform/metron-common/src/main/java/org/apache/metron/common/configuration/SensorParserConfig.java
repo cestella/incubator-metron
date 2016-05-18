@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.metron.common.utils.JSONUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class SensorParserConfig {
   private String parserClassName;
   private String sensorTopic;
   private String writerClassName;
-  private Map<String, Object> parserConfig;
+  private Map<String, Object> parserConfig = new HashMap<>();
 
   public String getWriterClassName() {
     return writerClassName;
