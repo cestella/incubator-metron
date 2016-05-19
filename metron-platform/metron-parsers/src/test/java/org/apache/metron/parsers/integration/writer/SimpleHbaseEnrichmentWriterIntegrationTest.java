@@ -1,3 +1,21 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.metron.parsers.integration.writer;
 
 import com.google.common.collect.ImmutableList;
@@ -88,57 +106,64 @@ public class SimpleHbaseEnrichmentWriterIntegrationTest extends BaseIntegrationT
             .withMillisecondsBetweenAttempts(5000)
             .withNumRetries(10)
             .build();
-    runner.start();
-    kafkaComponent.writeMessages(sensorType, inputMessages);
-    List<LookupKV<EnrichmentKey, EnrichmentValue>> outputMessages =
-            runner.process(new Processor<List<LookupKV<EnrichmentKey, EnrichmentValue>>>() {
-              List<LookupKV<EnrichmentKey, EnrichmentValue>> messages = null;
+    try {
+      runner.start();
+      kafkaComponent.writeMessages(sensorType, inputMessages);
+      List<LookupKV<EnrichmentKey, EnrichmentValue>> outputMessages =
+              runner.process(new Processor<List<LookupKV<EnrichmentKey, EnrichmentValue>>>() {
+                List<LookupKV<EnrichmentKey, EnrichmentValue>> messages = null;
 
-              public ReadinessState process(ComponentRunner runner) {
-                MockHTable table =  MockTableProvider.getTable(sensorType);
-                if(table != null && table.size() == inputMessages.size()) {
-                  EnrichmentConverter converter = new EnrichmentConverter();
-                  messages = new ArrayList<>();
-                  try {
-                    for(Result r : table.getScanner(Bytes.toBytes("cf"))) {
-                      messages.add(converter.fromResult(r, "cf"));
+                public ReadinessState process(ComponentRunner runner) {
+                  MockHTable table = MockTableProvider.getTable(sensorType);
+                  if (table != null && table.size() == inputMessages.size()) {
+                    EnrichmentConverter converter = new EnrichmentConverter();
+                    messages = new ArrayList<>();
+                    try {
+                      for (Result r : table.getScanner(Bytes.toBytes("cf"))) {
+                        messages.add(converter.fromResult(r, "cf"));
+                      }
+                    } catch (IOException e) {
                     }
-                  } catch (IOException e) {
+                    return ReadinessState.READY;
                   }
-                  return ReadinessState.READY;
+                  return ReadinessState.NOT_READY;
                 }
-                return ReadinessState.NOT_READY;
-              }
 
-              public List<LookupKV<EnrichmentKey, EnrichmentValue>> getResult() {
-                return messages;
-              }
-            });
-    Set<String> validIndicators = new HashSet<>(ImmutableList.of("col12", "col22", "col32"));
-    Map<String, Map<String, String>> validMetadata = new HashMap<String, Map<String, String>>() {{
-      put("col12", new HashMap<String, String>() {{
-        put("col1", "col11");
-        put("col3", "col13");
-      }});
-      put("col22", new HashMap<String, String>() {{
-        put("col1", "col21");
-        put("col3", "col23");
-      }});
-      put("col32", new HashMap<String, String>() {{
-        put("col1", "col31");
-        put("col3", "col33");
-      }});
-    }};
-    for(LookupKV<EnrichmentKey, EnrichmentValue> kv : outputMessages) {
-      Assert.assertTrue(validIndicators.contains(kv.getKey().indicator));
-      Assert.assertEquals(kv.getValue().getMetadata().get("source.type"), "dummy");
-      Assert.assertNotNull(kv.getValue().getMetadata().get("timestamp"));
-      Assert.assertNotNull(kv.getValue().getMetadata().get("original_string"));
-      Map<String, String> metadata = validMetadata.get(kv.getKey().indicator);
-      for(Map.Entry<String, String> x : metadata.entrySet()) {
-        Assert.assertEquals(kv.getValue().getMetadata().get(x.getKey()), x.getValue());
+                public List<LookupKV<EnrichmentKey, EnrichmentValue>> getResult() {
+                  return messages;
+                }
+              });
+      Set<String> validIndicators = new HashSet<>(ImmutableList.of("col12", "col22", "col32"));
+      Map<String, Map<String, String>> validMetadata = new HashMap<String, Map<String, String>>() {{
+        put("col12", new HashMap<String, String>() {{
+          put("col1", "col11");
+          put("col3", "col13");
+        }});
+        put("col22", new HashMap<String, String>() {{
+          put("col1", "col21");
+          put("col3", "col23");
+        }});
+        put("col32", new HashMap<String, String>() {{
+          put("col1", "col31");
+          put("col3", "col33");
+        }});
+      }};
+      for (LookupKV<EnrichmentKey, EnrichmentValue> kv : outputMessages) {
+        Assert.assertTrue(validIndicators.contains(kv.getKey().indicator));
+        Assert.assertEquals(kv.getValue().getMetadata().get("source.type"), "dummy");
+        Assert.assertNotNull(kv.getValue().getMetadata().get("timestamp"));
+        Assert.assertNotNull(kv.getValue().getMetadata().get("original_string"));
+        Map<String, String> metadata = validMetadata.get(kv.getKey().indicator);
+        for (Map.Entry<String, String> x : metadata.entrySet()) {
+          Assert.assertEquals(kv.getValue().getMetadata().get(x.getKey()), x.getValue());
+        }
+        Assert.assertEquals(metadata.size() + 3, kv.getValue().getMetadata().size());
       }
-      Assert.assertEquals(metadata.size() + 3, kv.getValue().getMetadata().size());
+    }
+    finally {
+      if(runner != null) {
+        runner.stop();
+      }
     }
   }
 }
