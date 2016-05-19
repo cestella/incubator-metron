@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.metron.parsers.integration.writer;
+package org.apache.metron.writers.integration;
 
 import com.google.common.collect.ImmutableList;
 import org.adrianwalker.multilinestring.Multiline;

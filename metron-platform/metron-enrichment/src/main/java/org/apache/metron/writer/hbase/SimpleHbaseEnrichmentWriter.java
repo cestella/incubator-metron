@@ -56,11 +56,15 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
     ,KEY_COLUMNS("shew.keyColumns")
     ,KEY_DELIM("shew.keyDelim")
     ,ENRICHMENT_TYPE("shew.enrichmentType")
+    ,VALUE_COLUMNS("shew.valueColumns")
     ,HBASE_PROVIDER("shew.hbaseProvider")
     ;
     String key;
     Configurations(String key) {
       this.key = key;
+    }
+    public String getKey() {
+      return key;
     }
     public Object get(Map<String, Object> config) {
       return config.get(key);
@@ -102,7 +106,7 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
       }).collect(Collectors.joining(delim));
     }
   }
-  private EnrichmentConverter converter;
+  private transient EnrichmentConverter converter;
   private String tableName;
   private String cf;
   private HTableInterface table;
@@ -118,11 +122,16 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
     if(hbaseProviderImpl != null) {
       provider = ReflectionUtils.createInstance(hbaseProviderImpl);
     }
+    if(converter == null) {
+      converter = new EnrichmentConverter();
+    }
   }
 
   @Override
   public void init(Map stormConf, WriterConfiguration configuration) throws Exception {
-    converter = new EnrichmentConverter();
+    if(converter == null) {
+      converter = new EnrichmentConverter();
+    }
   }
 
   protected synchronized TableProvider getProvider() {
@@ -161,8 +170,12 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
 
   }
 
-  private List<String> getKeyColumns(Object keyColumnsObj) {
+
+  private List<String> getColumns(Object keyColumnsObj, boolean allowNull) {
     Object o = keyColumnsObj;
+    if(allowNull && keyColumnsObj == null) {
+      return Collections.emptyList();
+    }
     if(o instanceof String) {
       return ImmutableList.of(o.toString());
     }
@@ -174,7 +187,7 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
       return keyCols;
     }
     else {
-      throw new RuntimeException("Unable to configure KeyTransformer with columns: " + o);
+      throw new RuntimeException("Unable to get columns: " + o);
     }
   }
 
@@ -185,7 +198,7 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
       return keyTransformer.getValue();
     }
     else {
-      List<String> keys = getKeyColumns(o);
+      List<String> keys = getColumns(o, false);
       Object delimObj = Configurations.KEY_DELIM.get(config);
       String delim = (delimObj == null || !(delimObj instanceof String))?null:delimObj.toString();
       transformer = new KeyTransformer(keys, delim);
@@ -195,15 +208,30 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
   }
 
 
-  private EnrichmentValue getValue(JSONObject message, Set<String> keyColumns) {
+  private EnrichmentValue getValue( JSONObject message
+                                  , Set<String> keyColumns
+                                  , Set<String> valueColumns
+                                  )
+  {
     Map<String, Object> metadata = new HashMap<>();
-    for(Object kv : message.entrySet()) {
-      Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>)kv;
-      if(!keyColumns.contains(entry.getKey())) {
-        metadata.put(entry.getKey().toString(), entry.getValue());
+    if(valueColumns == null || valueColumns.isEmpty()) {
+      for (Object kv : message.entrySet()) {
+        Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) kv;
+        if (!keyColumns.contains(entry.getKey())) {
+          metadata.put(entry.getKey().toString(), entry.getValue());
+        }
       }
+      return new EnrichmentValue(metadata);
     }
-    return new EnrichmentValue(metadata);
+    else {
+      for (Object kv : message.entrySet()) {
+        Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) kv;
+        if (valueColumns.contains(entry.getKey())) {
+          metadata.put(entry.getKey().toString(), entry.getValue());
+        }
+      }
+      return new EnrichmentValue(metadata);
+    }
   }
 
   private EnrichmentKey getKey(JSONObject message, KeyTransformer transformer, String enrichmentType) {
@@ -227,10 +255,11 @@ public class SimpleHbaseEnrichmentWriter extends AbstractWriter implements BulkM
     KeyTransformer transformer = getTransformer(sensorConfig);
     Object enrichmentTypeObj = Configurations.ENRICHMENT_TYPE.get(sensorConfig);
     String enrichmentType = enrichmentTypeObj == null?null:enrichmentTypeObj.toString();
+    Set<String> valueColumns = new HashSet<>(getColumns(Configurations.VALUE_COLUMNS.get(sensorConfig), true));
     List<Put> puts = new ArrayList<>();
     for(JSONObject message : messages) {
       EnrichmentKey key = getKey(message, transformer, enrichmentType);
-      EnrichmentValue value = getValue(message, transformer.keySet);
+      EnrichmentValue value = getValue(message, transformer.keySet, valueColumns);
       if(key == null || value == null) {
         continue;
       }
