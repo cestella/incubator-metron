@@ -20,18 +20,22 @@ package org.apache.metron.common.writer;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
+import com.google.common.collect.Iterables;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.Configurations;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
 import org.apache.metron.common.utils.ErrorUtils;
 import org.apache.metron.common.utils.MessageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
 
 public class BulkWriterComponent<MESSAGE_T> {
-
+  public static final Logger LOG = LoggerFactory
+            .getLogger(BulkWriterComponent.class);
   private Map<String, Collection<Tuple>> sensorTupleMap = new HashMap<>();
   private Map<String, List<MESSAGE_T>> sensorMessageMap = new HashMap<>();
   private OutputCollector collector;
@@ -49,10 +53,14 @@ public class BulkWriterComponent<MESSAGE_T> {
 
   public void commit(Iterable<Tuple> tuples) {
     tuples.forEach(t -> collector.ack(t));
+    if(LOG.isDebugEnabled()) {
+      LOG.debug("Acking " + Iterables.size(tuples) + " tuples");
+    }
   }
 
   public void error(Exception e, Iterable<Tuple> tuples) {
     tuples.forEach(t -> collector.fail(t));
+    LOG.error("Failing " + Iterables.size(tuples) + " tuples", e);
     ErrorUtils.handleError(collector, e, Constants.ERROR_STREAM);
   }
 
@@ -98,8 +106,10 @@ public class BulkWriterComponent<MESSAGE_T> {
           throw e;
         }
       }
-      sensorTupleMap.remove(sensorType);
-      sensorMessageMap.remove(sensorType);
+      finally {
+        sensorTupleMap.remove(sensorType);
+        sensorMessageMap.remove(sensorType);
+      }
     }
   }
 }
