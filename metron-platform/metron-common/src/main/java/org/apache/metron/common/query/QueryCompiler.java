@@ -112,7 +112,7 @@ class QueryCompiler extends PredicateBaseListener {
 
   @Override
   public void exitLogicalVariable(PredicateParser.LogicalVariableContext ctx) {
-    tokenStack.push(new PredicateToken<>(resolver.resolve(ctx.getText()), String.class));
+    tokenStack.push(new PredicateToken<>(resolver.resolve(ctx.getText()).toString(), String.class));
   }
 
 

@@ -19,5 +19,5 @@
 package org.apache.metron.common.query;
 
 public interface VariableResolver {
-  String resolve(String variable);
+  Object resolve(String variable);
 }
