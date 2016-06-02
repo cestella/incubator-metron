@@ -52,7 +52,7 @@ public class QueryValidation implements FieldValidation {
     }
     else {
       PredicateProcessor processor = new PredicateProcessor();
-      return processor.parse(condition, new MapVariableResolver(input));
+      return processor.parse(condition, new MapVariableResolver(input, validationConfig, globalConfig));
     }
   }
 

@@ -28,6 +28,7 @@ import org.apache.metron.common.field.validation.primitive.IntegerValidation;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -99,6 +100,18 @@ public enum LogicalFunctions implements Predicate<List<Object>> {
   , IS_URL(new URLValidation())
   , IS_DATE(new DateValidation())
   , IS_INTEGER(new IntegerValidation())
+  , MAP_EXISTS(list -> {
+      if(list.size() < 2) {
+        return false;
+      }
+      Object key = list.get(0);
+      Object mapObj = list.get(1);
+      if(key != null && mapObj != null && mapObj instanceof Map) {
+        return ((Map)mapObj).containsKey(key);
+      }
+      return false;
+    }
+  )
   ;
   Predicate<List<Object>> func;
   LogicalFunctions(Predicate<List<Object>> func) {
