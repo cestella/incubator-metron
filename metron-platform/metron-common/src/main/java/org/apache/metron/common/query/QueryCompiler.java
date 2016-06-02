@@ -195,14 +195,14 @@ class QueryCompiler extends PredicateBaseListener {
 
   @Override
   public void exitFunc_args(PredicateParser.Func_argsContext ctx) {
-    LinkedList<String> args = new LinkedList<>();
+    LinkedList<Object> args = new LinkedList<>();
     while(true) {
       Token<?> token = popStack();
       if(token.getUnderlyingType().equals(FunctionMarker.class)) {
         break;
       }
       else {
-        args.addFirst((String)token.getValue());
+        args.addFirst(token.getValue());
       }
     }
     tokenStack.push(new Token<>(args, List.class));
@@ -259,7 +259,7 @@ class QueryCompiler extends PredicateBaseListener {
   @Override
   public void exitLogicalFunc(PredicateParser.LogicalFuncContext ctx) {
     String funcName = ctx.getChild(0).getText();
-    Predicate<List<String>> func;
+    Predicate<List<Object>> func;
     try {
       func = LogicalFunctions.valueOf(funcName);
     }
@@ -269,9 +269,9 @@ class QueryCompiler extends PredicateBaseListener {
       );
     }
     Token<?> left = popStack();
-    List<String> argList = null;
+    List<Object> argList = null;
     if(left.getValue() instanceof List) {
-      argList = (List<String>) left.getValue();
+      argList = (List<Object>) left.getValue();
     }
     else {
       throw new ParseException("Unable to process in clause because " + left.getValue() + " is not a set");
