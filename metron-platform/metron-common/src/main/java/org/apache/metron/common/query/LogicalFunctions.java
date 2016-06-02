@@ -18,11 +18,11 @@
 
 package org.apache.metron.common.query;
 
-import com.google.common.base.Function;
 import org.apache.commons.net.util.SubnetUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Function;
 
 public enum LogicalFunctions implements Function<List<String>, Boolean> {
   IS_EMPTY ( list -> {

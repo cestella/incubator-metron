@@ -16,8 +16,13 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.query;
+package org.apache.metron.common.dsl;
 
-public interface VariableResolver {
-  Object resolve(String variable);
+public class ParseException extends RuntimeException {
+  public ParseException(String reason) {
+    super(reason);
+  }
+  public ParseException(String reason, Throwable t) {
+    super(reason, t);
+  }
 }

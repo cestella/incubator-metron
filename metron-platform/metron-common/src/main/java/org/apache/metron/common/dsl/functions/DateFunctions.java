@@ -1,6 +1,5 @@
-package org.apache.metron.common.transformation.functions;
+package org.apache.metron.common.dsl.functions;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

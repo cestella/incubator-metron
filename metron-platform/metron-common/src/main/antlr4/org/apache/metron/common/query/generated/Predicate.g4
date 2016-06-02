@@ -60,6 +60,10 @@ FALSE : 'false'
 
 EQ : '==' ;
 NEQ : '!=' ;
+LT : '<';
+LTE : '<=';
+GT : '>';
+GTE : '>=';
 COMMA : ',';
 
 LBRACKET : '[';
@@ -72,6 +76,9 @@ IN : 'in'
 NIN : 'not in'
    ;
 EXISTS : 'exists';
+INT_LITERAL     : '0'..'9'+ ;
+DOUBLE_LITERAL  : '0'..'9'+'.''0'..'9'+ ;
+
 IDENTIFIER : [a-zA-Z_][a-zA-Z_\.0-9]* ;
 fragment SCHAR:  ~['"\\\r\n];
 STRING_LITERAL : '"' SCHAR* '"'
@@ -101,8 +108,10 @@ logical_expr
  ;
 
 comparison_expr : comparison_operand comp_operator comparison_operand # ComparisonExpressionWithOperator
-                | identifier_operand IN list_entity #InExpression
-                | identifier_operand NIN list_entity #NInExpression
+                | identifier_operand IN list_entity #InExpression_List
+                | identifier_operand NIN list_entity #NInExpression_List
+                | identifier_operand IN t_func #InExpression_Func
+                | identifier_operand NIN t_func #NInExpression_Func
                 | LPAREN comparison_expr RPAREN # ComparisonExpressionParens
                 ;
 
@@ -118,14 +127,21 @@ func_args : op_list
 op_list : identifier_operand
         | op_list COMMA identifier_operand
         ;
+
+t_func : IDENTIFIER LPAREN func_args RPAREN #TransformationFunc
+       ;
+
 identifier_operand : STRING_LITERAL # StringLiteral
                    | IDENTIFIER     # LogicalVariable
-                   | IDENTIFIER LPAREN func_args RPAREN #StringFunc
+                   | t_func #id_tfunc
+                   | INT_LITERAL #IntegerLiteral
+                   | DOUBLE_LITERAL #DoubleLiteral
+                   | list_entity #List
                    ;
 
 comparison_operand : identifier_operand #IdentifierOperand
                    | logical_entity # LogicalConstComparison
                    ;
 
-comp_operator : (EQ | NEQ) # ComparisonOp
+comp_operator : (EQ | NEQ | LT | LTE | GT | GTE) # ComparisonOp
               ;

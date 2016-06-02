@@ -1,6 +1,7 @@
 package org.apache.metron.common.transformation;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.metron.common.utils.timestamp.TimestampConverters;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,6 +61,21 @@ public class TransformationTest {
   public void testURLToPath() {
     String query = "URL_TO_PATH(foo)";
     Assert.assertEquals("/my/path", run(query, ImmutableMap.of("foo", "http://www.google.co.uk/my/path")));
+  }
+
+  @Test
+  public void testDateConversion() {
+    long expected =1452013350000L;
+    {
+      String query = "TO_TIMESTAMP(foo, 'yyyy-MM-dd HH:mm:ss', 'UTC')";
+      Assert.assertEquals(expected, run(query, ImmutableMap.of("foo", "2016-01-05 17:02:30")));
+    }
+    {
+      String query = "TO_TIMESTAMP(foo, 'yyyy-MM-dd HH:mm:ss')";
+      Long ts = (Long) run(query, ImmutableMap.of("foo", "2016-01-05 17:02:30"));
+      //is it within 24 hours of the UTC?
+      Assert.assertTrue(Math.abs(ts - expected) < 8.64e+7);
+    }
   }
   @Test
   public void testGet() {

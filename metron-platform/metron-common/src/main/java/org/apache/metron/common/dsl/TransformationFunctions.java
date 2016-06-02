@@ -1,8 +1,8 @@
-package org.apache.metron.common.transformation;
+package org.apache.metron.common.dsl;
 
-import org.apache.metron.common.transformation.functions.DateFunctions;
-import org.apache.metron.common.transformation.functions.NetworkFunctions;
-import org.apache.metron.common.transformation.functions.StringFunctions;
+import org.apache.metron.common.dsl.functions.DateFunctions;
+import org.apache.metron.common.dsl.functions.NetworkFunctions;
+import org.apache.metron.common.dsl.functions.StringFunctions;
 
 import java.util.List;
 import java.util.function.Function;
@@ -22,7 +22,7 @@ public enum TransformationFunctions implements Function<List<Object>, Object> {
   ,URL_TO_PORT(new NetworkFunctions.URLToPort())
   ,URL_TO_PATH(new NetworkFunctions.URLToPath())
   ,URL_TO_PROTOCOL(new NetworkFunctions.URLToProtocol())
-  ,DATE_TO_TIMESTAMP(new DateFunctions.ToTimestamp())
+  ,TO_TIMESTAMP(new DateFunctions.ToTimestamp())
   ;
   Function<List<Object>, Object> func;
   TransformationFunctions(Function<List<Object>, Object> func) {

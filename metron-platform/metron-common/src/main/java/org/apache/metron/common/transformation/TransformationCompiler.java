@@ -1,10 +1,11 @@
 package org.apache.metron.common.transformation;
 
 import com.google.common.base.Joiner;
-import org.apache.metron.common.query.FunctionMarker;
-import org.apache.metron.common.query.ParseException;
-import org.apache.metron.common.query.StringFunctions;
-import org.apache.metron.common.query.VariableResolver;
+import org.apache.metron.common.dsl.Token;
+import org.apache.metron.common.dsl.TransformationFunctions;
+import org.apache.metron.common.dsl.FunctionMarker;
+import org.apache.metron.common.dsl.ParseException;
+import org.apache.metron.common.dsl.VariableResolver;
 import org.apache.metron.common.transformation.generated.TransformationBaseListener;
 import org.apache.metron.common.transformation.generated.TransformationParser;
 
@@ -15,7 +16,7 @@ import java.util.function.Function;
 
 public class TransformationCompiler extends TransformationBaseListener {
   private VariableResolver resolver = null;
-  private Stack<TransformationToken> tokenStack = new Stack<>();
+  private Stack<Token> tokenStack = new Stack<>();
   public TransformationCompiler(VariableResolver resolver) {
     this.resolver = resolver;
   }
@@ -28,24 +29,24 @@ public class TransformationCompiler extends TransformationBaseListener {
 
   @Override
   public void exitVariable(TransformationParser.VariableContext ctx) {
-    tokenStack.push(new TransformationToken<>(resolver.resolve(ctx.getText()), Object.class));
+    tokenStack.push(new Token<>(resolver.resolve(ctx.getText()), Object.class));
   }
 
   @Override
   public void exitStringLiteral(TransformationParser.StringLiteralContext ctx) {
-    tokenStack.push(new TransformationToken<>(ctx.getText().substring(1, ctx.getText().length() - 1), String.class));
+    tokenStack.push(new Token<>(ctx.getText().substring(1, ctx.getText().length() - 1), String.class));
   }
 
 
   @Override
   public void exitIntegerLiteral(TransformationParser.IntegerLiteralContext ctx) {
-    tokenStack.push(new TransformationToken<>(Integer.parseInt(ctx.getText()), Integer.class));
+    tokenStack.push(new Token<>(Integer.parseInt(ctx.getText()), Integer.class));
   }
 
 
   @Override
   public void exitDoubleLiteral(TransformationParser.DoubleLiteralContext ctx) {
-    tokenStack.push(new TransformationToken<>(Double.parseDouble(ctx.getText()), Double.class));
+    tokenStack.push(new Token<>(Double.parseDouble(ctx.getText()), Double.class));
   }
 
 
@@ -61,7 +62,7 @@ public class TransformationCompiler extends TransformationBaseListener {
               + Joiner.on(',').join(TransformationFunctions.values())
       );
     }
-    TransformationToken<?> left = popStack();
+    Token<?> left = popStack();
     List<Object> argList = null;
     if(left.getUnderlyingType().equals(List.class)) {
       argList = (List<Object>) left.getValue();
@@ -70,13 +71,13 @@ public class TransformationCompiler extends TransformationBaseListener {
       throw new ParseException("Unable to process in clause because " + left.getValue() + " is not a set");
     }
     Object result = func.apply(argList);
-    tokenStack.push(new TransformationToken<>(result, Object.class));
+    tokenStack.push(new Token<>(result, Object.class));
   }
 
 
   @Override
   public void enterFunc_args(TransformationParser.Func_argsContext ctx) {
-    tokenStack.push(new TransformationToken<>(new FunctionMarker(), FunctionMarker.class));
+    tokenStack.push(new Token<>(new FunctionMarker(), FunctionMarker.class));
   }
 
 
@@ -84,7 +85,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   public void exitFunc_args(TransformationParser.Func_argsContext ctx) {
     LinkedList<Object> args = new LinkedList<>();
     while(true) {
-      TransformationToken<?> token = popStack();
+      Token<?> token = popStack();
       if(token.getUnderlyingType().equals(FunctionMarker.class)) {
         break;
       }
@@ -92,7 +93,7 @@ public class TransformationCompiler extends TransformationBaseListener {
         args.addFirst(token.getValue());
       }
     }
-    tokenStack.push(new TransformationToken<>(args, List.class));
+    tokenStack.push(new Token<>(args, List.class));
   }
 
 
@@ -100,7 +101,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   public void exitList_entity(TransformationParser.List_entityContext ctx) {
     LinkedList<Object> args = new LinkedList<>();
     while(true) {
-      TransformationToken<?> token = popStack();
+      Token<?> token = popStack();
       if(token.getUnderlyingType().equals(FunctionMarker.class)) {
         break;
       }
@@ -108,15 +109,15 @@ public class TransformationCompiler extends TransformationBaseListener {
         args.addFirst(token.getValue());
       }
     }
-    tokenStack.push(new TransformationToken<>(args, List.class));
+    tokenStack.push(new Token<>(args, List.class));
   }
 
   @Override
   public void enterList_entity(TransformationParser.List_entityContext ctx) {
-    tokenStack.push(new TransformationToken<>(new FunctionMarker(), FunctionMarker.class));
+    tokenStack.push(new Token<>(new FunctionMarker(), FunctionMarker.class));
   }
 
-  public TransformationToken<?> popStack() {
+  public Token<?> popStack() {
     if(tokenStack.empty()) {
       throw new ParseException("Unable to pop an empty stack");
     }
@@ -127,7 +128,7 @@ public class TransformationCompiler extends TransformationBaseListener {
     if(tokenStack.empty()) {
       throw new ParseException("Invalid predicate: Empty stack.");
     }
-    TransformationToken<?> token = popStack();
+    Token<?> token = popStack();
     if(tokenStack.empty()) {
       return token.getValue();
     }

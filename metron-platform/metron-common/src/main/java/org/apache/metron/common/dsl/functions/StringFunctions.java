@@ -1,4 +1,4 @@
-package org.apache.metron.common.transformation.functions;
+package org.apache.metron.common.dsl.functions;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;

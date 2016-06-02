@@ -3,10 +3,9 @@ package org.apache.metron.common.transformation;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
-import org.apache.metron.common.query.ErrorListener;
-import org.apache.metron.common.query.ParseException;
-import org.apache.metron.common.query.VariableResolver;
-import org.apache.metron.common.transformation.generated.PredicateLexer;
+import org.apache.metron.common.dsl.ErrorListener;
+import org.apache.metron.common.dsl.ParseException;
+import org.apache.metron.common.dsl.VariableResolver;
 import org.apache.metron.common.transformation.generated.TransformationLexer;
 import org.apache.metron.common.transformation.generated.TransformationParser;
 
