@@ -86,6 +86,7 @@ public class MTLTransformationTest {
       "dc2tz" : {
                 "nyc" : "EST"
                ,"la" : "PST"
+               ,"london" : "UTC"
                 }
     }
    }
@@ -102,6 +103,20 @@ public class MTLTransformationTest {
         put("timestamp", "2016-01-05 17:02:30");
         put("url", "https://caseystella.com/blog");
         put("dc", "portland");
+      }});
+      handler.transformAndUpdate(input, c.getParserConfig());
+      long expected = 1452013350000L;
+      Assert.assertEquals(expected, input.get("utc_timestamp"));
+      Assert.assertEquals("caseystella.com", input.get("url_host"));
+      Assert.assertEquals("https", input.get("url_protocol"));
+      Assert.assertTrue(input.containsKey("timestamp"));
+      Assert.assertTrue(input.containsKey("url"));
+    }
+    {
+      JSONObject input = new JSONObject(new HashMap<String, Object>() {{
+        put("timestamp", "2016-01-05 17:02:30");
+        put("url", "https://caseystella.com/blog");
+        put("dc", "london");
       }});
       handler.transformAndUpdate(input, c.getParserConfig());
       long expected = 1452013350000L;
