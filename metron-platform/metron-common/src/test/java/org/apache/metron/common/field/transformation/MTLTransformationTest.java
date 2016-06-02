@@ -37,7 +37,7 @@ public class MTLTransformationTest {
            "transformation" : "MTL"
           ,"output" : "utc_timestamp"
           ,"config" : {
-            "utc_timestamp" : "TO_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss', 'UTC')"
+            "utc_timestamp" : "TO_EPOCH_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss', 'UTC')"
                       }
           }
                       ]
@@ -76,7 +76,7 @@ public class MTLTransformationTest {
            "transformation" : "MTL"
           ,"output" : [ "utc_timestamp", "url_host", "url_protocol" ]
           ,"config" : {
-            "utc_timestamp" : "TO_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss', MAP_GET(dc, dc2tz, 'UTC') )"
+            "utc_timestamp" : "TO_EPOCH_TIMESTAMP(timestamp, 'yyyy-MM-dd HH:mm:ss', MAP_GET(dc, dc2tz, 'UTC') )"
            ,"url_host" : "URL_TO_HOST(url)"
            ,"url_protocol" : "URL_TO_PROTOCOL(url)"
                       }

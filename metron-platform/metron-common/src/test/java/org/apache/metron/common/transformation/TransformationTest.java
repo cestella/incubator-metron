@@ -23,6 +23,7 @@ import org.apache.metron.common.utils.timestamp.TimestampConverters;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class TransformationTest {
@@ -63,13 +64,13 @@ public class TransformationTest {
   }
   @Test
   public void testTLDExtraction() {
-    String query = "TO_TLD(foo)";
+    String query = "DOMAIN_TO_TLD(foo)";
     Assert.assertEquals("co.uk", run(query, ImmutableMap.of("foo", "www.google.co.uk")));
   }
 
   @Test
   public void testTLDRemoval() {
-    String query = "REMOVE_TLD(foo)";
+    String query = "DOMAIN_REMOVE_TLD(foo)";
     Assert.assertEquals("www.google", run(query, ImmutableMap.of("foo", "www.google.co.uk")));
   }
 
@@ -101,23 +102,40 @@ public class TransformationTest {
   public void testDateConversion() {
     long expected =1452013350000L;
     {
-      String query = "TO_TIMESTAMP(foo, 'yyyy-MM-dd HH:mm:ss', 'UTC')";
+      String query = "TO_EPOCH_TIMESTAMP(foo, 'yyyy-MM-dd HH:mm:ss', 'UTC')";
       Assert.assertEquals(expected, run(query, ImmutableMap.of("foo", "2016-01-05 17:02:30")));
     }
     {
-      String query = "TO_TIMESTAMP(foo, 'yyyy-MM-dd HH:mm:ss')";
+      String query = "TO_EPOCH_TIMESTAMP(foo, 'yyyy-MM-dd HH:mm:ss')";
       Long ts = (Long) run(query, ImmutableMap.of("foo", "2016-01-05 17:02:30"));
       //is it within 24 hours of the UTC?
       Assert.assertTrue(Math.abs(ts - expected) < 8.64e+7);
     }
   }
+
+  @Test
+  public void testToString() {
+    Assert.assertEquals("5", run("TO_STRING(foo)", ImmutableMap.of("foo", 5)));
+  }
+
+  @Test
+  public void testToInteger() {
+    Assert.assertEquals(5, run("TO_INTEGER(foo)", ImmutableMap.of("foo", "5")));
+    Assert.assertEquals(5, run("TO_INTEGER(foo)", ImmutableMap.of("foo", 5)));
+  }
+
+  @Test
+  public void testToDouble() {
+    Assert.assertEquals(new Double(5.1), run("TO_DOUBLE(foo)", ImmutableMap.of("foo", 5.1d)));
+    Assert.assertEquals(new Double(5.1), run("TO_DOUBLE(foo)", ImmutableMap.of("foo", "5.1")));
+  }
   @Test
   public void testGet() {
     Map<String, Object> variables = ImmutableMap.of("foo", "www.google.co.uk");
-    Assert.assertEquals("www", run("GET_FIRST(SPLIT(REMOVE_TLD(foo), '.'))", variables));
-    Assert.assertEquals("www", run("GET(SPLIT(REMOVE_TLD(foo), '.'), 0)", variables));
-    Assert.assertEquals("google", run("GET_LAST(SPLIT(REMOVE_TLD(foo), '.'))", variables));
-    Assert.assertEquals("google", run("GET(SPLIT(REMOVE_TLD(foo), '.'), 1)", variables));
+    Assert.assertEquals("www", run("GET_FIRST(SPLIT(DOMAIN_REMOVE_TLD(foo), '.'))", variables));
+    Assert.assertEquals("www", run("GET(SPLIT(DOMAIN_REMOVE_TLD(foo), '.'), 0)", variables));
+    Assert.assertEquals("google", run("GET_LAST(SPLIT(DOMAIN_REMOVE_TLD(foo), '.'))", variables));
+    Assert.assertEquals("google", run("GET(SPLIT(DOMAIN_REMOVE_TLD(foo), '.'), 1)", variables));
   }
   private static Object run(String rule, Map<String, Object> variables) {
     TransformationProcessor processor = new TransformationProcessor();

@@ -157,13 +157,16 @@ public class QueryParserTest {
       put("bar", "bar.casey.grok");
       put("ip", "192.168.0.1");
       put("num", 7);
-      put("num3", 7);
       put("num2", 8.5);
+      put("num3", 7);
+      put("num4", "8.5");
       put("empty", "");
       put("spaced", "metron is great");
     }};
     Assert.assertTrue(run("num == 7", v -> variableMap.get(v)));
     Assert.assertTrue(run("num < num2", v -> variableMap.get(v)));
+    Assert.assertTrue(run("num < TO_DOUBLE(num2)", v -> variableMap.get(v)));
+    Assert.assertTrue(run("num < TO_DOUBLE(num4)", v -> variableMap.get(v)));
     Assert.assertTrue(run("num < 100", v -> variableMap.get(v)));
     Assert.assertTrue(run("num == num3", v -> variableMap.get(v)));
     Assert.assertFalse(run("num == num2", v -> variableMap.get(v)));
