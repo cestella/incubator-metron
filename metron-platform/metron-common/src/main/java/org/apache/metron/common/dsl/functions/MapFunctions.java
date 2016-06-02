@@ -16,27 +16,31 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.dsl;
+package org.apache.metron.common.dsl.functions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-public class MapVariableResolver implements VariableResolver {
-  List<Map> variableMappings = new ArrayList<>();
-  public MapVariableResolver(Map... variableMapping) {
-    for(Map m : variableMapping) {
-      this.variableMappings.add(m);
-    }
-  }
-  @Override
-  public Object resolve(String variable) {
-    for(Map variableMapping : variableMappings) {
-      Object o = variableMapping.get(variable);
-      if(o != null) {
-        return o;
+public class MapFunctions {
+  public static class MapGet implements Function<List<Object>, Object> {
+    @Override
+    public Object apply(List<Object> objects) {
+      Object keyObj = objects.get(0);
+      Object mapObj = objects.get(1);
+      Object defaultObj = null;
+      if(objects.size() >= 3) {
+        defaultObj = objects.get(2);
       }
+      if(keyObj == null || mapObj == null) {
+        return defaultObj;
+      }
+      Map<Object, Object> map = (Map)mapObj;
+      Object ret = map.get(keyObj);
+      if(ret == null && defaultObj != null) {
+        return defaultObj;
+      }
+      return ret;
     }
-    return null;
   }
 }

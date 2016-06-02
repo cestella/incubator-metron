@@ -1,6 +1,25 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.metron.common.dsl;
 
 import org.apache.metron.common.dsl.functions.DateFunctions;
+import org.apache.metron.common.dsl.functions.MapFunctions;
 import org.apache.metron.common.dsl.functions.NetworkFunctions;
 import org.apache.metron.common.dsl.functions.StringFunctions;
 
@@ -16,6 +35,7 @@ public enum TransformationFunctions implements Function<List<Object>, Object> {
   ,GET_FIRST(new StringFunctions.GetFirst())
   ,GET_LAST(new StringFunctions.GetLast())
   ,GET(new StringFunctions.Get())
+  ,MAP_GET(new MapFunctions.MapGet())
   ,TO_TLD(new NetworkFunctions.ExtractTLD())
   ,REMOVE_TLD(new NetworkFunctions.RemoveTLD())
   ,URL_TO_HOST(new NetworkFunctions.URLToHost())
