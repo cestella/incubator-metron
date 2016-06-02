@@ -18,6 +18,7 @@
 
 package org.apache.metron.common.query;
 
+import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.VariableResolver;
 import org.junit.Assert;
@@ -47,7 +48,10 @@ public class QueryParserTest {
     }
   }
 
-  private static boolean run(String rule, VariableResolver resolver) {
+  public static boolean run(String rule, Map resolver) {
+    return run(rule, new MapVariableResolver(resolver));
+  }
+  public static boolean run(String rule, VariableResolver resolver) {
     PredicateProcessor processor = new PredicateProcessor();
     Assert.assertTrue(rule + " not valid.", processor.validate(rule));
     return processor.parse(rule, resolver);
@@ -193,5 +197,6 @@ public class QueryParserTest {
     Assert.assertFalse(run("IN_SUBNET(ip_dst_addr, '192.168.0.0/24')", v-> variableMap.get(v)));
     Assert.assertTrue(run("not(IN_SUBNET(ip_dst_addr, '192.168.0.0/24'))", v-> variableMap.get(v)));
   }
+
 
 }

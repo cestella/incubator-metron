@@ -25,6 +25,7 @@ import org.apache.metron.common.query.generated.PredicateParser;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 class QueryCompiler extends PredicateBaseListener {
   private VariableResolver resolver = null;
@@ -258,7 +259,7 @@ class QueryCompiler extends PredicateBaseListener {
   @Override
   public void exitLogicalFunc(PredicateParser.LogicalFuncContext ctx) {
     String funcName = ctx.getChild(0).getText();
-    Function<List<String>, Boolean> func;
+    Predicate<List<String>> func;
     try {
       func = LogicalFunctions.valueOf(funcName);
     }
@@ -275,7 +276,7 @@ class QueryCompiler extends PredicateBaseListener {
     else {
       throw new ParseException("Unable to process in clause because " + left.getValue() + " is not a set");
     }
-    Boolean result = func.apply(argList);
+    Boolean result = func.test(argList);
     tokenStack.push(new Token<>(result, Boolean.class));
   }
 
