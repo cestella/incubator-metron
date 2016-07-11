@@ -53,7 +53,7 @@ public class SimpleHbaseEnrichmentWriterIntegrationTest extends BaseIntegrationT
   /**
    {
     "parserClassName" : "org.apache.metron.parsers.csv.CSVParser"
-   ,"writerClassName" : "org.apache.metron.writer.hbase.SimpleHbaseEnrichmentWriter"
+   ,"writerClassName" : "org.apache.metron.enrichment.writer.SimpleHbaseEnrichmentWriter"
    ,"sensorTopic":"dummy"
    ,"parserConfig":
    {

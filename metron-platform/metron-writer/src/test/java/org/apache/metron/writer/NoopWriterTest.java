@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.common.writer;
+package org.apache.metron.writer;
 
 import org.junit.Assert;
 import org.junit.Test;

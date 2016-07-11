@@ -15,18 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.parsers.writer;
+package org.apache.metron.writer.kafka;
 
 import backtype.storm.tuple.Tuple;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.metron.common.Constants;
-import org.apache.metron.common.configuration.Configurations;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.MessageWriter;
 import org.apache.metron.common.utils.ConversionUtils;
 import org.apache.metron.common.utils.StringUtils;
-import org.apache.metron.common.writer.AbstractWriter;
+import org.apache.metron.writer.AbstractWriter;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;

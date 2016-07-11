@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.writer;
+package org.apache.metron.writer;
 
 import backtype.storm.tuple.Tuple;
 import com.google.common.collect.Iterables;
@@ -27,9 +27,12 @@ import org.apache.metron.common.interfaces.MessageWriter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class WriterToBulkWriter<MESSAGE_T> implements BulkMessageWriter<MESSAGE_T> {
   MessageWriter<MESSAGE_T> messageWriter;
+
+  public static Function<WriterConfiguration, WriterConfiguration> TRANSFORMATION = config -> new SingleBatchConfigurationFacade(config);
 
   public WriterToBulkWriter(MessageWriter<MESSAGE_T> messageWriter) {
     this.messageWriter = messageWriter;

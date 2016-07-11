@@ -250,7 +250,7 @@ bolts:
                 args: [10]
 # Indexing Bolts
     -   id: "indexingBolt"
-        className: "org.apache.metron.enrichment.bolt.BulkMessageWriterBolt"
+        className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"
         constructorArgs:
             - "${kafka.zk}"
         configMethods:
@@ -258,7 +258,7 @@ bolts:
                 args:
                     - ref: "indexWriter"
     -   id: "hdfsIndexingBolt"
-        className: "org.apache.metron.enrichment.bolt.BulkMessageWriterBolt"
+        className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"
         constructorArgs:
             - "${kafka.zk}"
         configMethods:

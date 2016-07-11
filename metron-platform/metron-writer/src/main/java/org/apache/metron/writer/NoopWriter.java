@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.common.writer;
+package org.apache.metron.writer;
 
 import backtype.storm.tuple.Tuple;
 import com.google.common.base.Splitter;
@@ -24,10 +24,8 @@ import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
 import org.apache.metron.common.utils.ConversionUtils;
 
-import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 

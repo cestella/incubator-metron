@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.enrichment.bolt;
+package org.apache.metron.writer.bolt;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -25,15 +25,18 @@ import backtype.storm.tuple.Tuple;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.bolt.ConfiguredEnrichmentBolt;
 import org.apache.metron.common.configuration.writer.EnrichmentWriterConfiguration;
-import org.apache.metron.common.utils.ErrorUtils;
+import org.apache.metron.common.configuration.writer.WriterConfiguration;
+import org.apache.metron.common.interfaces.MessageWriter;
 import org.apache.metron.common.utils.MessageUtils;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
-import org.apache.metron.common.writer.BulkWriterComponent;
+import org.apache.metron.writer.BulkWriterComponent;
+import org.apache.metron.writer.WriterToBulkWriter;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
 
@@ -41,6 +44,7 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
           .getLogger(BulkMessageWriterBolt.class);
   private BulkMessageWriter<JSONObject> bulkMessageWriter;
   private BulkWriterComponent<JSONObject> writerComponent;
+  private Function<WriterConfiguration, WriterConfiguration> configurationTransformation = x -> x;
   public BulkMessageWriterBolt(String zookeeperUrl) {
     super(zookeeperUrl);
   }
@@ -50,12 +54,20 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
     return this;
   }
 
+  public BulkMessageWriterBolt withMessageWriter(MessageWriter<JSONObject> messageWriter) {
+    this.bulkMessageWriter = new WriterToBulkWriter<>(messageWriter);
+    configurationTransformation = WriterToBulkWriter.TRANSFORMATION;
+    return this;
+  }
+
   @Override
   public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
     this.writerComponent = new BulkWriterComponent<>(collector);
     super.prepare(stormConf, context, collector);
     try {
-      bulkMessageWriter.init(stormConf, new EnrichmentWriterConfiguration(getConfigurations()));
+      bulkMessageWriter.init(stormConf
+                            , configurationTransformation.apply(new EnrichmentWriterConfiguration(getConfigurations()))
+                            );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -69,7 +81,12 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
     String sensorType = MessageUtils.getSensorType(message);
     try
     {
-      writerComponent.write(sensorType, tuple, message, bulkMessageWriter, new EnrichmentWriterConfiguration(getConfigurations()));
+      writerComponent.write(sensorType
+                           , tuple
+                           , message
+                           , bulkMessageWriter
+                           , configurationTransformation.apply(new EnrichmentWriterConfiguration(getConfigurations()))
+                           );
     }
     catch(Exception e) {
       throw new RuntimeException("This should have been caught in the writerComponent.  If you see this, file a JIRA", e);

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.writer;
+package org.apache.metron.writer;
 
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 
