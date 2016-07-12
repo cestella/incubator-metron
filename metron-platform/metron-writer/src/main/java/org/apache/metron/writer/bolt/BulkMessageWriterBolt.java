@@ -31,6 +31,8 @@ import org.apache.metron.common.utils.MessageUtils;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
 import org.apache.metron.writer.BulkWriterComponent;
 import org.apache.metron.writer.WriterToBulkWriter;
+import org.apache.metron.writer.message.MessageGetter;
+import org.apache.metron.writer.message.MessageGetters;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,9 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
           .getLogger(BulkMessageWriterBolt.class);
   private BulkMessageWriter<JSONObject> bulkMessageWriter;
   private BulkWriterComponent<JSONObject> writerComponent;
-  private Function<WriterConfiguration, WriterConfiguration> configurationTransformation = x -> x;
+  private String messageGetterStr = MessageGetters.NAMED.name();
+  private transient MessageGetter messageGetter = null;
+  private transient Function<WriterConfiguration, WriterConfiguration> configurationTransformation;
   public BulkMessageWriterBolt(String zookeeperUrl) {
     super(zookeeperUrl);
   }
@@ -56,7 +60,11 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
 
   public BulkMessageWriterBolt withMessageWriter(MessageWriter<JSONObject> messageWriter) {
     this.bulkMessageWriter = new WriterToBulkWriter<>(messageWriter);
-    configurationTransformation = WriterToBulkWriter.TRANSFORMATION;
+    return this;
+  }
+
+  public BulkMessageWriterBolt withMessageGetter(String messageGetter) {
+    this.messageGetterStr = messageGetter;
     return this;
   }
 
@@ -64,6 +72,13 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
   public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
     this.writerComponent = new BulkWriterComponent<>(collector);
     super.prepare(stormConf, context, collector);
+    messageGetter = MessageGetters.valueOf(messageGetterStr);
+    if(bulkMessageWriter instanceof WriterToBulkWriter) {
+      configurationTransformation = WriterToBulkWriter.TRANSFORMATION;
+    }
+    else {
+      configurationTransformation = x -> x;
+    }
     try {
       bulkMessageWriter.init(stormConf
                             , configurationTransformation.apply(new EnrichmentWriterConfiguration(getConfigurations()))
@@ -73,11 +88,10 @@ public class BulkMessageWriterBolt extends ConfiguredEnrichmentBolt {
     }
   }
 
-
   @SuppressWarnings("unchecked")
   @Override
   public void execute(Tuple tuple) {
-    JSONObject message =(JSONObject)tuple.getValueByField("message");
+    JSONObject message = messageGetter.getMessage(tuple);
     String sensorType = MessageUtils.getSensorType(message);
     try
     {

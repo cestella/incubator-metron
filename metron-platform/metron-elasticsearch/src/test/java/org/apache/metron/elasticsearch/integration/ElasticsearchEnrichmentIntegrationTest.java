@@ -17,10 +17,9 @@
  */
 package org.apache.metron.elasticsearch.integration;
 
-import org.apache.metron.TestConstants;
 import org.apache.metron.common.interfaces.FieldNameConverter;
 import org.apache.metron.elasticsearch.writer.ElasticsearchFieldNameConverter;
-import org.apache.metron.integration.EnrichmentIntegrationTest;
+import org.apache.metron.indexing.integration.IndexingIntegrationTest;
 import org.apache.metron.integration.ComponentRunner;
 import org.apache.metron.integration.InMemoryComponent;
 import org.apache.metron.integration.Processor;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class ElasticsearchEnrichmentIntegrationTest extends EnrichmentIntegrationTest {
+public class ElasticsearchEnrichmentIntegrationTest extends IndexingIntegrationTest {
 
   private String indexDir = "target/elasticsearch";
   private String dateFormat = "yyyy.MM.dd.HH";
@@ -88,6 +87,9 @@ public class ElasticsearchEnrichmentIntegrationTest extends EnrichmentIntegratio
 
   @Override
   public void setAdditionalProperties(Properties topologyProperties) {
+    topologyProperties.setProperty("es.clustername", "metron");
+    topologyProperties.setProperty("es.port", "9300");
+    topologyProperties.setProperty("es.ip", "localhost");
     topologyProperties.setProperty("writer.class.name", "org.apache.metron.elasticsearch.writer.ElasticsearchWriter");
   }
 

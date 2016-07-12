@@ -20,7 +20,7 @@ package org.apache.metron.solr.integration;
 import com.google.common.base.Function;
 import org.apache.metron.common.configuration.Configurations;
 import org.apache.metron.common.interfaces.FieldNameConverter;
-import org.apache.metron.integration.EnrichmentIntegrationTest;
+import org.apache.metron.indexing.integration.IndexingIntegrationTest;
 import org.apache.metron.integration.ComponentRunner;
 import org.apache.metron.integration.InMemoryComponent;
 import org.apache.metron.integration.Processor;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class SolrEnrichmentIntegrationTest extends EnrichmentIntegrationTest {
+public class SolrEnrichmentIntegrationTest extends IndexingIntegrationTest {
 
   private String collection = "metron";
   private FieldNameConverter fieldNameConverter = fieldName -> fieldName;
@@ -81,7 +81,7 @@ public class SolrEnrichmentIntegrationTest extends EnrichmentIntegrationTest {
           List<Map<String, Object>> docsFromDisk;
           try {
             docs = solrComponent.getAllIndexedDocs(collection);
-            docsFromDisk = EnrichmentIntegrationTest.readDocsFromDisk(hdfsDir);
+            docsFromDisk = readDocsFromDisk(hdfsDir);
             System.out.println(docs.size() + " vs " + inputMessages.size() + " vs " + docsFromDisk.size());
           } catch (IOException e) {
             throw new IllegalStateException("Unable to retrieve indexed documents.", e);

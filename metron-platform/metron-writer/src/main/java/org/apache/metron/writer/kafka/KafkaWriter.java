@@ -18,12 +18,14 @@
 package org.apache.metron.writer.kafka;
 
 import backtype.storm.tuple.Tuple;
+import com.google.common.base.Joiner;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.MessageWriter;
 import org.apache.metron.common.utils.ConversionUtils;
+import org.apache.metron.common.utils.KafkaUtils;
 import org.apache.metron.common.utils.StringUtils;
 import org.apache.metron.writer.AbstractWriter;
 import org.json.simple.JSONObject;
@@ -37,6 +39,7 @@ public class KafkaWriter extends AbstractWriter implements MessageWriter<JSONObj
   public enum Configurations {
      BROKER("kafka.brokerUrl")
     ,KEY_SERIALIZER("kafka.keySerializer")
+    ,ZK_QUORUM("kafka.zkQuorum")
     ,VALUE_SERIALIZER("kafka.valueSerializer")
     ,REQUIRED_ACKS("kafka.requiredAcks")
     ,TOPIC("kafka.topic")
@@ -64,6 +67,7 @@ public class KafkaWriter extends AbstractWriter implements MessageWriter<JSONObj
   private String kafkaTopic = Constants.ENRICHMENT_TOPIC;
   private KafkaProducer kafkaProducer;
   private String configPrefix = null;
+  private String zkQuorum = null;
   private Map<String, Object> producerConfigs = new HashMap<>();
 
   public KafkaWriter() {}
@@ -72,6 +76,10 @@ public class KafkaWriter extends AbstractWriter implements MessageWriter<JSONObj
     this.brokerUrl = brokerUrl;
   }
 
+  public KafkaWriter withZkQuorum(String zkQuorum) {
+    this.zkQuorum = zkQuorum;
+    return this;
+  }
   public KafkaWriter withKeySerializer(String keySerializer) {
     this.keySerializer = keySerializer;
     return this;
@@ -112,6 +120,10 @@ public class KafkaWriter extends AbstractWriter implements MessageWriter<JSONObj
     if(brokerUrl != null) {
       this.brokerUrl = brokerUrl;
     }
+    String zkQuorum = Configurations.ZK_QUORUM.getAndConvert(getConfigPrefix(), configMap, String.class);
+    if(zkQuorum != null) {
+      withZkQuorum(zkQuorum);
+    }
     String keySerializer = Configurations.KEY_SERIALIZER.getAndConvert(getConfigPrefix(), configMap, String.class);
     if(keySerializer != null) {
       withKeySerializer(keySerializer);
@@ -146,7 +158,13 @@ public class KafkaWriter extends AbstractWriter implements MessageWriter<JSONObj
 
   @Override
   public void init() {
-
+    if(this.zkQuorum != null && this.brokerUrl == null) {
+      try {
+        this.brokerUrl = Joiner.on(",").join(KafkaUtils.INSTANCE.getBrokersFromZookeeper(this.zkQuorum));
+      } catch (Exception e) {
+        throw new IllegalStateException("Cannot read kafka brokers from zookeeper and you didn't specify them, giving up!", e);
+      }
+    }
     this.kafkaProducer = new KafkaProducer<>(createProducerConfigs());
   }
 

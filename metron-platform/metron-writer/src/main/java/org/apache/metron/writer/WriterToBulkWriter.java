@@ -25,14 +25,15 @@ import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.interfaces.BulkMessageWriter;
 import org.apache.metron.common.interfaces.MessageWriter;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class WriterToBulkWriter<MESSAGE_T> implements BulkMessageWriter<MESSAGE_T> {
+public class WriterToBulkWriter<MESSAGE_T> implements BulkMessageWriter<MESSAGE_T>, Serializable {
   MessageWriter<MESSAGE_T> messageWriter;
 
-  public static Function<WriterConfiguration, WriterConfiguration> TRANSFORMATION = config -> new SingleBatchConfigurationFacade(config);
+  public static transient Function<WriterConfiguration, WriterConfiguration> TRANSFORMATION = config -> new SingleBatchConfigurationFacade(config);
 
   public WriterToBulkWriter(MessageWriter<MESSAGE_T> messageWriter) {
     this.messageWriter = messageWriter;

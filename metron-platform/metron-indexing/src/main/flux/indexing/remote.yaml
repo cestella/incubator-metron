@@ -51,12 +51,13 @@ components:
                     - ref: "hdfsRotationPolicy"
     -   id: "kafkaWriter"
         className: "org.apache.metron.writer.kafka.KafkaWriter"
-        constructorArgs:
-            - "${kafka.zk}"
         configMethods:
             -   name: "withTopic"
                 args:
                     - "${index.error.topic}"
+            -   name: "withZkQuorum"
+                args:
+                    - "${kafka.zk}"
 
     -   id: "indexWriter"
         className: "${writer.class.name}"
@@ -67,21 +68,20 @@ components:
         constructorArgs:
             - "${kafka.zk}"
     -   id: "kafkaConfig"
-        className: "storm.kafka.SpoutConfig"
+        className: "org.apache.metron.common.spout.kafka.SpoutConfig"
         constructorArgs:
             # zookeeper hosts
             - ref: "zkHosts"
             # topic name
-            - "enrichments"
+            - "${index.input.topic}"
             # zk root
             - ""
             # id
-            - "enrichments"
-        properties:
-            -   name: "ignoreZkOffsets"
-                value: true
-            -   name: "startOffsetTime"
-                value: -1
+            - "indexing"
+        configMethods:
+            -   name: "from"
+                args:
+                    - "${kafka.start}"
 
 spouts:
     -   id: "kafkaSpout"
@@ -99,6 +99,9 @@ bolts:
             -   name: "withBulkMessageWriter"
                 args:
                     - ref: "indexWriter"
+            -   name: "withMessageGetter"
+                args:
+                    - "RAW"
     -   id: "hdfsIndexingBolt"
         className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"
         constructorArgs:
@@ -107,6 +110,10 @@ bolts:
             -   name: "withBulkMessageWriter"
                 args:
                     - ref: "hdfsWriter"
+            -   name: "withMessageGetter"
+                args:
+                    - "RAW"
+
     -   id: "indexingErrorBolt"
         className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"
         constructorArgs:
@@ -122,18 +129,23 @@ streams:
         from: "kafkaSpout"
         to: "indexingBolt"
         grouping:
-            streamId: "message"
             type: SHUFFLE
 
     -   name: "spout -> hdfs"
-        from: "threatIntelJoinBolt"
+        from: "kafkaSpout"
         to: "hdfsIndexingBolt"
         grouping:
-            streamId: "message"
             type: SHUFFLE
 
     -   name: "indexingBolt -> errorIndexingBolt"
         from: "indexingBolt"
+        to: "indexingErrorBolt"
+        grouping:
+            streamId: "error"
+            type: SHUFFLE
+
+    -   name: "hdfsBolt -> errorIndexingBolt"
+        from: "hdfsIndexingBolt"
         to: "indexingErrorBolt"
         grouping:
             streamId: "error"
