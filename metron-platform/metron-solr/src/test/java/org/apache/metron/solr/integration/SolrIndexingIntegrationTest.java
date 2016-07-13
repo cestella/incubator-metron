@@ -15,43 +15,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.elasticsearch.integration;
+package org.apache.metron.solr.integration;
 
+import com.google.common.base.Function;
+import org.apache.metron.common.configuration.Configurations;
 import org.apache.metron.common.interfaces.FieldNameConverter;
-import org.apache.metron.elasticsearch.writer.ElasticsearchFieldNameConverter;
+import org.apache.metron.enrichment.integration.utils.SampleUtil;
 import org.apache.metron.indexing.integration.IndexingIntegrationTest;
 import org.apache.metron.integration.ComponentRunner;
 import org.apache.metron.integration.InMemoryComponent;
 import org.apache.metron.integration.Processor;
 import org.apache.metron.integration.ReadinessState;
-import org.apache.metron.elasticsearch.integration.components.ElasticSearchComponent;
+import org.apache.metron.integration.components.KafkaWithZKComponent;
+import org.apache.metron.solr.integration.components.SolrComponent;
+import org.apache.metron.common.configuration.ConfigurationsUtils;
+import org.apache.metron.common.utils.JSONUtils;
 
-import java.io.File;
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class ElasticsearchEnrichmentIntegrationTest extends IndexingIntegrationTest {
+public class SolrIndexingIntegrationTest extends IndexingIntegrationTest {
 
-  private String indexDir = "target/elasticsearch";
-  private String dateFormat = "yyyy.MM.dd.HH";
-  private String index = "yaf_index_" + new SimpleDateFormat(dateFormat).format(new Date());
-  private FieldNameConverter fieldNameConverter = new ElasticsearchFieldNameConverter();
-
+  private String collection = "metron";
+  private FieldNameConverter fieldNameConverter = fieldName -> fieldName;
   @Override
   public FieldNameConverter getFieldNameConverter() {
     return fieldNameConverter;
   }
 
   @Override
-  public InMemoryComponent getSearchComponent(final Properties topologyProperties) {
-    return new ElasticSearchComponent.Builder()
-            .withHttpPort(9211)
-            .withIndexDir(new File(indexDir))
+  public InMemoryComponent getSearchComponent(final Properties topologyProperties) throws Exception {
+    SolrComponent solrComponent = new SolrComponent.Builder()
+            .addCollection(collection, "../metron-solr/src/test/resources/solr/conf")
+            .withPostStartCallback(new Function<SolrComponent, Void>() {
+              @Nullable
+              @Override
+              public Void apply(@Nullable SolrComponent solrComponent) {
+                topologyProperties.setProperty("solr.zk", solrComponent.getZookeeperUrl());
+                try {
+                  String testZookeeperUrl = topologyProperties.getProperty(KafkaWithZKComponent.ZOOKEEPER_PROPERTY);
+                  Configurations configurations = SampleUtil.getSampleConfigs();
+                  Map<String, Object> globalConfig = configurations.getGlobalConfig();
+                  globalConfig.put("solr.zookeeper", solrComponent.getZookeeperUrl());
+                  ConfigurationsUtils.writeGlobalConfigToZookeeper(JSONUtils.INSTANCE.toJSON(globalConfig), testZookeeperUrl);
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+                return null;
+              }
+            })
             .build();
+    return solrComponent;
   }
 
   @Override
@@ -59,11 +76,11 @@ public class ElasticsearchEnrichmentIntegrationTest extends IndexingIntegrationT
     return new Processor<List<Map<String, Object>>>() {
       List<Map<String, Object>> docs = null;
       public ReadinessState process(ComponentRunner runner) {
-        ElasticSearchComponent elasticSearchComponent = runner.getComponent("search", ElasticSearchComponent.class);
-        if (elasticSearchComponent.hasIndex(index)) {
+        SolrComponent solrComponent = runner.getComponent("search", SolrComponent.class);
+        if (solrComponent.hasCollection(collection)) {
           List<Map<String, Object>> docsFromDisk;
           try {
-            docs = elasticSearchComponent.getAllIndexedDocs(index, testSensorType + "_doc");
+            docs = solrComponent.getAllIndexedDocs(collection);
             docsFromDisk = readDocsFromDisk(hdfsDir);
             System.out.println(docs.size() + " vs " + inputMessages.size() + " vs " + docsFromDisk.size());
           } catch (IOException e) {
@@ -87,14 +104,11 @@ public class ElasticsearchEnrichmentIntegrationTest extends IndexingIntegrationT
 
   @Override
   public void setAdditionalProperties(Properties topologyProperties) {
-    topologyProperties.setProperty("es.clustername", "metron");
-    topologyProperties.setProperty("es.port", "9300");
-    topologyProperties.setProperty("es.ip", "localhost");
-    topologyProperties.setProperty("writer.class.name", "org.apache.metron.elasticsearch.writer.ElasticsearchWriter");
+    topologyProperties.setProperty("writer.class.name", "org.apache.metron.solr.writer.SolrWriter");
   }
 
   @Override
   public String cleanField(String field) {
-    return field;
+    return field.replaceFirst("_[dfils]$", "");
   }
 }
