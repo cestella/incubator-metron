@@ -25,23 +25,22 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.metron.TestConstants;
 import org.apache.metron.common.Constants;
-import org.apache.metron.common.interfaces.FieldNameConverter;
 import org.apache.metron.common.configuration.EnrichmentConfigurations;
 import org.apache.metron.hbase.TableProvider;
 import org.apache.metron.enrichment.converter.EnrichmentKey;
 import org.apache.metron.enrichment.converter.EnrichmentValue;
 import org.apache.metron.enrichment.converter.EnrichmentHelper;
 import org.apache.metron.integration.*;
-import org.apache.metron.integration.components.ConfigUploadComponent;
+import org.apache.metron.enrichment.integration.components.ConfigUploadComponent;
 import org.apache.metron.integration.utils.TestUtils;
 import org.apache.metron.test.utils.UnitTestHelper;
 import org.apache.metron.integration.components.FluxTopologyComponent;
 import org.apache.metron.integration.components.KafkaWithZKComponent;
-import org.apache.metron.integration.mock.MockGeoAdapter;
+import org.apache.metron.enrichment.integration.mock.MockGeoAdapter;
 import org.apache.metron.test.mock.MockHTable;
 import org.apache.metron.enrichment.lookup.LookupKV;
 
-import org.apache.metron.integration.utils.SampleUtil;
+import org.apache.metron.enrichment.integration.utils.SampleUtil;
 import org.apache.metron.common.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Stack;
 
 public class EnrichmentIntegrationTest extends BaseIntegrationTest {
 

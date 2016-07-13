@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.integration.mock;
+package org.apache.metron.enrichment.integration.mock;
 
 import com.google.common.base.Joiner;
 import org.apache.metron.enrichment.bolt.CacheKey;

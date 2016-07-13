@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.metron.integration.mock;
+package org.apache.metron.enrichment.integration.mock;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.HTableInterface;

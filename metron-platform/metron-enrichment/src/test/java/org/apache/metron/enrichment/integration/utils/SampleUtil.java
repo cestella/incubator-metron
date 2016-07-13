@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.integration.utils;
+package org.apache.metron.enrichment.integration.utils;
 
 import org.apache.metron.TestConstants;
 import org.apache.metron.common.configuration.Configurations;

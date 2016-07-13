@@ -21,7 +21,7 @@
         <version>0.2.0BETA</version>
     </parent>
     <artifactId>metron-writer</artifactId>
-    <name>metron-common</name>
+    <name>metron-writer</name>
     <description>Components common to all enrichments</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

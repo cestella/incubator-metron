@@ -15,14 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.integration.components;
+package org.apache.metron.enrichment.integration.components;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.metron.common.configuration.ConfigurationsUtils;
 import org.apache.metron.common.configuration.SensorParserConfig;
-import org.apache.metron.common.utils.JSONUtils;
 import org.apache.metron.integration.InMemoryComponent;
 import org.apache.metron.integration.UnableToStartException;
+import org.apache.metron.integration.components.KafkaWithZKComponent;
 
 import java.util.HashMap;
 import java.util.Map;

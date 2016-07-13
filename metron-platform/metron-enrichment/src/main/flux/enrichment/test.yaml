@@ -21,7 +21,7 @@ config:
 components:
 # Enrichment
     -   id: "geoEnrichmentAdapter"
-        className: "org.apache.metron.integration.mock.MockGeoAdapter"
+        className: "org.apache.metron.enrichment.integration.mock.MockGeoAdapter"
     -   id: "geoEnrichment"
         className: "org.apache.metron.enrichment.configuration.Enrichment"
         constructorArgs:
