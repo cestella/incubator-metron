@@ -256,22 +256,6 @@ bolts:
             -   name: "withMaxTimeRetain"
                 args: [10]
 # Indexing Bolts
-    -   id: "indexingBolt"
-        className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"
-        constructorArgs:
-            - "${kafka.zk}"
-        configMethods:
-            -   name: "withBulkMessageWriter"
-                args:
-                    - ref: "indexWriter"
-    -   id: "hdfsIndexingBolt"
-        className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"
-        constructorArgs:
-            - "${kafka.zk}"
-        configMethods:
-            -   name: "withBulkMessageWriter"
-                args:
-                    - ref: "hdfsWriter"
 
     -   id: "outputBolt"
         className: "org.apache.metron.writer.bolt.BulkMessageWriterBolt"

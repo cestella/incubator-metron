@@ -20,7 +20,7 @@ metron_solr_jar_name: metron-solr-{{ metron_version }}.jar
 metron_elasticsearch_jar_name: metron-elasticsearch-{{ metron_version }}.jar
 metron_pcap_jar_name: metron-pcap-backend-{{ metron_version }}.jar
 metron_parsers_jar_name: metron-parsers-{{ metron_version }}.jar
-metron_enrichment_jar_name: metron-enrichment-{{ metron_version }}.jar
+metron_enrichment_jar_name: metron-enrichment-{{ metron_version }}-uber.jar
 
 metron_common_bundle_name: metron-common-{{ metron_version }}-archive.tar.gz
 metron_pcap_bundle_name: metron-pcap-backend-{{ metron_version }}-archive.tar.gz
