@@ -28,7 +28,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <storm.hdfs.version>0.1.2</storm.hdfs.version>
         <tinkerpop.version>3.2.0-incubating</tinkerpop.version>
-        <titan.version>0.5.4</titan.version>
+        <titan.version>1.0.0</titan.version>
         <guava.version>${global_hbase_guava_version}</guava.version>
     </properties>
     <dependencies>
