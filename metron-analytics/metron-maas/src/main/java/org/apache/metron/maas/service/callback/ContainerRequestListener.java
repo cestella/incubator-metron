@@ -22,7 +22,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
 
   private static final Log LOG = LogFactory.getLog(ContainerRequestListener.class);
 
-  private Map<Resource, BlockingQueue<Container>> acceptedContainersByResource = Maps.newHashMap();
+  private Map<String, BlockingQueue<Container>> acceptedContainersByResource = Maps.newHashMap();
   private AMRMClientAsync amRMClient;
   @VisibleForTesting
   private UserGroupInformation appSubmitterUgi;
@@ -41,9 +41,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
     this.appSubmitterUgi = appSubmitterUgi;
     this.timelineClient = timelineClient;
   }
-  public BlockingQueue<Container> getContainerQueue(Resource resource) {
-    return acceptedContainersByResource.get(resource);
-  }
+
   public void initialize(AMRMClientAsync amRMClient
                         , NMClientAsync nmClient
                         )
@@ -60,14 +58,8 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
 
   public void requestContainers(int number, Resource characteristic) {
     Priority pri = Priority.newInstance(0);
-    AMRMClient.ContainerRequest request = new AMRMClient.ContainerRequest(characteristic, null, null, pri, false);
-    AtomicInteger containersRequested;
-    synchronized(acceptedContainersByResource) {
-      BlockingQueue<Container> queue = acceptedContainersByResource.get(characteristic);
-      if(queue == null) {
-        acceptedContainersByResource.put(characteristic, new LinkedBlockingDeque<>());
-      }
-    }
+    BlockingQueue<Container> queue = getQueue(characteristic);
+    AMRMClient.ContainerRequest request = new AMRMClient.ContainerRequest(characteristic, null, null, pri, true);
     for(int i = 0;i < number;++i) {
       amRMClient.addContainerRequest(request);
     }
@@ -119,19 +111,31 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
     LOG.info("Got response from RM for container ask, allocatedCnt="
             + allocatedContainers.size());
     for (Container allocatedContainer : allocatedContainers) {
-      BlockingQueue<Container> queue = acceptedContainersByResource.get(allocatedContainer.getResource());
+      BlockingQueue<Container> queue = getQueue(allocatedContainer.getResource());
       queue.add(allocatedContainer);
       LOG.info("Launching shell command on a new container."
               + ", containerId=" + allocatedContainer.getId()
               + ", containerNode=" + allocatedContainer.getNodeId().getHost()
               + ":" + allocatedContainer.getNodeId().getPort()
               + ", containerNodeURI=" + allocatedContainer.getNodeHttpAddress()
-              + ", containerResourceMemory"
+              + ", containerResourceMemory="
               + allocatedContainer.getResource().getMemory()
-              + ", containerResourceVirtualCores"
+              + ", containerResourceVirtualCores="
               + allocatedContainer.getResource().getVirtualCores());
     }
   }
+
+  public BlockingQueue<Container> getQueue(Resource resource) {
+    synchronized(acceptedContainersByResource) {
+      BlockingQueue<Container> containers = acceptedContainersByResource.get(resource.getMemory() + ":" + resource.getVirtualCores());
+      if(containers == null) {
+        containers = new LinkedBlockingDeque<>();
+        acceptedContainersByResource.put(resource.getMemory() + ":" + resource.getVirtualCores(), containers);
+      }
+      return containers;
+    }
+  }
+
 
   @Override
   public void onShutdownRequest() {

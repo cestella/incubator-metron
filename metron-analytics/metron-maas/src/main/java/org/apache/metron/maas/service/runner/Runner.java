@@ -6,6 +6,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -16,6 +18,7 @@ import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 import org.apache.metron.maas.service.ConfigUtil;
 import org.apache.metron.maas.config.MaaSConfig;
 import org.apache.metron.maas.config.ModelEndpoint;
+import org.apache.metron.maas.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,9 +88,9 @@ public class Runner {
 
     public static String toArgs(Map.Entry<RunnerOptions, String> ... arg) {
       return
-      Joiner.on(" ").join(Iterables.transform(Arrays.asList(arg)
-                                             , a -> "-" + a.getKey().option.getOpt()
-                                                  + a.getValue() == null?"":(" " + a.getValue())
+      Joiner.on(" ").join(Iterables.transform(Utils.INSTANCE.toList(arg)
+                                             , a -> "-" + a.getKey().shortCode
+                                                  + (a.getValue() == null?"":(" " + a.getValue()))
                                              )
                          );
 
@@ -123,7 +126,7 @@ public class Runner {
 
     public static void printHelp() {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp( "MaaSApplicationMaster", getOptions());
+      formatter.printHelp( "MaaSRunner", getOptions());
     }
 
     public static Options getOptions() {
@@ -134,6 +137,7 @@ public class Runner {
       return ret;
     }
   }
+  private static final Log LOG = LogFactory.getLog(Runner.class);
   public void main(String... argv) throws Exception {
     CommandLine cli = RunnerOptions.parse(new PosixParser(), argv);
     String zkQuorum = RunnerOptions.ZK_QUORUM.get(cli);
@@ -145,9 +149,11 @@ public class Runner {
     ServiceDiscovery<ModelEndpoint> serviceDiscovery = null;
     CuratorFramework client = null;
 
+    LOG.error("Running script " + script);
     try {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
       client = CuratorFrameworkFactory.newClient(zkQuorum, retryPolicy);
+      client.start();
       MaaSConfig config = ConfigUtil.INSTANCE.read(client, zkRoot, MaaSConfig.class);
       JsonInstanceSerializer<ModelEndpoint> serializer = new JsonInstanceSerializer<>(ModelEndpoint.class);
       try {

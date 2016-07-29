@@ -156,7 +156,9 @@ public class ModelSubmission {
     try {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
       client = CuratorFrameworkFactory.newClient(ModelSubmissionOptions.ZK_QUORUM.get(cli), retryPolicy);
+      client.start();
       MaaSConfig config = ConfigUtil.INSTANCE.read(client, ModelSubmissionOptions.ZK_ROOT.get(cli), MaaSConfig.class);
+
       if (ModelSubmissionOptions.LOCAL_MODEL_PATH.has(cli)) {
         FileSystem fs = FileSystem.get(new Configuration());
         File localDir = new File(ModelSubmissionOptions.LOCAL_MODEL_PATH.get(cli));

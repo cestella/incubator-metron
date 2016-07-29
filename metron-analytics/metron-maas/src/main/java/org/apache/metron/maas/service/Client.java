@@ -72,6 +72,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.timeline.TimelineUtils;
+import org.apache.metron.maas.util.Utils;
 
 import static org.apache.metron.maas.service.Client.ClientOptions.*;
 
@@ -164,7 +165,6 @@ public class Client {
 
   // Timeline domain ID
   private String domainId = null;
-  private String scriptPath = null;
   private String zkQuorum = null;
   private String zkRoot = null;
   // Flag to indicate whether to create the domain of the given ID
@@ -237,16 +237,10 @@ public class Client {
       o.setRequired(true);
       return o;
     })
-    ,SCRIPT_PATH("sp", code -> {
-      Option o = new Option(code, "script_path", true, "Script Path");
-      o.setRequired(true);
-      return o;
-    })
-
     ,SHELL_ENV("e", code -> {
       Option o = new Option(code, "shell_env", true,
               "Environment for shell script. Specified as env_key=env_val pairs");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,DEBUG("d", code -> {
@@ -344,9 +338,9 @@ public class Client {
 
     public static String toArgs(Map.Entry<ClientOptions, String> ... arg) {
       return
-      Joiner.on(" ").join(Iterables.transform(Arrays.asList(arg)
-                                             , a -> "-" + a.getKey().option.getOpt()
-                                                  + a.getValue() == null?"":(" " + a.getValue())
+      Joiner.on(" ").join(Iterables.transform(Utils.INSTANCE.toList(arg)
+                                             , a -> "-" + a.getKey().shortCode
+                                                  + (a.getValue() == null?"":(" " + a.getValue()))
                                              )
                          );
 
@@ -369,7 +363,7 @@ public class Client {
 
     public static void printHelp() {
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp( "MaaSApplicationMaster", getOptions());
+      formatter.printHelp( "MaaSClient", getOptions());
     }
 
     public static Options getOptions() {
@@ -439,12 +433,9 @@ public class Client {
       throw new IllegalArgumentException("No jar file specified for application master");
     }
 
-    if (!SCRIPT_PATH.has(cli)){
-      throw new IllegalArgumentException("No Script path for app master specified!");
-    }
+
 
     appMasterJar = JAR.get(cli);
-    scriptPath = SCRIPT_PATH.get(cli);
 
     if (SHELL_ENV.has(cli)) {
       String envs[] = cli.getOptionValues(SHELL_ENV.option.getOpt());
@@ -679,16 +670,13 @@ public class Client {
     // Set class name
     vargs.add(appMasterMainClass);
     // Set params for Application Master
-    vargs.add(ApplicationMaster.AMOptions.toArgs(ApplicationMaster.AMOptions.SCRIPT_PATH.of(scriptPath)
-                                                ,ApplicationMaster.AMOptions.ZK_QUORUM.of(zkQuorum)
+    vargs.add(ApplicationMaster.AMOptions.toArgs(ApplicationMaster.AMOptions.ZK_QUORUM.of(zkQuorum)
                                                 ,ApplicationMaster.AMOptions.ZK_ROOT.of(zkRoot)
                                                 )
              );
     if (null != nodeLabelExpression) {
       appContext.setNodeLabelExpression(nodeLabelExpression);
     }
-    vargs.add("--priority " + String.valueOf(shellCmdPriority));
-
     for (Map.Entry<String, String> entry : shellEnv.entrySet()) {
       vargs.add("--shell_env " + entry.getKey() + "=" + entry.getValue());
     }

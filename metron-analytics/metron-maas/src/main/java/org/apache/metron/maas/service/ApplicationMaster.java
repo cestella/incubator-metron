@@ -81,6 +81,7 @@ import org.apache.metron.maas.service.queue.ZKQueue;
 import org.apache.metron.maas.service.runner.MaaSHandler;
 import org.apache.metron.maas.service.yarn.Resources;
 import org.apache.metron.maas.service.yarn.YarnUtils;
+import org.apache.metron.maas.util.Utils;
 
 /**
  * An ApplicationMaster for executing shell commands on a set of launched
@@ -194,7 +195,6 @@ public class ApplicationMaster {
   private static final String log4jPath = "log4j.properties";
 
   private ByteBuffer allTokens;
-  private String scriptPath;
   private ContainerRequestListener listener;
   // Launch threads
   private ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
@@ -225,11 +225,6 @@ public class ApplicationMaster {
       o.setRequired(true);
       return o;
     })
-    ,SCRIPT_PATH("sp", code -> {
-      Option o = new Option(code, "script_path", true, "Script Path");
-      o.setRequired(true);
-      return o;
-    })
     ,APP_ATTEMPT_ID("aid", code -> {
       Option o = new Option(code, "app_attempt_id", true, "App Attempt ID. Not to be used unless for testing purposes");
       o.setRequired(false);
@@ -238,7 +233,7 @@ public class ApplicationMaster {
     ,SHELL_ENV("e", code -> {
       Option o = new Option(code, "shell_env", true,
               "Environment for shell script. Specified as env_key=env_val pairs");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,DEBUG("d", code -> {
@@ -276,9 +271,9 @@ public class ApplicationMaster {
 
     public static String toArgs(Map.Entry<AMOptions, String> ... arg) {
       return
-      Joiner.on(" ").join(Iterables.transform(Arrays.asList(arg)
-                                             , a -> "-" + a.getKey().option.getOpt()
-                                                  + a.getValue() == null?"":(" " + a.getValue())
+      Joiner.on(" ").join(Iterables.transform(Utils.INSTANCE.toList(arg)
+                                             , a -> "-" + a.getKey().shortCode
+                                                  + (a.getValue() == null?"":(" " + a.getValue()))
                                              )
                          );
 
@@ -406,7 +401,6 @@ public class ApplicationMaster {
       dumpOutDebugInfo();
     }
     zkQuorum = AMOptions.ZK_QUORUM.get(cliParser);
-    scriptPath = AMOptions.SCRIPT_PATH.get(cliParser);
     zkRoot = AMOptions.ZK_ROOT.get(cliParser);
 
     Map<String, String> envs = System.getenv();
@@ -540,10 +534,14 @@ public class ApplicationMaster {
                               .createQueue(ImmutableMap.of(ZKQueue.ZK_CLIENT, maasHandler.getClient()
                                                           )
                                           );
+    LOG.info("Ready to accept requests...");
     while(true) {
       ModelRequest request = requestQueue.dequeue();
+      LOG.info("Received request for model " + request.getName() + ":" + request.getVersion() + "x" + request.getNumInstances()
+              + " containers of size " + request.getMemory() + "M at path " + request.getPath()
+              );
       EnumMap<Resources, Integer> resourceRequest = Resources.toResourceMap(Resources.MEMORY.of(request.getMemory())
-                                                                            ,Resources.V_CORE.of(request.getMemory())
+                                                                            ,Resources.V_CORE.of(1)
                                                                             );
       EnumMap<Resources, Integer> resources = Resources.getRealisticResourceRequest( maxResources
                                                                                    , Resources.toResource(resourceRequest)
@@ -552,9 +550,9 @@ public class ApplicationMaster {
       if(request.getAction() == Action.ADD) {
         listener.requestContainers(request.getNumInstances(), resource);
         for (int i = 0; i < request.getNumInstances(); ++i) {
-          Container container = listener.getContainerQueue(resource).take();
-          executor.execute(new LaunchContainer(new Path(scriptPath)
-                        , conf
+          Container container = listener.getQueue(resource).take();
+          LOG.info("Found container id of " + container.getId().getContainerId());
+          executor.execute(new LaunchContainer(conf
                         , zkQuorum
                         , zkRoot
                         , nmClientAsync

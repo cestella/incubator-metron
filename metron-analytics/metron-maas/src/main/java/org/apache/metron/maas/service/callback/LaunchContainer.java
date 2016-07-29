@@ -10,8 +10,10 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.records.*;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.metron.maas.config.ModelRequest;
+import org.apache.metron.maas.service.runner.Runner;
 import org.apache.metron.maas.service.runner.Runner.RunnerOptions;
 
 import java.nio.ByteBuffer;
@@ -21,7 +23,6 @@ public class LaunchContainer implements Runnable {
   private static final Log LOG = LogFactory.getLog(LaunchContainer.class);
   private ModelRequest request;
   private Container container;
-  private Path scriptPath;
   private Configuration conf ;
   private NMClientAsync nmClientAsync;
   private ContainerRequestListener containerListener;
@@ -29,8 +30,7 @@ public class LaunchContainer implements Runnable {
   private String zkRoot;
   private ByteBuffer allTokens;
 
-  public LaunchContainer( Path scriptPath
-                        , Configuration conf
+  public LaunchContainer( Configuration conf
                         , String zkQuorum
                         , String zkRoot
                         , NMClientAsync nmClientAsync
@@ -43,7 +43,6 @@ public class LaunchContainer implements Runnable {
     this.allTokens = allTokens;
     this.zkQuorum = zkQuorum;
     this.zkRoot = zkRoot;
-    this.scriptPath = scriptPath;
     this.request = request;
     this.container = container;
     this.conf = conf;
@@ -58,8 +57,6 @@ public class LaunchContainer implements Runnable {
 
     // Set the local resources
     Map<String, LocalResource> localResources = new HashMap<>();
-    String script = localizeResources(localResources, scriptPath);
-    assert script != null;
 
     String modelScript = localizeResources(localResources, new Path(request.getPath()));
 
@@ -110,11 +107,15 @@ public class LaunchContainer implements Runnable {
     // "." to the path.
     // By default, all the hadoop specific classpaths will already be available
     // in $CLASSPATH, so we should be careful not to overwrite it.
-    String classPathEnv = "$CLASSPATH:./*:";
-    env.put("CLASSPATH", classPathEnv);
+    StringBuffer classPathEnv = new StringBuffer("$CLASSPATH:./*:");
+    if (conf.getBoolean(YarnConfiguration.IS_MINI_YARN_CLUSTER, false)) {
+      classPathEnv.append(System.getProperty("java.class.path"));
+    }
+    env.put("CLASSPATH", classPathEnv.toString());
 
     // Construct the command to be executed on the launched container
-    String command = "./" + script
+    String command = ApplicationConstants.Environment.JAVA_HOME.$$() + "/bin/java "
+            + Runner.class + " "
             + RunnerOptions.toArgs(RunnerOptions.CONTAINER_ID.of(container.getId().getContainerId() + "")
                                   ,RunnerOptions.ZK_QUORUM.of(zkQuorum)
                                   ,RunnerOptions.ZK_ROOT.of(zkRoot)

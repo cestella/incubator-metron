@@ -16,15 +16,11 @@
  * limitations under the License.
  */
 package org.apache.metron.maas;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +51,8 @@ import org.apache.metron.maas.service.ApplicationMaster;
 import org.apache.metron.maas.service.Client;
 import org.apache.metron.maas.service.ConfigUtil;
 import org.apache.metron.maas.service.queue.ZKQueue;
+import org.apache.metron.maas.submit.ModelSubmission;
+import org.apache.zookeeper.KeeperException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -85,6 +83,7 @@ public class MaasIntegrationTest {
     zookeeperUrl = testZkServer.getConnectString();
     RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
     client = CuratorFrameworkFactory.newClient(zookeeperUrl, retryPolicy);
+    client.start();
     conf = new YarnConfiguration();
     conf.setInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 128);
     conf.set("yarn.log.dir", "target");
@@ -168,11 +167,18 @@ public class MaasIntegrationTest {
         put(ZKQueue.ZK_PATH, "/maas/queue");
       }});
     }};
-    client.setData().forPath("/maas/config", ConfigUtil.INSTANCE.toBytes(config));
+    String configRoot = "/maas/config";
+    byte[] configData = ConfigUtil.INSTANCE.toBytes(config);
+    try {
+      client.setData().forPath(configRoot, configData);
+    }
+    catch(KeeperException.NoNodeException e) {
+      client.create().creatingParentsIfNeeded().forPath(configRoot, configData);
+    }
     String[] args = {
             "--jar", APPMASTER_JAR,
             "--zk_quorum", zookeeperUrl,
-            "--zk_root", "/maas/config",
+            "--zk_root", configRoot,
             "--master_memory", "512",
             "--master_vcores", "2",
     };
@@ -239,8 +245,31 @@ public class MaasIntegrationTest {
     }
     Assert.assertTrue(errorMessage, verified);
 
+    ModelSubmission.main(new String[] {
+            "--name", "dummy",
+            "--version", "1.0",
+            "--zk_quorum", zookeeperUrl,
+            "--zk_root", configRoot,
+            "--local_model_path", "target/src/test/resources/maas",
+            "--hdfs_model_path", "maas/dummy",
+            "--num_instances", "1",
+            "--memory", "100",
 
-
+    });
+    boolean passed = false;
+    for(int i = 0;i < 100;++i) {
+      try {
+        String output =  makeRESTcall(new URL("http://localhost:1500/echo/casey"));
+        if(output.contains("casey")) {
+          passed = true;
+          break;
+        }
+      }
+      catch(Exception e) {
+      }
+      Thread.sleep(2000);
+    }
+    Assert.assertTrue(passed);
     /*t.join();
     LOG.info("Client run completed. Result=" + result);
     Assert.assertTrue(result.get());
@@ -288,6 +317,34 @@ public class MaasIntegrationTest {
               entities.getEntities().get(0).getDomainId());
     }
     */
+  }
+  private String makeRESTcall(URL url) throws IOException {
+    HttpURLConnection conn = null;
+    //make connection
+    try{
+      conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+
+      if (conn.getResponseCode() != 200) {
+        throw new RuntimeException("Failed : HTTP error code : "
+                + conn.getResponseCode());
+      }
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(
+              (conn.getInputStream())));
+
+      String output = "";
+      String line;
+      while ((line = br.readLine()) != null) {
+        output += line + "\n";
+      }
+      return output;
+    }
+    finally {
+      if(conn != null) {
+        conn.disconnect();
+      }
+    }
   }
 
   /*
