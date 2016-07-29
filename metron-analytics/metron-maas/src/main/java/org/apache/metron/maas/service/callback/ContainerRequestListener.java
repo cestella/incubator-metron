@@ -10,6 +10,7 @@ import org.apache.hadoop.yarn.client.api.AMRMClient;
 import org.apache.hadoop.yarn.client.api.TimelineClient;
 import org.apache.hadoop.yarn.client.api.async.AMRMClientAsync;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
+import org.apache.metron.maas.service.ContainerTracker;
 import org.apache.metron.maas.service.yarn.YarnUtils;
 
 import java.nio.ByteBuffer;
@@ -21,8 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler, NMClientAsync.CallbackHandler  {
 
   private static final Log LOG = LogFactory.getLog(ContainerRequestListener.class);
-
-  private Map<String, BlockingQueue<Container>> acceptedContainersByResource = Maps.newHashMap();
+  private ContainerTracker state;
   private AMRMClientAsync amRMClient;
   @VisibleForTesting
   private UserGroupInformation appSubmitterUgi;
@@ -35,11 +35,13 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
   public ContainerRequestListener( TimelineClient timelineClient
                                  , UserGroupInformation appSubmitterUgi
                                  , String domainId
+                                 , int minMemorySize
                                  )
   {
     this.domainId = domainId;
     this.appSubmitterUgi = appSubmitterUgi;
     this.timelineClient = timelineClient;
+    state = new ContainerTracker(minMemorySize);
   }
 
   public void initialize(AMRMClientAsync amRMClient
@@ -58,7 +60,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
 
   public void requestContainers(int number, Resource characteristic) {
     Priority pri = Priority.newInstance(0);
-    BlockingQueue<Container> queue = getQueue(characteristic);
+    state.getQueue(characteristic);
     AMRMClient.ContainerRequest request = new AMRMClient.ContainerRequest(characteristic, null, null, pri, true);
     for(int i = 0;i < number;++i) {
       amRMClient.addContainerRequest(request);
@@ -106,13 +108,16 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
     }
   }
 
+  public BlockingQueue<Container> getContainers(Resource resource) {
+    return state.getQueue(resource);
+  }
+
   @Override
   public void onContainersAllocated(List<Container> allocatedContainers) {
     LOG.info("Got response from RM for container ask, allocatedCnt="
             + allocatedContainers.size());
     for (Container allocatedContainer : allocatedContainers) {
-      BlockingQueue<Container> queue = getQueue(allocatedContainer.getResource());
-      queue.add(allocatedContainer);
+      state.registerContainer(allocatedContainer.getResource(), allocatedContainer);
       LOG.info("Launching shell command on a new container."
               + ", containerId=" + allocatedContainer.getId()
               + ", containerNode=" + allocatedContainer.getNodeId().getHost()
@@ -125,16 +130,6 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
     }
   }
 
-  public BlockingQueue<Container> getQueue(Resource resource) {
-    synchronized(acceptedContainersByResource) {
-      BlockingQueue<Container> containers = acceptedContainersByResource.get(resource.getMemory() + ":" + resource.getVirtualCores());
-      if(containers == null) {
-        containers = new LinkedBlockingDeque<>();
-        acceptedContainersByResource.put(resource.getMemory() + ":" + resource.getVirtualCores(), containers);
-      }
-      return containers;
-    }
-  }
 
 
   @Override

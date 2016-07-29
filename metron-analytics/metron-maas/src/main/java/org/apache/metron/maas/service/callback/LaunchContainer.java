@@ -16,6 +16,7 @@ import org.apache.metron.maas.config.ModelRequest;
 import org.apache.metron.maas.service.runner.Runner;
 import org.apache.metron.maas.service.runner.Runner.RunnerOptions;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -57,9 +58,15 @@ public class LaunchContainer implements Runnable {
 
     // Set the local resources
     Map<String, LocalResource> localResources = new HashMap<>();
-
+    LOG.info("Local Directory Contents");
+    for(File f : new File(".").listFiles()) {
+      LOG.info("  " + f.getName());
+    }
+    LOG.info("Localizing " + request.getPath());
     String modelScript = localizeResources(localResources, new Path(request.getPath()));
-
+    for(Map.Entry<String, LocalResource> entry : localResources.entrySet()) {
+      LOG.info(entry.getKey() + " localized: " + entry.getValue().getResource() );
+    }
     // The container for the eventual shell commands needs its own local
     // resources too.
     // In this scenario, if a shell script is specified, we need to have it
@@ -126,6 +133,7 @@ public class LaunchContainer implements Runnable {
             + " 1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout"
             + " 2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr";
     List<String> commands = new ArrayList<String>();
+    LOG.info("Executing container command: " + command);
     commands.add(command);
 
 

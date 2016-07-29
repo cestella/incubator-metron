@@ -142,7 +142,8 @@ public class ModelSubmission {
       return ret;
     }
   }
-  public static void main(String... argv) throws Exception {
+
+  public void execute(FileSystem fs, String... argv) throws Exception {
     CommandLine cli = ModelSubmissionOptions.parse(new PosixParser(), argv);
     ModelRequest request = new ModelRequest() {{
       setName(ModelSubmissionOptions.NAME.get(cli));
@@ -160,7 +161,6 @@ public class ModelSubmission {
       MaaSConfig config = ConfigUtil.INSTANCE.read(client, ModelSubmissionOptions.ZK_ROOT.get(cli), MaaSConfig.class);
 
       if (ModelSubmissionOptions.LOCAL_MODEL_PATH.has(cli)) {
-        FileSystem fs = FileSystem.get(new Configuration());
         File localDir = new File(ModelSubmissionOptions.LOCAL_MODEL_PATH.get(cli));
         Path hdfsPath = new Path(ModelSubmissionOptions.HDFS_MODEL_PATH.get(cli));
         updateHDFS(fs, localDir, hdfsPath);
@@ -173,6 +173,12 @@ public class ModelSubmission {
         client.close();
       }
     }
+  }
+
+  public static void main(String... argv) throws Exception {
+    FileSystem fs = FileSystem.get(new Configuration());
+    ModelSubmission submission = new ModelSubmission();
+    submission.execute(fs, argv);
   }
 
   public static void updateHDFS(FileSystem fs, File localDir, Path hdfsPath) throws IOException {

@@ -101,7 +101,7 @@ public enum YarnUtils {
           final TimelineClient timelineClient, Container container, String domainId,
           UserGroupInformation ugi) {
     final TimelineEntity entity = new TimelineEntity();
-    entity.setEntityId(container.getId().toString());
+    entity.setEntityId("" + container.getId());
     entity.setEntityType(ApplicationMaster.DSEntity.DS_CONTAINER.toString());
     entity.setDomainId(domainId);
     entity.addPrimaryFilter("user", ugi.getShortUserName());

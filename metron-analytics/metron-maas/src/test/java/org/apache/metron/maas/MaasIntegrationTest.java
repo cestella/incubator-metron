@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.RetryPolicy;
@@ -245,13 +246,14 @@ public class MaasIntegrationTest {
     }
     Assert.assertTrue(errorMessage, verified);
 
-    ModelSubmission.main(new String[] {
+    new ModelSubmission().execute(FileSystem.get(conf)
+            ,new String[] {
             "--name", "dummy",
             "--version", "1.0",
             "--zk_quorum", zookeeperUrl,
             "--zk_root", configRoot,
-            "--local_model_path", "target/src/test/resources/maas",
-            "--hdfs_model_path", "maas/dummy",
+            "--local_model_path", "src/test/resources/maas",
+            "--hdfs_model_path", "target/maas/dummy",
             "--num_instances", "1",
             "--memory", "100",
 

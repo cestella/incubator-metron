@@ -491,7 +491,8 @@ public class ApplicationMaster {
       YarnUtils.INSTANCE.publishApplicationAttemptEvent(timelineClient, appAttemptID.toString(),
               ContainerEvents.DS_APP_ATTEMPT_START, domainId, appSubmitterUgi);
     }
-    listener = new ContainerRequestListener(timelineClient , appSubmitterUgi , domainId);
+    int minSize = getMinContainerMemoryIncrement(conf);
+    listener = new ContainerRequestListener(timelineClient , appSubmitterUgi , domainId, minSize);
     amRMClient = AMRMClientAsync.createAMRMClientAsync(1000, listener);
     amRMClient.init(conf);
     amRMClient.start();
@@ -550,7 +551,7 @@ public class ApplicationMaster {
       if(request.getAction() == Action.ADD) {
         listener.requestContainers(request.getNumInstances(), resource);
         for (int i = 0; i < request.getNumInstances(); ++i) {
-          Container container = listener.getQueue(resource).take();
+          Container container = listener.getContainers(resource).take();
           LOG.info("Found container id of " + container.getId().getContainerId());
           executor.execute(new LaunchContainer(conf
                         , zkQuorum
@@ -605,6 +606,14 @@ public class ApplicationMaster {
     }
     numRequestedContainers.set(numTotalContainers);
     */
+  }
+
+  private int getMinContainerMemoryIncrement(Configuration conf) {
+    String incrementStr = conf.get("yarn.scheduler.increment-allocation-mb");
+    if(incrementStr == null || incrementStr.length() == 0) {
+      incrementStr = conf.get("yarn.scheduler.minimum-allocation-mb");
+    }
+    return Integer.parseInt(incrementStr);
   }
 
   @VisibleForTesting
