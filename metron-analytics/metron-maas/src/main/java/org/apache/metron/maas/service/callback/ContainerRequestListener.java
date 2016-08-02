@@ -5,11 +5,14 @@ import com.google.common.collect.Maps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.authorize.Service;
 import org.apache.hadoop.yarn.api.records.*;
 import org.apache.hadoop.yarn.client.api.AMRMClient;
 import org.apache.hadoop.yarn.client.api.TimelineClient;
 import org.apache.hadoop.yarn.client.api.async.AMRMClientAsync;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
+import org.apache.metron.maas.common.ServiceDiscoverer;
+import org.apache.metron.maas.config.ModelRequest;
 import org.apache.metron.maas.service.ContainerTracker;
 import org.apache.metron.maas.service.yarn.YarnUtils;
 
@@ -31,7 +34,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
   @VisibleForTesting
   private TimelineClient timelineClient;
   private NMClientAsync nmClient;
-
+  private ServiceDiscoverer serviceDiscoverer;
   public ContainerRequestListener( TimelineClient timelineClient
                                  , UserGroupInformation appSubmitterUgi
                                  , String domainId
@@ -46,16 +49,32 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
 
   public void initialize(AMRMClientAsync amRMClient
                         , NMClientAsync nmClient
+                        , ServiceDiscoverer serviceDiscoverer
                         )
   {
     this.nmClient = nmClient;
     this.amRMClient = amRMClient;
+    this.serviceDiscoverer = serviceDiscoverer;
   }
 
 
 
-  public void removeContainers(int number, Resource characteristic) {
+  public void removeContainers(int number, ModelRequest request) {
+    int i = 0;
+    for(Container c : state.getList(request)) {
+      if(i < number) {
+        amRMClient.releaseAssignedContainer(c.getId());
+        nmClient.stopContainerAsync(c.getId(), c.getNodeId());
+      }
+      else {
+        break;
+      }
+      i++;
+    }
+  }
 
+  public ContainerTracker getContainerState() {
+    return state;
   }
 
   public void requestContainers(int number, Resource characteristic) {
@@ -81,7 +100,6 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
 
       // non complete containers should not be here
       assert (containerStatus.getState() == ContainerState.COMPLETE);
-
       // increment counters for completed/failed containers
       int exitStatus = containerStatus.getExitStatus();
       if (0 != exitStatus) {
@@ -117,6 +135,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
     LOG.info("Got response from RM for container ask, allocatedCnt="
             + allocatedContainers.size());
     for (Container allocatedContainer : allocatedContainers) {
+      containers.put(allocatedContainer.getId(), allocatedContainer);
       state.registerContainer(allocatedContainer.getResource(), allocatedContainer);
       LOG.info("Launching shell command on a new container."
               + ", containerId=" + allocatedContainer.getId()
@@ -152,12 +171,17 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
   }
 
   @Override
-    public void onContainerStopped(ContainerId containerId) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Succeeded to stop Container " + containerId);
-      }
-      containers.remove(containerId);
+  public void onContainerStopped(ContainerId containerId) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Succeeded to stop Container " + containerId);
     }
+    if(containerId == null) {
+      LOG.error("Container stopped callback: Empty container ID!");
+      throw new IllegalStateException("onContainerStopped returned null container ID!");
+    }
+    serviceDiscoverer.unregisterByContainer(containerId.getContainerId() + "");
+    containers.remove(containerId);
+  }
 
     @Override
     public void onContainerStatusReceived(ContainerId containerId,
@@ -178,7 +202,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
       if (container != null) {
         nmClient.getContainerStatusAsync(containerId, container.getNodeId());
       }
-      if(timelineClient != null) {
+      if(timelineClient != null && container != null) {
         YarnUtils.INSTANCE.publishContainerStartEvent( timelineClient, container, domainId, appSubmitterUgi);
       }
     }
@@ -186,6 +210,7 @@ public class ContainerRequestListener implements AMRMClientAsync.CallbackHandler
     @Override
     public void onStartContainerError(ContainerId containerId, Throwable t) {
       LOG.error("Failed to start Container " + containerId);
+      serviceDiscoverer.unregisterByContainer(containerId.getContainerId() + "");
       containers.remove(containerId);
     }
 

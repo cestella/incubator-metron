@@ -48,12 +48,12 @@ public class ModelSubmission {
     })
     ,LOCAL_MODEL_PATH("lmp", code -> {
       Option o = new Option(code, "local_model_path", true, "Model Path (local)");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,HDFS_MODEL_PATH("hmp", code -> {
       Option o = new Option(code, "hdfs_model_path", true, "Model Path (HDFS)");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,NAME("n", code -> {
@@ -73,7 +73,12 @@ public class ModelSubmission {
     })
     ,MEMORY("m", code -> {
       Option o = new Option(code, "memory", true, "Memory for container");
-      o.setRequired(true);
+      o.setRequired(false);
+      return o;
+    })
+    ,MODE("mo", code -> {
+      Option o = new Option(code, "mode", true, "ADD or REMOVE");
+      o.setRequired(false);
       return o;
     })
     ;
@@ -145,14 +150,25 @@ public class ModelSubmission {
 
   public void execute(FileSystem fs, String... argv) throws Exception {
     CommandLine cli = ModelSubmissionOptions.parse(new PosixParser(), argv);
-    ModelRequest request = new ModelRequest() {{
-      setName(ModelSubmissionOptions.NAME.get(cli));
-      setAction(Action.ADD);
-      setVersion(ModelSubmissionOptions.VERSION.get(cli));
-      setNumInstances(Integer.parseInt(ModelSubmissionOptions.NUM_INSTANCES.get(cli)));
-      setMemory(Integer.parseInt(ModelSubmissionOptions.MEMORY.get(cli)));
-      setPath(ModelSubmissionOptions.HDFS_MODEL_PATH.get(cli));
-    }};
+    ModelRequest request = null;
+    if(!ModelSubmissionOptions.MODE.has(cli) || ModelSubmissionOptions.MODE.get(cli).equals("ADD")) {
+      request = new ModelRequest() {{
+        setName(ModelSubmissionOptions.NAME.get(cli));
+        setAction(Action.ADD);
+        setVersion(ModelSubmissionOptions.VERSION.get(cli));
+        setNumInstances(Integer.parseInt(ModelSubmissionOptions.NUM_INSTANCES.get(cli)));
+        setMemory(Integer.parseInt(ModelSubmissionOptions.MEMORY.get(cli)));
+        setPath(ModelSubmissionOptions.HDFS_MODEL_PATH.get(cli));
+      }};
+    }
+    else {
+      request = new ModelRequest() {{
+        setName(ModelSubmissionOptions.NAME.get(cli));
+        setAction(Action.REMOVE);
+        setNumInstances(Integer.parseInt(ModelSubmissionOptions.NUM_INSTANCES.get(cli)));
+        setVersion(ModelSubmissionOptions.VERSION.get(cli));
+      }};
+    }
     CuratorFramework client = null;
     try {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);

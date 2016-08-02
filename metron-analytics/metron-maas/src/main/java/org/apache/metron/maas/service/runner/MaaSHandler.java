@@ -5,6 +5,8 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.hadoop.security.authorize.Service;
+import org.apache.metron.maas.common.ServiceDiscoverer;
 import org.apache.metron.maas.config.MaaSConfig;
 import org.apache.metron.maas.service.ConfigUtil;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -22,7 +24,7 @@ public class MaaSHandler {
   private String root;
   private ObjectMapper _mapper = new ObjectMapper();
   protected ReadWriteLock lock = new ReentrantReadWriteLock();
-
+  private ServiceDiscoverer discoverer;
   public MaaSHandler(String zkQuorum, String root) {
     this.zkQuorum = zkQuorum;
     this.root = root;
@@ -58,5 +60,10 @@ public class MaaSHandler {
               }
             }
     );
+    discoverer = new ServiceDiscoverer(client, config.getServiceRoot());
+    discoverer.start();
+  }
+  public ServiceDiscoverer getDiscoverer() {
+    return discoverer;
   }
 }

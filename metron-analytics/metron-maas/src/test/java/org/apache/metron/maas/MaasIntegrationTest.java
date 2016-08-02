@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +49,10 @@ import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler;
+import org.apache.metron.maas.common.ServiceDiscoverer;
 import org.apache.metron.maas.config.MaaSConfig;
+import org.apache.metron.maas.config.Model;
+import org.apache.metron.maas.config.ModelEndpoint;
 import org.apache.metron.maas.service.ApplicationMaster;
 import org.apache.metron.maas.service.Client;
 import org.apache.metron.maas.service.ConfigUtil;
@@ -245,80 +250,97 @@ public class MaasIntegrationTest {
       }
     }
     Assert.assertTrue(errorMessage, verified);
+    FileSystem fs = FileSystem.get(conf);
+    try {
+      new ModelSubmission().execute(FileSystem.get(conf)
+              , new String[]{
+                      "--name", "dummy",
+                      "--version", "1.0",
+                      "--zk_quorum", zookeeperUrl,
+                      "--zk_root", configRoot,
+                      "--local_model_path", "src/test/resources/maas",
+                      "--hdfs_model_path", new Path(fs.getHomeDirectory(), "maas/dummy").toString(),
+                      "--num_instances", "1",
+                      "--memory", "100",
+                      "--mode", "ADD",
 
-    new ModelSubmission().execute(FileSystem.get(conf)
-            ,new String[] {
-            "--name", "dummy",
-            "--version", "1.0",
-            "--zk_quorum", zookeeperUrl,
-            "--zk_root", configRoot,
-            "--local_model_path", "src/test/resources/maas",
-            "--hdfs_model_path", "target/maas/dummy",
-            "--num_instances", "1",
-            "--memory", "100",
+              });
+      ServiceDiscoverer discoverer = new ServiceDiscoverer(this.client, config.getServiceRoot());
+      discoverer.start();
+      {
+        boolean passed = false;
+        for (int i = 0; i < 100; ++i) {
+          try {
+            List<ModelEndpoint> endpoints = discoverer.getEndpoints(new Model("dummy", "1.0"));
+            if (endpoints != null && endpoints.size() == 1) {
+              String output = makeRESTcall(new URL("http://localhost:1500/echo/casey"));
+              if (output.contains("casey")) {
+                passed = true;
+                break;
+              }
+            }
+          } catch (Exception e) {
+          }
+          Thread.sleep(2000);
+        }
+        Assert.assertTrue(passed);
+      }
 
-    });
-    boolean passed = false;
-    for(int i = 0;i < 100;++i) {
-      try {
-        String output =  makeRESTcall(new URL("http://localhost:1500/echo/casey"));
-        if(output.contains("casey")) {
-          passed = true;
-          break;
+      {
+        List<ModelEndpoint> endpoints = discoverer.getEndpoints(new Model("dummy", "1.0"));
+        Assert.assertNotNull(endpoints);
+        Assert.assertEquals(1, endpoints.size());
+      }
+      new ModelSubmission().execute(FileSystem.get(conf)
+              , new String[]{
+                      "--name", "dummy",
+                      "--version", "1.0",
+                      "--zk_quorum", zookeeperUrl,
+                      "--zk_root", configRoot,
+                      "--num_instances", "1",
+                      "--mode", "REMOVE",
+
+              });
+      {
+        boolean passed = false;
+        for (int i = 0; i < 100; ++i) {
+          try {
+            List<ModelEndpoint> endpoints = discoverer.getEndpoints(new Model("dummy", "1.0"));
+            //ensure that the endpoint is dead.
+            if (endpoints == null || endpoints.size() == 0) {
+              passed = true;
+              break;
+            }
+          } catch (Exception e) {
+          }
+          Thread.sleep(2000);
+        }
+        Assert.assertTrue(passed);
+      }
+    }
+    finally {
+      cleanup();
+    }
+  }
+
+  private void cleanup() {
+    try {
+      System.out.println("Cleaning up...");
+      String line;
+      Process p = Runtime.getRuntime().exec("ps -e");
+      BufferedReader input =
+              new BufferedReader(new InputStreamReader(p.getInputStream()));
+      while ((line = input.readLine()) != null) {
+        if(line.contains("dummy_rest.sh")) {
+          String pid = Iterables.get(Splitter.on(" ").split(line.replaceAll("\\s+", " ")), 0);
+          System.out.println("Killing " + pid + " from " + line);
+          Runtime.getRuntime().exec("kill -9 " + pid);
         }
       }
-      catch(Exception e) {
-      }
-      Thread.sleep(2000);
+      input.close();
+    } catch (Exception err) {
+      err.printStackTrace();
     }
-    Assert.assertTrue(passed);
-    /*t.join();
-    LOG.info("Client run completed. Result=" + result);
-    Assert.assertTrue(result.get());
-
-    TimelineDomain domain = null;
-    if (haveDomain) {
-      domain = yarnCluster.getApplicationHistoryServer()
-              .getTimelineStore().getDomain("TEST_DOMAIN");
-      Assert.assertNotNull(domain);
-      Assert.assertEquals("reader_user reader_group", domain.getReaders());
-      Assert.assertEquals("writer_user writer_group", domain.getWriters());
-    }
-    TimelineEntities entitiesAttempts = yarnCluster
-            .getApplicationHistoryServer()
-            .getTimelineStore()
-            .getEntities(ApplicationMaster.DSEntity.DS_APP_ATTEMPT.toString(),
-                    null, null, null, null, null, null, null, null, null);
-    Assert.assertNotNull(entitiesAttempts);
-    Assert.assertEquals(1, entitiesAttempts.getEntities().size());
-    Assert.assertEquals(2, entitiesAttempts.getEntities().get(0).getEvents()
-            .size());
-    Assert.assertEquals(entitiesAttempts.getEntities().get(0).getEntityType()
-            .toString(), ApplicationMaster.DSEntity.DS_APP_ATTEMPT.toString());
-    if (haveDomain) {
-      Assert.assertEquals(domain.getId(),
-              entitiesAttempts.getEntities().get(0).getDomainId());
-    } else {
-      Assert.assertEquals("DEFAULT",
-              entitiesAttempts.getEntities().get(0).getDomainId());
-    }
-    TimelineEntities entities = yarnCluster
-            .getApplicationHistoryServer()
-            .getTimelineStore()
-            .getEntities(ApplicationMaster.DSEntity.DS_CONTAINER.toString(), null,
-                    null, null, null, null, null, null, null, null);
-    Assert.assertNotNull(entities);
-    Assert.assertEquals(2, entities.getEntities().size());
-    Assert.assertEquals(entities.getEntities().get(0).getEntityType()
-            .toString(), ApplicationMaster.DSEntity.DS_CONTAINER.toString());
-    if (haveDomain) {
-      Assert.assertEquals(domain.getId(),
-              entities.getEntities().get(0).getDomainId());
-    } else {
-      Assert.assertEquals("DEFAULT",
-              entities.getEntities().get(0).getDomainId());
-    }
-    */
   }
   private String makeRESTcall(URL url) throws IOException {
     HttpURLConnection conn = null;

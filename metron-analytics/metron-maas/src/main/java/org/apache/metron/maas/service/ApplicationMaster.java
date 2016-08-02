@@ -40,6 +40,7 @@ import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceAudience.Private;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.net.NetUtils;
@@ -72,6 +73,7 @@ import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.log4j.LogManager;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.metron.maas.common.ServiceDiscoverer;
 import org.apache.metron.maas.service.callback.LaunchContainer;
 import org.apache.metron.maas.config.Action;
 import org.apache.metron.maas.config.ModelRequest;
@@ -500,7 +502,6 @@ public class ApplicationMaster {
     nmClientAsync = new NMClientAsyncImpl(listener);
     nmClientAsync.init(conf);
     nmClientAsync.start();
-    listener.initialize(amRMClient, nmClientAsync);
 
 
     // Setup local RPC Server to accept status requests directly from clients
@@ -525,8 +526,9 @@ public class ApplicationMaster {
     maasHandler = new MaaSHandler(zkQuorum, zkRoot);
     try {
       maasHandler.start();
+      listener.initialize(amRMClient, nmClientAsync, maasHandler.getDiscoverer());
     } catch (Exception e) {
-      throw new IllegalStateException("Unable to listen to zookeeper");
+      throw new IllegalStateException("Unable to find zookeeper", e);
     }
     EnumMap<Resources, Integer> maxResources = Resources.toResourceMap( Resources.MEMORY.of(maxMem)
                                                                       , Resources.V_CORE.of(maxVCores)
@@ -548,6 +550,7 @@ public class ApplicationMaster {
                                                                                    , Resources.toResource(resourceRequest)
                                                                                    );
       Resource resource = Resources.toResource(resources);
+      Path appMasterJar  = getAppMasterJar(FileSystem.get(conf));
       if(request.getAction() == Action.ADD) {
         listener.requestContainers(request.getNumInstances(), resource);
         for (int i = 0; i < request.getNumInstances(); ++i) {
@@ -561,51 +564,21 @@ public class ApplicationMaster {
                         , request
                         , container
                         , allTokens
+                        , appMasterJar
                                               )
                           );
+          listener.getContainerState().registerRequest(container, request);
         }
       }
       else if(request.getAction() == Action.REMOVE) {
-
+        listener.removeContainers(request.getNumInstances(), request);
       }
     }
+  }
 
-    /*
-    // A resource ask cannot exceed the max.
-    if (containerMemory > maxMem) {
-      LOG.info("Container memory specified above max threshold of cluster."
-              + " Using max value." + ", specified=" + containerMemory + ", max="
-              + maxMem);
-      containerMemory = maxMem;
-    }
-
-    if (containerVirtualCores > maxVCores) {
-      LOG.info("Container virtual cores specified above max threshold of cluster."
-              + " Using max value." + ", specified=" + containerVirtualCores + ", max="
-              + maxVCores);
-      containerVirtualCores = maxVCores;
-    }
-
-    List<Container> previousAMRunningContainers =
-            response.getContainersFromPreviousAttempts();
-    LOG.info(appAttemptID + " received " + previousAMRunningContainers.size()
-            + " previous attempts' running containers on AM registration.");
-    numAllocatedContainers.addAndGet(previousAMRunningContainers.size());
-
-    int numTotalContainersToRequest =
-            numTotalContainers - previousAMRunningContainers.size();
-    // Setup ask for containers from RM
-    // Send request for containers to RM
-    // Until we get our fully allocated quota, we keep on polling RM for
-    // containers
-    // Keep looping until all the containers are launched and shell script
-    // executed on them ( regardless of success/failure).
-    for (int i = 0; i < numTotalContainersToRequest; ++i) {
-      ContainerRequest containerAsk = setupContainerAskForRM();
-      amRMClient.addContainerRequest(containerAsk);
-    }
-    numRequestedContainers.set(numTotalContainers);
-    */
+  private Path getAppMasterJar(FileSystem fs) {
+    String suffix = "MaaS/" + appAttemptID.getApplicationId() + "/AppMaster.Jar";
+    return new Path(fs.getHomeDirectory(), suffix);
   }
 
   private int getMinContainerMemoryIncrement(Configuration conf) {

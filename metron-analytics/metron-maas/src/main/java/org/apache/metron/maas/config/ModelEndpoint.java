@@ -1,6 +1,8 @@
 package org.apache.metron.maas.config;
 
-public class ModelEndpoint {
+import java.io.Serializable;
+
+public class ModelEndpoint implements Serializable {
   private String url;
   private String name;
   private String version;
@@ -8,6 +10,16 @@ public class ModelEndpoint {
 
   public String getContainerId() {
     return containerId;
+  }
+
+  @Override
+  public String toString() {
+    return "ModelEndpoint{" +
+            "url='" + url + '\'' +
+            ", name='" + name + '\'' +
+            ", version='" + version + '\'' +
+            ", containerId='" + containerId + '\'' +
+            '}';
   }
 
   public void setContainerId(String containerId) {

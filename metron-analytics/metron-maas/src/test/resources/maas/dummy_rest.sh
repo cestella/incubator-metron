@@ -1,7 +1,9 @@
+#!/bin/bash
+
 rm -f out
 mkfifo out
 trap "rm -f out" EXIT
-echo "localhost:1500" > endpoint.dat
+echo "http://localhost:1500" > endpoint.dat
 while true
 do
   cat out | nc -l 1500 > >( # parse the netcat output, to build the answer redirected to the pipe "out".

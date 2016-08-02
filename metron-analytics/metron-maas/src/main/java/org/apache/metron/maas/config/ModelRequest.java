@@ -56,4 +56,5 @@ public class ModelRequest {
   public void setMemory(int memory) {
     this.memory = memory;
   }
+
 }

@@ -2,16 +2,15 @@ package org.apache.metron.maas.service.callback;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.records.*;
 import org.apache.hadoop.yarn.client.api.async.NMClientAsync;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.apache.metron.maas.common.ServiceDiscoverer;
 import org.apache.metron.maas.config.ModelRequest;
 import org.apache.metron.maas.service.runner.Runner;
 import org.apache.metron.maas.service.runner.Runner.RunnerOptions;
@@ -30,6 +29,7 @@ public class LaunchContainer implements Runnable {
   private String zkQuorum;
   private String zkRoot;
   private ByteBuffer allTokens;
+  private Path appJarLocation;
 
   public LaunchContainer( Configuration conf
                         , String zkQuorum
@@ -39,6 +39,7 @@ public class LaunchContainer implements Runnable {
                         , ModelRequest request
                         , Container container
                         , ByteBuffer allTokens
+                        , Path appJarLocation
                         )
   {
     this.allTokens = allTokens;
@@ -49,13 +50,13 @@ public class LaunchContainer implements Runnable {
     this.conf = conf;
     this.nmClientAsync = nmClientAsync;
     this.containerListener = containerListener;
+    this.appJarLocation = appJarLocation;
   }
 
   @Override
   public void run() {
     LOG.info("Setting up container launch container for containerid="
             + container.getId());
-
     // Set the local resources
     Map<String, LocalResource> localResources = new HashMap<>();
     LOG.info("Local Directory Contents");
@@ -63,7 +64,7 @@ public class LaunchContainer implements Runnable {
       LOG.info("  " + f.getName());
     }
     LOG.info("Localizing " + request.getPath());
-    String modelScript = localizeResources(localResources, new Path(request.getPath()));
+    String modelScript = localizeResources(localResources, new Path(request.getPath()), appJarLocation);
     for(Map.Entry<String, LocalResource> entry : localResources.entrySet()) {
       LOG.info(entry.getKey() + " localized: " + entry.getValue().getResource() );
     }
@@ -122,7 +123,7 @@ public class LaunchContainer implements Runnable {
 
     // Construct the command to be executed on the launched container
     String command = ApplicationConstants.Environment.JAVA_HOME.$$() + "/bin/java "
-            + Runner.class + " "
+            + Runner.class.getName() + " "
             + RunnerOptions.toArgs(RunnerOptions.CONTAINER_ID.of(container.getId().getContainerId() + "")
                                   ,RunnerOptions.ZK_QUORUM.of(zkQuorum)
                                   ,RunnerOptions.ZK_ROOT.of(zkRoot)
@@ -152,25 +153,34 @@ public class LaunchContainer implements Runnable {
     nmClientAsync.startContainerAsync(container, ctx);
   }
 
-  public String localizeResources(Map<String, LocalResource> resources, Path scriptLocation) {
-    try {
-      FileSystem fs = scriptLocation.getFileSystem(conf);
-      String script = null;
-      for (RemoteIterator<LocatedFileStatus> it = fs.listFiles(scriptLocation, true);it.hasNext();) {
-        LocatedFileStatus status = it.next();
-        URL url = ConverterUtils.getYarnUrlFromURI( status.getPath().toUri());
+  private Map.Entry<String, LocalResource> localizeResource(FileStatus status) {
+    URL url = ConverterUtils.getYarnUrlFromURI( status.getPath().toUri());
         LocalResource resource = LocalResource.newInstance(url,
                 LocalResourceType.FILE, LocalResourceVisibility.APPLICATION,
                 status.getLen(), status.getModificationTime());
         String name = status.getPath().getName();
+    return new AbstractMap.SimpleEntry<String, LocalResource>(name, resource);
+  }
+
+  public String localizeResources(Map<String, LocalResource> resources, Path scriptLocation, Path appJarLocation) {
+    try {
+      FileSystem fs = scriptLocation.getFileSystem(conf);
+      String script = null;
+      Map.Entry<String, LocalResource> kv = localizeResource(fs.getFileStatus(appJarLocation));
+      resources.put(kv.getKey(), kv.getValue());
+      for (RemoteIterator<LocatedFileStatus> it = fs.listFiles(scriptLocation, true);it.hasNext();) {
+        LocatedFileStatus status = it.next();
+        kv = localizeResource(status);
+        String name = kv.getKey();
         if(name.endsWith(".sh")) {
           script = name;
         }
-        resources.put(name, resource);
+        resources.put(name, kv.getValue());
       }
       return script;
     }
     catch(Exception e) {
+      LOG.error(e.getMessage(), e);
       return null;
     }
   }

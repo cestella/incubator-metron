@@ -138,7 +138,9 @@ public class Runner {
     }
   }
   private static final Log LOG = LogFactory.getLog(Runner.class);
-  public void main(String... argv) throws Exception {
+  private static Process p;
+  private static ServiceDiscovery<ModelEndpoint> serviceDiscovery = null;
+  public static void main(String... argv) throws Exception {
     CommandLine cli = RunnerOptions.parse(new PosixParser(), argv);
     String zkQuorum = RunnerOptions.ZK_QUORUM.get(cli);
     String zkRoot = RunnerOptions.ZK_ROOT.get(cli);
@@ -146,10 +148,13 @@ public class Runner {
     String name = RunnerOptions.NAME.get(cli);
     String version = RunnerOptions.VERSION.get(cli);
     String containerId = RunnerOptions.CONTAINER_ID.get(cli);
-    ServiceDiscovery<ModelEndpoint> serviceDiscovery = null;
     CuratorFramework client = null;
 
     LOG.error("Running script " + script);
+    LOG.info("Local Directory Contents");
+    for(File f : new File(".").listFiles()) {
+      LOG.info("  " + f.getName());
+    }
     try {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
       client = CuratorFrameworkFactory.newClient(zkQuorum, retryPolicy);
@@ -165,17 +170,35 @@ public class Runner {
       }
       finally {
       }
+      LOG.info("Created service @ " + config.getServiceRoot());
+
+
       serviceDiscovery.start();
-      Process p = new ProcessBuilder(script).start();
+
+      File cwd = new File(script).getParentFile();
+      final String cmd = new File(cwd, script).getAbsolutePath();
+        try {
+          p = new ProcessBuilder(cmd).directory(cwd).start();
+
+        }
+        catch(Exception e) {
+          LOG.info("Unable to execute " + cmd + " from " + new File(".").getAbsolutePath());
+          LOG.error(e.getMessage(), e);
+          throw new IllegalStateException(e.getMessage(), e);
+        }
+
+
       try {
-        URL endpointUrl = readURL();
-        ModelEndpoint endpoint = new ModelEndpoint()
-        {{
-          setName(name);
-          setContainerId(containerId);
-          setUrl(endpointUrl.toString());
-          setVersion(version);
-        }};
+        LOG.info("Started " + cmd);
+        URL endpointUrl = readURL(cwd);
+        LOG.info("Read endpoint " + endpointUrl);
+        ModelEndpoint endpoint = new ModelEndpoint();
+        {
+          endpoint.setName(name);
+          endpoint.setContainerId(containerId);
+          endpoint.setUrl(endpointUrl.toString());
+          endpoint.setVersion(version);
+        };
         ServiceInstanceBuilder<ModelEndpoint> builder = ServiceInstance.<ModelEndpoint> builder()
                                                                        .address(endpointUrl.getHost())
                                                                        .id(containerId)
@@ -185,7 +208,22 @@ public class Runner {
                                                                        .serviceType(ServiceType.STATIC)
                                                                        .payload(endpoint)
                                                                        ;
-        serviceDiscovery.registerService(builder.build());
+        final ServiceInstance<ModelEndpoint> instance = builder.build();
+        serviceDiscovery.registerService(instance);
+        LOG.info("Installed instance " + name + ":" + version + "@" + endpointUrl);
+
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
+          @Override
+          public void run()
+          {
+            LOG.info("KILLING CONTAINER PROCESS...");
+            if(p != null) {
+              LOG.info("Process destroyed forcibly");
+              p.destroyForcibly();
+            }
+          }
+        });
       }
       finally {
         if (p.waitFor() != 0) {
@@ -207,9 +245,9 @@ public class Runner {
 
 
 
-  private static URL readURL() throws IOException, InterruptedException {
+  private static URL readURL(File cwd) throws IOException, InterruptedException {
     String content = "";
-    File f = new File("endpoint.dat");
+    File f = new File(cwd, "endpoint.dat");
     for(int i = 0;i < NUM_ATTEMPTS;i++) {
       if(f.exists()) {
         try {
