@@ -221,7 +221,7 @@ public class Client {
     })
     ,ZK_ROOT("zr", code -> {
       Option o = new Option(code, "zk_root", true, "Zookeeper Root");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,SHELL_ENV("e", code -> {
@@ -393,7 +393,7 @@ public class Client {
 
     keepContainers = false;
     zkQuorum = ZK_QUORUM.get(cli);
-    zkRoot = ZK_ROOT.get(cli);
+    zkRoot = ZK_ROOT.get(cli, "/metron/maas/config");
     appName = "MaaS";
     amPriority = 0;
     amQueue = QUEUE.get(cli, "default");
@@ -654,7 +654,6 @@ public class Client {
 
     // Service data is a binary blob that can be passed to the application
     // Not needed in this scenario
-    // amContainer.setServiceData(serviceData);
 
     // Setup security tokens
     if (UserGroupInformation.isSecurityEnabled()) {
