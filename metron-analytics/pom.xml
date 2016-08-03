@@ -41,7 +41,8 @@
 		</license>
 	</licenses>
 	<modules>
-		<module>metron-maas</module>
+		<module>metron-maas-service</module>
+		<module>metron-maas-common</module>
 	</modules>
 	<dependencies>
 		<dependency>
