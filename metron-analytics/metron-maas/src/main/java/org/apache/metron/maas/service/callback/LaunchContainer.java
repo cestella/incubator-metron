@@ -25,22 +25,20 @@ public class LaunchContainer implements Runnable {
   private Container container;
   private Configuration conf ;
   private NMClientAsync nmClientAsync;
-  private ContainerRequestListener containerListener;
   private String zkQuorum;
   private String zkRoot;
   private ByteBuffer allTokens;
   private Path appJarLocation;
 
   public LaunchContainer( Configuration conf
-                        , String zkQuorum
-                        , String zkRoot
-                        , NMClientAsync nmClientAsync
-                        , ContainerRequestListener containerListener
-                        , ModelRequest request
-                        , Container container
-                        , ByteBuffer allTokens
-                        , Path appJarLocation
-                        )
+          , String zkQuorum
+          , String zkRoot
+          , NMClientAsync nmClientAsync
+          , ModelRequest request
+          , Container container
+          , ByteBuffer allTokens
+          , Path appJarLocation
+  )
   {
     this.allTokens = allTokens;
     this.zkQuorum = zkQuorum;
@@ -49,7 +47,6 @@ public class LaunchContainer implements Runnable {
     this.container = container;
     this.conf = conf;
     this.nmClientAsync = nmClientAsync;
-    this.containerListener = containerListener;
     this.appJarLocation = appJarLocation;
   }
 
@@ -61,7 +58,7 @@ public class LaunchContainer implements Runnable {
     Map<String, LocalResource> localResources = new HashMap<>();
     LOG.info("Local Directory Contents");
     for(File f : new File(".").listFiles()) {
-      LOG.info("  " + f.getName());
+      LOG.info("  " + f.length() + " - " + f.getName() );
     }
     LOG.info("Localizing " + request.getPath());
     String modelScript = localizeResources(localResources, new Path(request.getPath()), appJarLocation);
@@ -116,21 +113,23 @@ public class LaunchContainer implements Runnable {
     // By default, all the hadoop specific classpaths will already be available
     // in $CLASSPATH, so we should be careful not to overwrite it.
     StringBuffer classPathEnv = new StringBuffer("$CLASSPATH:./*:");
-    if (conf.getBoolean(YarnConfiguration.IS_MINI_YARN_CLUSTER, false)) {
+    //if (conf.getBoolean(YarnConfiguration.IS_MINI_YARN_CLUSTER, false)) {
       classPathEnv.append(System.getProperty("java.class.path"));
-    }
+    //}
     env.put("CLASSPATH", classPathEnv.toString());
 
     // Construct the command to be executed on the launched container
     String command = ApplicationConstants.Environment.JAVA_HOME.$$() + "/bin/java "
             + Runner.class.getName() + " "
             + RunnerOptions.toArgs(RunnerOptions.CONTAINER_ID.of(container.getId().getContainerId() + "")
-                                  ,RunnerOptions.ZK_QUORUM.of(zkQuorum)
-                                  ,RunnerOptions.ZK_ROOT.of(zkRoot)
-                                  ,RunnerOptions.SCRIPT.of(modelScript)
-                                  ,RunnerOptions.NAME.of(request.getName())
-                                  ,RunnerOptions.VERSION.of(request.getVersion())
-                                  )
+            ,RunnerOptions.ZK_QUORUM.of(zkQuorum)
+            ,RunnerOptions.ZK_ROOT.of(zkRoot)
+            ,RunnerOptions.SCRIPT.of(modelScript)
+            ,RunnerOptions.NAME.of(request.getName())
+            ,RunnerOptions.VERSION.of(request.getVersion())
+    )
+//            + " 1>" + "/tmp/stdout"
+//            + " 2>" + "/tmp/stderr";
             + " 1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout"
             + " 2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr";
     List<String> commands = new ArrayList<String>();
@@ -155,15 +154,17 @@ public class LaunchContainer implements Runnable {
 
   private Map.Entry<String, LocalResource> localizeResource(FileStatus status) {
     URL url = ConverterUtils.getYarnUrlFromURI( status.getPath().toUri());
-        LocalResource resource = LocalResource.newInstance(url,
-                LocalResourceType.FILE, LocalResourceVisibility.APPLICATION,
-                status.getLen(), status.getModificationTime());
-        String name = status.getPath().getName();
-    return new AbstractMap.SimpleEntry<String, LocalResource>(name, resource);
+    LocalResource resource = LocalResource.newInstance(url,
+            LocalResourceType.FILE, LocalResourceVisibility.APPLICATION,
+            status.getLen(), status.getModificationTime());
+    String name = status.getPath().getName();
+    return new AbstractMap.SimpleEntry<>(name, resource);
   }
 
   public String localizeResources(Map<String, LocalResource> resources, Path scriptLocation, Path appJarLocation) {
     try {
+      LOG.info("Model payload: " + scriptLocation);
+      LOG.info("AppJAR Location: " + appJarLocation);
       FileSystem fs = scriptLocation.getFileSystem(conf);
       String script = null;
       Map.Entry<String, LocalResource> kv = localizeResource(fs.getFileStatus(appJarLocation));
@@ -175,6 +176,7 @@ public class LaunchContainer implements Runnable {
         if(name.endsWith(".sh")) {
           script = name;
         }
+        LOG.info("Localized " + name + " -> " + status.toString());
         resources.put(name, kv.getValue());
       }
       return script;
@@ -184,4 +186,5 @@ public class LaunchContainer implements Runnable {
       return null;
     }
   }
+
 }

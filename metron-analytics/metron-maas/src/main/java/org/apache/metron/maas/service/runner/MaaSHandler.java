@@ -46,7 +46,7 @@ public class MaaSHandler {
       client = CuratorFrameworkFactory.newClient(zkQuorum, retryPolicy);
       client.start();
     }
-    config = ConfigUtil.INSTANCE.read(client, root, MaaSConfig.class);
+    config = ConfigUtil.INSTANCE.read(client, root, new MaaSConfig(), MaaSConfig.class);
     cache = new NodeCache(client, root);
     cache.getListenable().addListener(() -> {
               byte[] data = cache.getCurrentData().getData();

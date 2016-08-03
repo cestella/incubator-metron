@@ -78,7 +78,7 @@ public class ModelSubmission {
     })
     ,MODE("mo", code -> {
       Option o = new Option(code, "mode", true, "ADD or REMOVE");
-      o.setRequired(false);
+      o.setRequired(true);
       return o;
     })
     ;
@@ -151,7 +151,8 @@ public class ModelSubmission {
   public void execute(FileSystem fs, String... argv) throws Exception {
     CommandLine cli = ModelSubmissionOptions.parse(new PosixParser(), argv);
     ModelRequest request = null;
-    if(!ModelSubmissionOptions.MODE.has(cli) || ModelSubmissionOptions.MODE.get(cli).equals("ADD")) {
+    String mode = ModelSubmissionOptions.MODE.get(cli);
+    if ( mode.equalsIgnoreCase("ADD")) {
       request = new ModelRequest() {{
         setName(ModelSubmissionOptions.NAME.get(cli));
         setAction(Action.ADD);
@@ -160,8 +161,7 @@ public class ModelSubmission {
         setMemory(Integer.parseInt(ModelSubmissionOptions.MEMORY.get(cli)));
         setPath(ModelSubmissionOptions.HDFS_MODEL_PATH.get(cli));
       }};
-    }
-    else {
+    } else if(mode.equalsIgnoreCase("REMOVE")) {
       request = new ModelRequest() {{
         setName(ModelSubmissionOptions.NAME.get(cli));
         setAction(Action.REMOVE);
@@ -174,7 +174,7 @@ public class ModelSubmission {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
       client = CuratorFrameworkFactory.newClient(ModelSubmissionOptions.ZK_QUORUM.get(cli), retryPolicy);
       client.start();
-      MaaSConfig config = ConfigUtil.INSTANCE.read(client, ModelSubmissionOptions.ZK_ROOT.get(cli), MaaSConfig.class);
+      MaaSConfig config = ConfigUtil.INSTANCE.read(client, ModelSubmissionOptions.ZK_ROOT.get(cli), new MaaSConfig(), MaaSConfig.class);
 
       if (ModelSubmissionOptions.LOCAL_MODEL_PATH.has(cli)) {
         File localDir = new File(ModelSubmissionOptions.LOCAL_MODEL_PATH.get(cli));
@@ -183,9 +183,8 @@ public class ModelSubmission {
       }
       Queue queue = config.createQueue(ImmutableMap.of(ZKQueue.ZK_CLIENT, client));
       queue.enqueue(request);
-    }
-    finally {
-      if(client != null) {
+    } finally {
+      if (client != null) {
         client.close();
       }
     }

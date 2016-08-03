@@ -17,7 +17,11 @@
  */
 package org.apache.metron.maas.service;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Function;
@@ -160,9 +164,6 @@ public class Client {
 
   private long attemptFailuresValidityInterval = -1;
 
-  // Debug flag
-  boolean debugFlag = false;
-
   // Timeline domain ID
   private String domainId = null;
   private String zkQuorum = null;
@@ -240,11 +241,6 @@ public class Client {
     ,SHELL_ENV("e", code -> {
       Option o = new Option(code, "shell_env", true,
               "Environment for shell script. Specified as env_key=env_val pairs");
-      o.setRequired(false);
-      return o;
-    })
-    ,DEBUG("d", code -> {
-      Option o = new Option(code, "debug", false,"Dump out debug information");
       o.setRequired(false);
       return o;
     })
@@ -386,7 +382,9 @@ public class Client {
   public Client() throws Exception  {
     this(new YarnConfiguration());
   }
-
+  public static String getJar(Class klass) throws URISyntaxException {
+    return klass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+  }
   /**
    * Parse command line options
    * @param args Parsed command line options
@@ -407,10 +405,6 @@ public class Client {
     }
 
 
-    if (DEBUG.has(cli)) {
-      debugFlag = true;
-
-    }
     keepContainers = false;
     zkQuorum = ZK_QUORUM.get(cli);
     zkRoot = ZK_ROOT.get(cli);
@@ -430,12 +424,15 @@ public class Client {
     }
 
     if (!JAR.has(cli)){
-      throw new IllegalArgumentException("No jar file specified for application master");
+      try {
+        appMasterJar = getJar(ApplicationMaster.class);
+      } catch (URISyntaxException e) {
+        throw new IllegalArgumentException("No jar file specified for application master: " + e.getMessage(), e);
+      }
     }
-
-
-
-    appMasterJar = JAR.get(cli);
+    else {
+      appMasterJar = JAR.get(cli);
+    }
 
     if (SHELL_ENV.has(cli)) {
       String envs[] = cli.getOptionValues(SHELL_ENV.option.getOpt());
@@ -576,8 +573,7 @@ public class Client {
     // Copy the application master jar to the filesystem
     // Create a local resource to point to the destination jar path
     FileSystem fs = FileSystem.get(conf);
-    addToLocalResources(fs, appMasterJar, appMasterJarPath, appId.toString(),
-            localResources, null);
+    Path ajPath = addToLocalResources(fs, appMasterJar, appMasterJarPath, appId.toString(), localResources, null);
 
     // Set the log4j properties if needed
     if (!log4jPropFile.isEmpty()) {
@@ -585,37 +581,6 @@ public class Client {
               localResources, null);
     }
 
-    // The shell script has to be made available on the final container(s)
-    // where it will be executed.
-    // To do this, we need to first copy into the filesystem that is visible
-    // to the yarn framework.
-    // We do not need to set this as a local resource for the application
-    // master as the application master does not need it.
-    /*String hdfsShellScriptLocation = "";
-    long hdfsShellScriptLen = 0;
-    long hdfsShellScriptTimestamp = 0;
-    if (!shellScriptPath.isEmpty()) {
-      Path shellSrc = new Path(shellScriptPath);
-      String shellPathSuffix =
-              appName + "/" + appId.toString() + "/" + SCRIPT_PATH;
-      Path shellDst =
-              new Path(fs.getHomeDirectory(), shellPathSuffix);
-      fs.copyFromLocalFile(false, true, shellSrc, shellDst);
-      hdfsShellScriptLocation = shellDst.toUri().toString();
-      FileStatus shellFileStatus = fs.getFileStatus(shellDst);
-      hdfsShellScriptLen = shellFileStatus.getLen();
-      hdfsShellScriptTimestamp = shellFileStatus.getModificationTime();
-    }
-
-    if (!shellCommand.isEmpty()) {
-      addToLocalResources(fs, null, shellCommandPath, appId.toString(),
-              localResources, shellCommand);
-    }
-
-    if (shellArgs.length > 0) {
-      addToLocalResources(fs, null, shellArgsPath, appId.toString(),
-              localResources, StringUtils.join(shellArgs, " "));
-    }*/
 
     // Set the necessary security tokens as needed
     //amContainer.setContainerTokens(containerToken);
@@ -627,9 +592,6 @@ public class Client {
     // put location of shell script into env
     // using the env info, the application master will create the correct local resource for the
     // eventual containers that will be launched to execute the shell scripts
-    /*env.put(DSConstants.DISTRIBUTEDSHELLSCRIPTLOCATION, hdfsShellScriptLocation);
-    env.put(DSConstants.DISTRIBUTEDSHELLSCRIPTTIMESTAMP, Long.toString(hdfsShellScriptTimestamp));
-    env.put(DSConstants.DISTRIBUTEDSHELLSCRIPTLEN, Long.toString(hdfsShellScriptLen));*/
     if (domainId != null && domainId.length() > 0) {
       env.put(DSConstants.TIMELINEDOMAIN, domainId);
     }
@@ -672,6 +634,7 @@ public class Client {
     // Set params for Application Master
     vargs.add(ApplicationMaster.AMOptions.toArgs(ApplicationMaster.AMOptions.ZK_QUORUM.of(zkQuorum)
                                                 ,ApplicationMaster.AMOptions.ZK_ROOT.of(zkRoot)
+                                                ,ApplicationMaster.AMOptions.APP_JAR_PATH.of(ajPath.toString())
                                                 )
              );
     if (null != nodeLabelExpression) {
@@ -679,9 +642,6 @@ public class Client {
     }
     for (Map.Entry<String, String> entry : shellEnv.entrySet()) {
       vargs.add("--shell_env " + entry.getKey() + "=" + entry.getValue());
-    }
-    if (debugFlag) {
-      vargs.add("--debug");
     }
 
     vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/AppMaster.stdout");
@@ -738,7 +698,6 @@ public class Client {
     appContext.setAMContainerSpec(amContainer);
 
     // Set the priority for the application master
-    // TODO - what is the range for priority? how to decide?
     Priority pri = Priority.newInstance(amPriority);
     appContext.setPriority(pri);
 
@@ -752,10 +711,6 @@ public class Client {
     LOG.info("Submitting application to ASM");
 
     yarnClient.submitApplication(appContext);
-
-    // TODO
-    // Try submitting the same request again
-    // app submission failure?
 
     // Monitor the application
     return monitorApplication(appId);
@@ -800,6 +755,10 @@ public class Client {
 
       YarnApplicationState state = report.getYarnApplicationState();
       FinalApplicationStatus dsStatus = report.getFinalApplicationStatus();
+      if(YarnApplicationState.RUNNING == state) {
+        LOG.info("Application is running...");
+        return true;
+      }
       if (YarnApplicationState.FINISHED == state) {
         if (FinalApplicationStatus.SUCCEEDED == dsStatus) {
           LOG.info("Application has completed successfully. Breaking monitoring loop");
@@ -846,7 +805,7 @@ public class Client {
     yarnClient.killApplication(appId);
   }
 
-  private void addToLocalResources(FileSystem fs, String fileSrcPath,
+  private Path addToLocalResources(FileSystem fs, String fileSrcPath,
                                    String fileDstPath, String appId, Map<String, LocalResource> localResources,
                                    String resources) throws IOException {
     String suffix =
@@ -872,6 +831,7 @@ public class Client {
                     LocalResourceType.FILE, LocalResourceVisibility.APPLICATION,
                     scFileStatus.getLen(), scFileStatus.getModificationTime());
     localResources.put(fileDstPath, scRsrc);
+    return dst;
   }
 
   private void prepareTimelineDomain() {

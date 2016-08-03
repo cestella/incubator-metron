@@ -159,7 +159,7 @@ public class Runner {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
       client = CuratorFrameworkFactory.newClient(zkQuorum, retryPolicy);
       client.start();
-      MaaSConfig config = ConfigUtil.INSTANCE.read(client, zkRoot, MaaSConfig.class);
+      MaaSConfig config = ConfigUtil.INSTANCE.read(client, zkRoot, new MaaSConfig(), MaaSConfig.class);
       JsonInstanceSerializer<ModelEndpoint> serializer = new JsonInstanceSerializer<>(ModelEndpoint.class);
       try {
         serviceDiscovery = ServiceDiscoveryBuilder.builder(ModelEndpoint.class)

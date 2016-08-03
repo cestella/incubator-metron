@@ -2,6 +2,7 @@ package org.apache.metron.maas.service;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.metron.maas.config.MaaSConfig;
+import org.apache.zookeeper.KeeperException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
@@ -32,12 +33,17 @@ public enum ConfigUtil {
       return new ObjectMapper();
     }
   };
-  public <T> T read(CuratorFramework client, String root, Class<T> clazz) throws Exception {
-    byte[] data = client.getData().forPath(root);
-    return read(data, clazz);
+  public <T> T read(CuratorFramework client, String root, T def, Class<T> clazz) throws Exception {
+    try {
+      byte[] data = client.getData().forPath(root);
+      return read(data, clazz);
+    }
+    catch(KeeperException.NoNodeException nne) {
+      return def;
+    }
   }
   public <T> T read(byte[] data, Class<T> clazz) throws Exception {
-    return _mapper.get().readValue(data, clazz);
+      return _mapper.get().readValue(data, clazz);
   }
   public byte[] toBytes(Object o) throws IOException {
     return _mapper.get().writeValueAsBytes(o);

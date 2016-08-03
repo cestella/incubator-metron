@@ -2,14 +2,17 @@ package org.apache.metron.maas.config;
 
 import org.apache.metron.maas.service.queue.Queue;
 import org.apache.metron.maas.service.queue.QueueHandler;
+import org.apache.metron.maas.service.queue.ZKQueue;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MaaSConfig {
   private QueueHandler queue = QueueHandler.ZOOKEEPER;
-  private Map<String, Object> queueConfig = new HashMap<>();
-  private String serviceRoot;
+  private Map<String, Object> queueConfig = new HashMap<String, Object>() {{
+    put(ZKQueue.ZK_PATH, "/maas/queue");
+  }};
+  private String serviceRoot = "/maas/service";
 
   public String getServiceRoot() {
     return serviceRoot;

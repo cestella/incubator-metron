@@ -205,11 +205,10 @@ public class ApplicationMaster {
   @VisibleForTesting
   TimelineClient timelineClient;
 
-  private final String linux_bash_command = "bash";
-  private final String windows_command = "cmd /c";
   private String zkQuorum;
   private String zkRoot;
   private MaaSHandler maasHandler;
+  private Path appJarPath;
 
   public enum AMOptions {
     HELP("h", code -> {
@@ -227,19 +226,13 @@ public class ApplicationMaster {
       o.setRequired(true);
       return o;
     })
+    ,APP_JAR_PATH("aj", code -> {
+      Option o = new Option(code, "app_jar_path", true, "App Jar Path");
+      o.setRequired(true);
+      return o;
+    })
     ,APP_ATTEMPT_ID("aid", code -> {
       Option o = new Option(code, "app_attempt_id", true, "App Attempt ID. Not to be used unless for testing purposes");
-      o.setRequired(false);
-      return o;
-    })
-    ,SHELL_ENV("e", code -> {
-      Option o = new Option(code, "shell_env", true,
-              "Environment for shell script. Specified as env_key=env_val pairs");
-      o.setRequired(false);
-      return o;
-    })
-    ,DEBUG("d", code -> {
-      Option o = new Option(code, "debug", false,"Dump out debug information");
       o.setRequired(false);
       return o;
     })
@@ -338,35 +331,6 @@ public class ApplicationMaster {
     }
   }
 
-  /**
-   * Dump out contents of $CWD and the environment to stdout for debugging
-   */
-  private void dumpOutDebugInfo() {
-
-    LOG.info("Dump debug output");
-    Map<String, String> envs = System.getenv();
-    for (Map.Entry<String, String> env : envs.entrySet()) {
-      LOG.info("System env: key=" + env.getKey() + ", val=" + env.getValue());
-      System.out.println("System env: key=" + env.getKey() + ", val="
-              + env.getValue());
-    }
-
-    BufferedReader buf = null;
-    try {
-      String lines = Shell.WINDOWS ? Shell.execCommand("cmd", "/c", "dir") :
-              Shell.execCommand("ls", "-al");
-      buf = new BufferedReader(new StringReader(lines));
-      String line = "";
-      while ((line = buf.readLine()) != null) {
-        LOG.info("System CWD content: " + line);
-        System.out.println("System CWD content: " + line);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      IOUtils.cleanup(LOG, buf);
-    }
-  }
 
   public ApplicationMaster() {
     // Set up the configuration
@@ -399,11 +363,10 @@ public class ApplicationMaster {
       return false;
     }
 
-    if (AMOptions.DEBUG.has(cliParser)) {
-      dumpOutDebugInfo();
-    }
+
     zkQuorum = AMOptions.ZK_QUORUM.get(cliParser);
     zkRoot = AMOptions.ZK_ROOT.get(cliParser);
+    appJarPath = new Path(AMOptions.APP_JAR_PATH.get(cliParser));
 
     Map<String, String> envs = System.getenv();
 
@@ -550,7 +513,7 @@ public class ApplicationMaster {
                                                                                    , Resources.toResource(resourceRequest)
                                                                                    );
       Resource resource = Resources.toResource(resources);
-      Path appMasterJar  = getAppMasterJar(FileSystem.get(conf));
+      Path appMasterJar  = getAppMasterJar();
       if(request.getAction() == Action.ADD) {
         listener.requestContainers(request.getNumInstances(), resource);
         for (int i = 0; i < request.getNumInstances(); ++i) {
@@ -560,7 +523,6 @@ public class ApplicationMaster {
                         , zkQuorum
                         , zkRoot
                         , nmClientAsync
-                        , listener
                         , request
                         , container
                         , allTokens
@@ -576,11 +538,9 @@ public class ApplicationMaster {
     }
   }
 
-  private Path getAppMasterJar(FileSystem fs) {
-    String suffix = "MaaS/" + appAttemptID.getApplicationId() + "/AppMaster.Jar";
-    return new Path(fs.getHomeDirectory(), suffix);
+  private Path getAppMasterJar() {
+    return appJarPath;
   }
-
   private int getMinContainerMemoryIncrement(Configuration conf) {
     String incrementStr = conf.get("yarn.scheduler.increment-allocation-mb");
     if(incrementStr == null || incrementStr.length() == 0) {
