@@ -52,7 +52,7 @@ public class ServiceDiscoverer implements Closeable{
     cache.getListenable().addListener((client1, event) -> {
       updateState();
     });
-
+    updateState();
   }
 
   public ServiceDiscovery<ModelEndpoint> getServiceDiscovery() {

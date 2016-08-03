@@ -496,7 +496,12 @@ public class ApplicationMaster {
                                           );
     LOG.info("Ready to accept requests...");
     while(true) {
+
       ModelRequest request = requestQueue.dequeue();
+      if(request == null) {
+        LOG.error("Received a null request...");
+        continue;
+      }
       LOG.info("Received request for model " + request.getName() + ":" + request.getVersion() + "x" + request.getNumInstances()
               + " containers of size " + request.getMemory() + "M at path " + request.getPath()
               );

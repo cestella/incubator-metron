@@ -60,7 +60,7 @@ public class ModelSubmission {
     })
     ,ZK_ROOT("zr", code -> {
       Option o = new Option(code, "zk_root", true, "Zookeeper Root");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,LOCAL_MODEL_PATH("lmp", code -> {
@@ -173,7 +173,7 @@ public class ModelSubmission {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
       client = CuratorFrameworkFactory.newClient(ModelSubmissionOptions.ZK_QUORUM.get(cli), retryPolicy);
       client.start();
-      MaaSConfig config = ConfigUtil.INSTANCE.read(client, ModelSubmissionOptions.ZK_ROOT.get(cli), new MaaSConfig(), MaaSConfig.class);
+      MaaSConfig config = ConfigUtil.INSTANCE.read(client, ModelSubmissionOptions.ZK_ROOT.get(cli, "/metron/maas/config"), new MaaSConfig(), MaaSConfig.class);
       String mode = ModelSubmissionOptions.MODE.get(cli);
       if ( mode.equalsIgnoreCase("ADD")) {
         request = new ModelRequest() {{
