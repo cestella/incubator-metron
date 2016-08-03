@@ -15,12 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.maas;
+package org.apache.metron.maas.service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,9 +52,6 @@ import org.apache.metron.maas.common.ServiceDiscoverer;
 import org.apache.metron.maas.config.MaaSConfig;
 import org.apache.metron.maas.config.Model;
 import org.apache.metron.maas.config.ModelEndpoint;
-import org.apache.metron.maas.service.ApplicationMaster;
-import org.apache.metron.maas.service.Client;
-import org.apache.metron.maas.service.ConfigUtil;
 import org.apache.metron.maas.service.queue.ZKQueue;
 import org.apache.metron.maas.submit.ModelSubmission;
 import org.apache.zookeeper.KeeperException;

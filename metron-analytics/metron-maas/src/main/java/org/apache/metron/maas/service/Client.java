@@ -136,15 +136,6 @@ public class Client {
 
   // Env variables to be setup for the shell command
   private Map<String, String> shellEnv = new HashMap<String, String>();
-  // Shell Command Container priority
-  private int shellCmdPriority = 0;
-
-  // Amt of memory to request for container in which shell script will be executed
-  private int containerMemory = 10;
-  // Amt. of virtual cores to request for container in which shell script will be executed
-  private int containerVirtualCores = 1;
-  // No. of containers in which the shell script needs to be executed
-  private int numContainers = 1;
   private String nodeLabelExpression = null;
 
   // log4j.properties file
@@ -175,8 +166,6 @@ public class Client {
   private String modifyACLs = null;
 
 
-  private static final String shellCommandPath = "shellCommands";
-  private static final String shellArgsPath = "shellArgs";
   private static final String appMasterJarPath = "AppMaster.jar";
   // Hardcoded path to custom log_properties
   private static final String log4jPath = "log4j.properties";
@@ -448,7 +437,6 @@ public class Client {
         shellEnv.put(key, val);
       }
     }
-    shellCmdPriority = 0;
 
 
     nodeLabelExpression = NODE_LABEL_EXPRESSION.get(cli, null);
@@ -844,8 +832,6 @@ public class Client {
       return;
     }
     try {
-      //TODO: we need to check and combine the existing timeline domain ACLs,
-      //but let's do it once we have client java library to query domains.
       TimelineDomain domain = new TimelineDomain();
       domain.setId(domainId);
       domain.setReaders(

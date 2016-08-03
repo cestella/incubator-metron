@@ -20,21 +20,26 @@ package org.apache.metron.maas.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.state.ConnectionState;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.x.discovery.*;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 import org.apache.curator.x.discovery.details.ServiceCacheListener;
 import org.apache.metron.maas.config.Model;
 import org.apache.metron.maas.config.ModelEndpoint;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ServiceDiscoverer {
+public class ServiceDiscoverer implements Closeable{
   private static final Log LOG = LogFactory.getLog(ServiceDiscoverer.class);
-  private ServiceCache<ModelEndpoint> cache;
+  private TreeCache cache;
   private ReadWriteLock rwLock = new ReentrantReadWriteLock();
   private ServiceDiscovery<ModelEndpoint> serviceDiscovery;
   private Map<Model, List<ModelEndpoint>> state = new HashMap<>();
@@ -42,22 +47,20 @@ public class ServiceDiscoverer {
 
   public ServiceDiscoverer(CuratorFramework client, String root) {
     JsonInstanceSerializer<ModelEndpoint> serializer = new JsonInstanceSerializer<>(ModelEndpoint.class);
-    serviceDiscovery =ServiceDiscoveryBuilder.builder(ModelEndpoint.class)
+    serviceDiscovery = ServiceDiscoveryBuilder.builder(ModelEndpoint.class)
                 .client(client)
                 .basePath(root)
                 .serializer(serializer)
                 .build();
-    cache = serviceDiscovery.serviceCacheBuilder().name("dummy").build();
-    cache.addListener(new ServiceCacheListener() {
-      @Override
-      public void cacheChanged() {
-        updateState();
-      }
-
-      @Override
-      public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState) {
-      }
+    cache = new TreeCache(client, root);
+    cache.getListenable().addListener((client1, event) -> {
+      updateState();
     });
+
+  }
+
+  public ServiceDiscovery<ModelEndpoint> getServiceDiscovery() {
+    return serviceDiscovery;
   }
 
   private void updateState() {
@@ -144,4 +147,52 @@ public class ServiceDiscoverer {
       rwLock.readLock().unlock();
     }
   }
+
+  public Map<Model, List<ModelEndpoint>> listEndpoints(Model model) {
+    Map<Model, List<ModelEndpoint>> ret = new HashMap<>();
+    rwLock.readLock().lock();
+    try {
+      Query query = new Query(model);
+      for(Map.Entry<Model, List<ModelEndpoint>> kv : state.entrySet()) {
+        if(query.match(kv.getKey())) {
+          ret.put(kv.getKey(), kv.getValue());
+        }
+      }
+      return ret;
+    }
+    finally {
+      rwLock.readLock().unlock();
+    }
+  }
+
+  public void close() {
+    if(cache != null) {
+      CloseableUtils.closeQuietly(cache);
+    }
+    if(serviceDiscovery != null) {
+      CloseableUtils.closeQuietly(serviceDiscovery);
+    }
+
+  }
+
+  private static class Query {
+    Model model;
+    public Query(Model model) {
+      this.model = model;
+    }
+
+    public boolean match(Model m) {
+      boolean isNameMatch = ((model.getName() != null && model.getName().equals(m.getName())) || model.getName() == null);
+      if(!isNameMatch) {
+        return false;
+      }
+      boolean isVersionMatch = (model.getVersion() != null && model.getVersion().equals(m.getVersion())) || model.getVersion() == null;
+      if(!isVersionMatch) {
+        return false;
+      }
+
+      return true;
+    }
+  }
+
 }

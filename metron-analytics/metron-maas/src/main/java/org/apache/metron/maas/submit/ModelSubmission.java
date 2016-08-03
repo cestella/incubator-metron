@@ -75,17 +75,17 @@ public class ModelSubmission {
     })
     ,NAME("n", code -> {
       Option o = new Option(code, "name", true, "Model Name");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,VERSION("v", code -> {
       Option o = new Option(code, "version", true, "Model version");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,NUM_INSTANCES("ni", code -> {
       Option o = new Option(code, "num_instances", true, "Number of model instances");
-      o.setRequired(true);
+      o.setRequired(false);
       return o;
     })
     ,MEMORY("m", code -> {
@@ -94,7 +94,7 @@ public class ModelSubmission {
       return o;
     })
     ,MODE("mo", code -> {
-      Option o = new Option(code, "mode", true, "ADD or REMOVE");
+      Option o = new Option(code, "mode", true, "ADD, LIST or REMOVE");
       o.setRequired(true);
       return o;
     })
@@ -186,6 +186,12 @@ public class ModelSubmission {
         setVersion(ModelSubmissionOptions.VERSION.get(cli));
       }};
     }
+    else if(mode.equalsIgnoreCase("LIST")) {
+      if(ModelSubmissionOptions.NAME.has(cli)) {
+
+      }
+    }
+
     CuratorFramework client = null;
     try {
       RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
