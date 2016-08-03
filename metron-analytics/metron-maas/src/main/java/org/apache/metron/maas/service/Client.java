@@ -17,11 +17,8 @@
  */
 package org.apache.metron.maas.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Function;
@@ -593,7 +590,7 @@ public class Client {
     // using the env info, the application master will create the correct local resource for the
     // eventual containers that will be launched to execute the shell scripts
     if (domainId != null && domainId.length() > 0) {
-      env.put(DSConstants.TIMELINEDOMAIN, domainId);
+      env.put(Constants.TIMELINEDOMAIN, domainId);
     }
 
     // Add AppMaster.jar location to classpath

@@ -23,5 +23,5 @@ import org.apache.hadoop.classification.InterfaceAudience;
 @VisibleForTesting
 @InterfaceAudience.Private
 public enum ContainerEvents {
-  DS_APP_ATTEMPT_START, DS_APP_ATTEMPT_END, DS_CONTAINER_START, DS_CONTAINER_END
+  APP_ATTEMPT_START, CONTAINER_START, CONTAINER_END
 }

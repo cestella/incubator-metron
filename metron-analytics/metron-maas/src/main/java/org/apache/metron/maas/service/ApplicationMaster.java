@@ -17,10 +17,8 @@
  */
 package org.apache.metron.maas.service;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
@@ -40,14 +38,11 @@ import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceAudience.Private;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.ExitUtil;
-import org.apache.hadoop.util.Shell;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.api.ApplicationConstants.Environment;
 import org.apache.hadoop.yarn.api.ApplicationMasterProtocol;
@@ -73,7 +68,6 @@ import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.log4j.LogManager;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.metron.maas.common.ServiceDiscoverer;
 import org.apache.metron.maas.service.callback.LaunchContainer;
 import org.apache.metron.maas.config.Action;
 import org.apache.metron.maas.config.ModelRequest;
@@ -426,8 +420,8 @@ public class ApplicationMaster {
     }
 
 
-    if (envs.containsKey(DSConstants.TIMELINEDOMAIN)) {
-      domainId = envs.get(DSConstants.TIMELINEDOMAIN);
+    if (envs.containsKey(Constants.TIMELINEDOMAIN)) {
+      domainId = envs.get(Constants.TIMELINEDOMAIN);
     }
     return true;
   }
@@ -454,7 +448,7 @@ public class ApplicationMaster {
     startTimelineClient(conf);
     if(timelineClient != null) {
       YarnUtils.INSTANCE.publishApplicationAttemptEvent(timelineClient, appAttemptID.toString(),
-              ContainerEvents.DS_APP_ATTEMPT_START, domainId, appSubmitterUgi);
+              ContainerEvents.APP_ATTEMPT_START, domainId, appSubmitterUgi);
     }
     int minSize = getMinContainerMemoryIncrement(conf);
     listener = new ContainerRequestListener(timelineClient , appSubmitterUgi , domainId, minSize);

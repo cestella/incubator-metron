@@ -82,7 +82,7 @@ public enum YarnUtils {
     entity.addPrimaryFilter("user", ugi.getShortUserName());
     TimelineEvent event = new TimelineEvent();
     event.setTimestamp(System.currentTimeMillis());
-    event.setEventType(ContainerEvents.DS_CONTAINER_END.toString());
+    event.setEventType(ContainerEvents.CONTAINER_END.toString());
     event.addEventInfo("State", container.getState().name());
     event.addEventInfo("Exit Status", container.getExitStatus());
     entity.addEvent(event);
@@ -109,7 +109,7 @@ public enum YarnUtils {
       timelineClient.putEntities(entity);
     } catch (YarnException | IOException e) {
       LOG.error("App Attempt "
-              + (appEvent.equals(ContainerEvents.DS_APP_ATTEMPT_START) ? "start" : "end")
+              + (appEvent.equals(ContainerEvents.APP_ATTEMPT_START) ? "start" : "end")
               + " event could not be published for "
               + appAttemptId.toString(), e);
     }
@@ -124,7 +124,7 @@ public enum YarnUtils {
     entity.addPrimaryFilter("user", ugi.getShortUserName());
     TimelineEvent event = new TimelineEvent();
     event.setTimestamp(System.currentTimeMillis());
-    event.setEventType(ContainerEvents.DS_CONTAINER_START.toString());
+    event.setEventType(ContainerEvents.CONTAINER_START.toString());
     event.addEventInfo("Node", container.getNodeId().toString());
     event.addEventInfo("Resources", container.getResource().toString());
     entity.addEvent(event);
