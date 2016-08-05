@@ -30,7 +30,7 @@ public class TransformationTest {
   @Test
   public void testSample() {
     //String query = "TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ] and IN_SUBNET(ip, '192.168.0.0/24')";
-    String query = "TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ] and IN_SUBNET(ip, '192.168.0.0/24')";
+    String query = "[]";
     Map<String, Object> variables = new HashMap<String, Object>() {{
       put("foo", "casey");
       put("foo", "casey");

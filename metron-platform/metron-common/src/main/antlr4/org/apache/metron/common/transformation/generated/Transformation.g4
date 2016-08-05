@@ -134,7 +134,8 @@ func_args : op_list
 op_list : identifier_operand
         | op_list COMMA identifier_operand
         ;
-list_entity : LBRACKET op_list RBRACKET;
+list_entity : LBRACKET op_list RBRACKET
+            | LBRACKET RBRACKET;
 
 arithmetic_expr: arithmetic_expr_mul #ArithExpr_solo
                | arithmetic_expr_mul PLUS arithmetic_expr_mul #ArithExpr_plus
