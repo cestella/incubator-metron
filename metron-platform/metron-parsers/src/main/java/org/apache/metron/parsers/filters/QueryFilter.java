@@ -19,7 +19,7 @@
 package org.apache.metron.parsers.filters;
 
 import org.apache.metron.common.dsl.MapVariableResolver;
-import org.apache.metron.common.query.PredicateProcessor;
+import org.apache.metron.common.transformation.PredicateProcessor;
 import org.apache.metron.common.dsl.VariableResolver;
 import org.apache.metron.parsers.interfaces.MessageFilter;
 import org.json.simple.JSONObject;

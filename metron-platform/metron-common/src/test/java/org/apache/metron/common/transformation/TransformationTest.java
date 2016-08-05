@@ -19,7 +19,6 @@
 package org.apache.metron.common.transformation;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.metron.common.utils.timestamp.TimestampConverters;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,6 +26,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TransformationTest {
+
+  @Test
+  public void testSample() {
+    //String query = "TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ] and IN_SUBNET(ip, '192.168.0.0/24')";
+    String query = "TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ] and IN_SUBNET(ip, '192.168.0.0/24')";
+    Map<String, Object> variables = new HashMap<String, Object>() {{
+      put("foo", "casey");
+      put("foo", "casey");
+      put("ip", "192.168.0.1");
+      put("empty", "");
+      put("spaced", "metron is great");
+    }};
+    StellarProcessor processor = new StellarProcessor();
+    System.out.println(processor.parse(query, x -> variables.get(x)));
+  }
 
   @Test
   public void testHappyPath() {
@@ -152,7 +166,7 @@ public class TransformationTest {
     Assert.assertEquals("google", run("GET(SPLIT(DOMAIN_REMOVE_TLD(foo), '.'), 1)", variables));
   }
   private static Object run(String rule, Map<String, Object> variables) {
-    TransformationProcessor processor = new TransformationProcessor();
+    StellarProcessor processor = new StellarProcessor();
     Assert.assertTrue(rule + " not valid.", processor.validate(rule));
     return processor.parse(rule, x -> variables.get(x));
   }

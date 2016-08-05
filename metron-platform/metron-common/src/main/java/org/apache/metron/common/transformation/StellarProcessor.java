@@ -16,26 +16,11 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.field.transformation;
+package org.apache.metron.common.transformation;
 
-import org.apache.metron.common.utils.ReflectionUtils;
+public class StellarProcessor extends BaseTransformationProcessor<Object> {
 
-public enum FieldTransformations {
-  IP_PROTOCOL(new IPProtocolTransformation())
-  ,REMOVE(new RemoveTransformation())
-  ,MTL(new MTLTransformation())
-  ,STELLAR(new MTLTransformation())
-  ;
-  FieldTransformation mapping;
-  FieldTransformations(FieldTransformation mapping) {
-    this.mapping = mapping;
-  }
-  public static FieldTransformation get(String mapping) {
-    try {
-      return FieldTransformations.valueOf(mapping).mapping;
-    }
-    catch(Exception ex) {
-      return ReflectionUtils.createInstance(mapping);
-    }
+  public StellarProcessor() {
+    super(Object.class);
   }
 }

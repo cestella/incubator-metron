@@ -21,7 +21,7 @@ package org.apache.metron.common.configuration.enrichment.threatintel;
 import com.google.common.base.Joiner;
 import org.apache.metron.common.aggregator.Aggregator;
 import org.apache.metron.common.aggregator.Aggregators;
-import org.apache.metron.common.query.PredicateProcessor;
+import org.apache.metron.common.transformation.PredicateProcessor;
 
 import java.util.HashMap;
 import java.util.Map;

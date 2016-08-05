@@ -23,7 +23,7 @@ import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.configuration.enrichment.threatintel.ThreatIntelConfig;
 import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
 import org.apache.metron.common.dsl.MapVariableResolver;
-import org.apache.metron.common.query.PredicateProcessor;
+import org.apache.metron.common.transformation.PredicateProcessor;
 import org.apache.metron.common.dsl.VariableResolver;
 
 import javax.annotation.Nullable;

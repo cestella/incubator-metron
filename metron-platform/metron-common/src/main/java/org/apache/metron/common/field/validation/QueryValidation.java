@@ -19,7 +19,7 @@
 package org.apache.metron.common.field.validation;
 
 import org.apache.metron.common.dsl.MapVariableResolver;
-import org.apache.metron.common.query.PredicateProcessor;
+import org.apache.metron.common.transformation.PredicateProcessor;
 
 import java.util.Map;
 

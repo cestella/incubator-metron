@@ -20,8 +20,10 @@ package org.apache.metron.common.field.transformation;
 
 import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.dsl.ParseException;
-import org.apache.metron.common.query.PredicateProcessor;
+import org.apache.metron.common.transformation.PredicateProcessor;
 import org.apache.metron.common.dsl.VariableResolver;
+import org.apache.metron.common.transformation.StellarProcessor;
+import storm.trident.planner.processor.StateQueryProcessor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +33,7 @@ public class RemoveTransformation implements FieldTransformation {
   public static final String CONDITION_CONF = "condition";
   public static final PredicateProcessor PASSTHROUGH_PROCESSOR = new PredicateProcessor() {
     @Override
-    public boolean parse(String rule, VariableResolver resolver) {
+    public Boolean parse(String rule, VariableResolver resolver) {
       return true;
     }
 

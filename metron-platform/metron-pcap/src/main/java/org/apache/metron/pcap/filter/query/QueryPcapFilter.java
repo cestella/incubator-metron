@@ -20,7 +20,7 @@ package org.apache.metron.pcap.filter.query;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.metron.common.Constants;
-import org.apache.metron.common.query.PredicateProcessor;
+import org.apache.metron.common.transformation.PredicateProcessor;
 import org.apache.metron.common.dsl.VariableResolver;
 import org.apache.metron.pcap.PacketInfo;
 import org.apache.metron.pcap.PcapHelper;

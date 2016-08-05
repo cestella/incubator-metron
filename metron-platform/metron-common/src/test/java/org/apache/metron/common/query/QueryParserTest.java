@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.VariableResolver;
+import org.apache.metron.common.transformation.PredicateProcessor;
 import org.junit.Assert;
 import org.junit.Test;
 
