@@ -1,5 +1,5 @@
-// Generated from org/apache/metron/common/transformation/generated/Transformation.g4 by ANTLR 4.5
-package org.apache.metron.common.transformation.generated;
+// Generated from org/apache/metron/common/stellar/generated/Stellar.g4 by ANTLR 4.5
+package org.apache.metron.common.stellar.generated;
 
 //CHECKSTYLE:OFF
 /**
@@ -27,467 +27,467 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * This class provides an empty implementation of {@link TransformationListener},
+ * This class provides an empty implementation of {@link StellarListener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class TransformationBaseListener implements TransformationListener {
+public class StellarBaseListener implements StellarListener {
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTransformation(TransformationParser.TransformationContext ctx) { }
+	@Override public void enterTransformation(StellarParser.TransformationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTransformation(TransformationParser.TransformationContext ctx) { }
+	@Override public void exitTransformation(StellarParser.TransformationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonExpression(TransformationParser.ComparisonExpressionContext ctx) { }
+	@Override public void enterComparisonExpression(StellarParser.ComparisonExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonExpression(TransformationParser.ComparisonExpressionContext ctx) { }
+	@Override public void exitComparisonExpression(StellarParser.ComparisonExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTernaryFunc(TransformationParser.TernaryFuncContext ctx) { }
+	@Override public void enterTernaryFunc(StellarParser.TernaryFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTernaryFunc(TransformationParser.TernaryFuncContext ctx) { }
+	@Override public void exitTernaryFunc(StellarParser.TernaryFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNotFunc(TransformationParser.NotFuncContext ctx) { }
+	@Override public void enterNotFunc(StellarParser.NotFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNotFunc(TransformationParser.NotFuncContext ctx) { }
+	@Override public void exitNotFunc(StellarParser.NotFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTransformationEntity(TransformationParser.TransformationEntityContext ctx) { }
+	@Override public void enterTransformationEntity(StellarParser.TransformationEntityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTransformationEntity(TransformationParser.TransformationEntityContext ctx) { }
+	@Override public void exitTransformationEntity(StellarParser.TransformationEntityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpression(TransformationParser.ArithExpressionContext ctx) { }
+	@Override public void enterArithExpression(StellarParser.ArithExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpression(TransformationParser.ArithExpressionContext ctx) { }
+	@Override public void exitArithExpression(StellarParser.ArithExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTransformationExpr(TransformationParser.TransformationExprContext ctx) { }
+	@Override public void enterTransformationExpr(StellarParser.TransformationExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTransformationExpr(TransformationParser.TransformationExprContext ctx) { }
+	@Override public void exitTransformationExpr(StellarParser.TransformationExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogicalExpressionAnd(TransformationParser.LogicalExpressionAndContext ctx) { }
+	@Override public void enterLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogicalExpressionAnd(TransformationParser.LogicalExpressionAndContext ctx) { }
+	@Override public void exitLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogicalExpressionOr(TransformationParser.LogicalExpressionOrContext ctx) { }
+	@Override public void enterLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogicalExpressionOr(TransformationParser.LogicalExpressionOrContext ctx) { }
+	@Override public void exitLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonExpressionWithOperator(TransformationParser.ComparisonExpressionWithOperatorContext ctx) { }
+	@Override public void enterComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonExpressionWithOperator(TransformationParser.ComparisonExpressionWithOperatorContext ctx) { }
+	@Override public void exitComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInExpression(TransformationParser.InExpressionContext ctx) { }
+	@Override public void enterInExpression(StellarParser.InExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInExpression(TransformationParser.InExpressionContext ctx) { }
+	@Override public void exitInExpression(StellarParser.InExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNInExpression(TransformationParser.NInExpressionContext ctx) { }
+	@Override public void enterNInExpression(StellarParser.NInExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNInExpression(TransformationParser.NInExpressionContext ctx) { }
+	@Override public void exitNInExpression(StellarParser.NInExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonExpressionParens(TransformationParser.ComparisonExpressionParensContext ctx) { }
+	@Override public void enterComparisonExpressionParens(StellarParser.ComparisonExpressionParensContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonExpressionParens(TransformationParser.ComparisonExpressionParensContext ctx) { }
+	@Override public void exitComparisonExpressionParens(StellarParser.ComparisonExpressionParensContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIdentifierOperand(TransformationParser.IdentifierOperandContext ctx) { }
+	@Override public void enterIdentifierOperand(StellarParser.IdentifierOperandContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIdentifierOperand(TransformationParser.IdentifierOperandContext ctx) { }
+	@Override public void exitIdentifierOperand(StellarParser.IdentifierOperandContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTransformation_entity(TransformationParser.Transformation_entityContext ctx) { }
+	@Override public void enterTransformation_entity(StellarParser.Transformation_entityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTransformation_entity(TransformationParser.Transformation_entityContext ctx) { }
+	@Override public void exitTransformation_entity(StellarParser.Transformation_entityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonOp(TransformationParser.ComparisonOpContext ctx) { }
+	@Override public void enterComparisonOp(StellarParser.ComparisonOpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonOp(TransformationParser.ComparisonOpContext ctx) { }
+	@Override public void exitComparisonOp(StellarParser.ComparisonOpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithOp_plus(TransformationParser.ArithOp_plusContext ctx) { }
+	@Override public void enterArithOp_plus(StellarParser.ArithOp_plusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithOp_plus(TransformationParser.ArithOp_plusContext ctx) { }
+	@Override public void exitArithOp_plus(StellarParser.ArithOp_plusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithOp_mul(TransformationParser.ArithOp_mulContext ctx) { }
+	@Override public void enterArithOp_mul(StellarParser.ArithOp_mulContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithOp_mul(TransformationParser.ArithOp_mulContext ctx) { }
+	@Override public void exitArithOp_mul(StellarParser.ArithOp_mulContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunc_args(TransformationParser.Func_argsContext ctx) { }
+	@Override public void enterFunc_args(StellarParser.Func_argsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunc_args(TransformationParser.Func_argsContext ctx) { }
+	@Override public void exitFunc_args(StellarParser.Func_argsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOp_list(TransformationParser.Op_listContext ctx) { }
+	@Override public void enterOp_list(StellarParser.Op_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOp_list(TransformationParser.Op_listContext ctx) { }
+	@Override public void exitOp_list(StellarParser.Op_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterList_entity(TransformationParser.List_entityContext ctx) { }
+	@Override public void enterList_entity(StellarParser.List_entityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitList_entity(TransformationParser.List_entityContext ctx) { }
+	@Override public void exitList_entity(StellarParser.List_entityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_solo(TransformationParser.ArithExpr_soloContext ctx) { }
+	@Override public void enterArithExpr_solo(StellarParser.ArithExpr_soloContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpr_solo(TransformationParser.ArithExpr_soloContext ctx) { }
+	@Override public void exitArithExpr_solo(StellarParser.ArithExpr_soloContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_plus(TransformationParser.ArithExpr_plusContext ctx) { }
+	@Override public void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpr_plus(TransformationParser.ArithExpr_plusContext ctx) { }
+	@Override public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_minus(TransformationParser.ArithExpr_minusContext ctx) { }
+	@Override public void enterArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpr_minus(TransformationParser.ArithExpr_minusContext ctx) { }
+	@Override public void exitArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_div(TransformationParser.ArithExpr_divContext ctx) { }
+	@Override public void enterArithExpr_div(StellarParser.ArithExpr_divContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpr_div(TransformationParser.ArithExpr_divContext ctx) { }
+	@Override public void exitArithExpr_div(StellarParser.ArithExpr_divContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_mul_solo(TransformationParser.ArithExpr_mul_soloContext ctx) { }
+	@Override public void enterArithExpr_mul_solo(StellarParser.ArithExpr_mul_soloContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpr_mul_solo(TransformationParser.ArithExpr_mul_soloContext ctx) { }
+	@Override public void exitArithExpr_mul_solo(StellarParser.ArithExpr_mul_soloContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_mul(TransformationParser.ArithExpr_mulContext ctx) { }
+	@Override public void enterArithExpr_mul(StellarParser.ArithExpr_mulContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithExpr_mul(TransformationParser.ArithExpr_mulContext ctx) { }
+	@Override public void exitArithExpr_mul(StellarParser.ArithExpr_mulContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTransformationFunc(TransformationParser.TransformationFuncContext ctx) { }
+	@Override public void enterTransformationFunc(StellarParser.TransformationFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTransformationFunc(TransformationParser.TransformationFuncContext ctx) { }
+	@Override public void exitTransformationFunc(StellarParser.TransformationFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNumericFunctions(TransformationParser.NumericFunctionsContext ctx) { }
+	@Override public void enterNumericFunctions(StellarParser.NumericFunctionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNumericFunctions(TransformationParser.NumericFunctionsContext ctx) { }
+	@Override public void exitNumericFunctions(StellarParser.NumericFunctionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDoubleLiteral(TransformationParser.DoubleLiteralContext ctx) { }
+	@Override public void enterDoubleLiteral(StellarParser.DoubleLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDoubleLiteral(TransformationParser.DoubleLiteralContext ctx) { }
+	@Override public void exitDoubleLiteral(StellarParser.DoubleLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIntLiteral(TransformationParser.IntLiteralContext ctx) { }
+	@Override public void enterIntLiteral(StellarParser.IntLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIntLiteral(TransformationParser.IntLiteralContext ctx) { }
+	@Override public void exitIntLiteral(StellarParser.IntLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVariable(TransformationParser.VariableContext ctx) { }
+	@Override public void enterVariable(StellarParser.VariableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitVariable(TransformationParser.VariableContext ctx) { }
+	@Override public void exitVariable(StellarParser.VariableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParenArith(TransformationParser.ParenArithContext ctx) { }
+	@Override public void enterParenArith(StellarParser.ParenArithContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParenArith(TransformationParser.ParenArithContext ctx) { }
+	@Override public void exitParenArith(StellarParser.ParenArithContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogicalConst(TransformationParser.LogicalConstContext ctx) { }
+	@Override public void enterLogicalConst(StellarParser.LogicalConstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogicalConst(TransformationParser.LogicalConstContext ctx) { }
+	@Override public void exitLogicalConst(StellarParser.LogicalConstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithmeticOperands(TransformationParser.ArithmeticOperandsContext ctx) { }
+	@Override public void enterArithmeticOperands(StellarParser.ArithmeticOperandsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArithmeticOperands(TransformationParser.ArithmeticOperandsContext ctx) { }
+	@Override public void exitArithmeticOperands(StellarParser.ArithmeticOperandsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStringLiteral(TransformationParser.StringLiteralContext ctx) { }
+	@Override public void enterStringLiteral(StellarParser.StringLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStringLiteral(TransformationParser.StringLiteralContext ctx) { }
+	@Override public void exitStringLiteral(StellarParser.StringLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterList(TransformationParser.ListContext ctx) { }
+	@Override public void enterList(StellarParser.ListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitList(TransformationParser.ListContext ctx) { }
+	@Override public void exitList(StellarParser.ListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExistsFunc(TransformationParser.ExistsFuncContext ctx) { }
+	@Override public void enterExistsFunc(StellarParser.ExistsFuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExistsFunc(TransformationParser.ExistsFuncContext ctx) { }
+	@Override public void exitExistsFunc(StellarParser.ExistsFuncContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

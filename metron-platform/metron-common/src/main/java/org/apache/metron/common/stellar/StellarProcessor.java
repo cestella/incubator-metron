@@ -16,24 +16,11 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.transformation;
+package org.apache.metron.common.stellar;
 
+public class StellarProcessor extends BaseStellarProcessor<Object> {
 
-import org.apache.metron.common.dsl.VariableResolver;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
-public class PredicateProcessor extends BaseTransformationProcessor<Boolean> {
-
-  public PredicateProcessor() {
-    super(Boolean.class);
-  }
-
-  @Override
-  public Boolean parse(String rule, VariableResolver resolver) {
-    if(rule == null || isEmpty(rule.trim())) {
-      return true;
-    }
-    return super.parse(rule, resolver);
+  public StellarProcessor() {
+    super(Object.class);
   }
 }

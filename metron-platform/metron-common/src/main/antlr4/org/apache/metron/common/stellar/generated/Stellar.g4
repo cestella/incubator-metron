@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-grammar Transformation;
+grammar Stellar;
 
 @header {
 //CHECKSTYLE:OFF

@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public enum TransformationFunctions implements Function<List<Object>, Object> {
+public enum StellarFunctions implements Function<List<Object>, Object> {
   TO_LOWER(strings -> strings.get(0)==null?null:strings.get(0).toString().toLowerCase())
   ,TO_UPPER(strings -> strings.get(0) == null?null:strings.get(0).toString().toUpperCase())
   ,TO_STRING(strings -> strings.get(0) == null?null:strings.get(0).toString())
@@ -151,7 +151,7 @@ public enum TransformationFunctions implements Function<List<Object>, Object> {
     }
   }
   Function<List<Object>, Object> func;
-  TransformationFunctions(Function<List<Object>, Object> func) {
+  StellarFunctions(Function<List<Object>, Object> func) {
     this.func = func;
   }
 

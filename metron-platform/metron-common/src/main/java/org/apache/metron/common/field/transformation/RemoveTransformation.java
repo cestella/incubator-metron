@@ -20,10 +20,8 @@ package org.apache.metron.common.field.transformation;
 
 import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.dsl.ParseException;
-import org.apache.metron.common.transformation.PredicateProcessor;
+import org.apache.metron.common.stellar.StellarPredicateProcessor;
 import org.apache.metron.common.dsl.VariableResolver;
-import org.apache.metron.common.transformation.StellarProcessor;
-import storm.trident.planner.processor.StateQueryProcessor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.Map;
 
 public class RemoveTransformation implements FieldTransformation {
   public static final String CONDITION_CONF = "condition";
-  public static final PredicateProcessor PASSTHROUGH_PROCESSOR = new PredicateProcessor() {
+  public static final StellarPredicateProcessor PASSTHROUGH_PROCESSOR = new StellarPredicateProcessor() {
     @Override
     public Boolean parse(String rule, VariableResolver resolver) {
       return true;
@@ -56,13 +54,13 @@ public class RemoveTransformation implements FieldTransformation {
     return conditionObj.toString();
   }
 
-  private PredicateProcessor getPredicateProcessor(String condition)
+  private StellarPredicateProcessor getPredicateProcessor(String condition)
   {
     if(condition == null) {
       return PASSTHROUGH_PROCESSOR;
     }
     else {
-      return new PredicateProcessor();
+      return new StellarPredicateProcessor();
     }
   }
 
@@ -73,7 +71,7 @@ public class RemoveTransformation implements FieldTransformation {
                                 , Map<String, Object> sensorConfig
                                 ) {
     String condition = getCondition(fieldMappingConfig);
-    PredicateProcessor processor = getPredicateProcessor(condition);
+    StellarPredicateProcessor processor = getPredicateProcessor(condition);
     if(processor.parse(condition, new MapVariableResolver(input))) {
       return new HashMap<String, Object>() {{
         for(String outputField : outputFields) {

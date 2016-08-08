@@ -1,5 +1,5 @@
-// Generated from org/apache/metron/common/transformation/generated/Transformation.g4 by ANTLR 4.5
-package org.apache.metron.common.transformation.generated;
+// Generated from org/apache/metron/common/stellar/generated/Stellar.g4 by ANTLR 4.5
+package org.apache.metron.common.stellar.generated;
 
 //CHECKSTYLE:OFF
 /**
@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class TransformationLexer extends Lexer {
+public class StellarLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.5", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -100,13 +100,13 @@ public class TransformationLexer extends Lexer {
 	}
 
 
-	public TransformationLexer(CharStream input) {
+	public StellarLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@Override
-	public String getGrammarFileName() { return "Transformation.g4"; }
+	public String getGrammarFileName() { return "Stellar.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

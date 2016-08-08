@@ -16,32 +16,28 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.transformation;
+package org.apache.metron.common.stellar;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
-import org.apache.metron.common.dsl.Token;
-import org.apache.metron.common.dsl.TransformationFunctions;
-import org.apache.metron.common.dsl.FunctionMarker;
-import org.apache.metron.common.dsl.ParseException;
-import org.apache.metron.common.dsl.VariableResolver;
+import org.apache.metron.common.dsl.*;
 import org.apache.metron.common.query.BooleanOp;
-import org.apache.metron.common.transformation.generated.TransformationBaseListener;
-import org.apache.metron.common.transformation.generated.TransformationParser;
+import org.apache.metron.common.stellar.generated.StellarBaseListener;
+import org.apache.metron.common.stellar.generated.StellarParser;
 import org.apache.metron.common.utils.ConversionUtils;
 
 import java.util.*;
 import java.util.function.Function;
 
-public class TransformationCompiler extends TransformationBaseListener {
+public class StellarCompiler extends StellarBaseListener {
   private VariableResolver resolver = null;
   private Stack<Token> tokenStack = new Stack<>();
-  public TransformationCompiler(VariableResolver resolver) {
+  public StellarCompiler(VariableResolver resolver) {
     this.resolver = resolver;
   }
 
   @Override
-  public void enterTransformation(TransformationParser.TransformationContext ctx) {
+  public void enterTransformation(StellarParser.TransformationContext ctx) {
     tokenStack.clear();
   }
 
@@ -69,7 +65,7 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitArithExpr_plus(TransformationParser.ArithExpr_plusContext ctx) {
+  public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
     Number r = (Number)right.getValue();
@@ -79,7 +75,7 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitArithExpr_minus(TransformationParser.ArithExpr_minusContext ctx) {
+  public void exitArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
     Number r = (Number)right.getValue();
@@ -89,7 +85,7 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitArithExpr_div(TransformationParser.ArithExpr_divContext ctx) {
+  public void exitArithExpr_div(StellarParser.ArithExpr_divContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
     Number r = (Number)right.getValue();
@@ -99,7 +95,7 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitArithExpr_mul(TransformationParser.ArithExpr_mulContext ctx) {
+  public void exitArithExpr_mul(StellarParser.ArithExpr_mulContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
     Number r = (Number)right.getValue();
@@ -108,7 +104,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   }
 
   @Override
-  public void exitTernaryFunc(TransformationParser.TernaryFuncContext ctx) {
+  public void exitTernaryFunc(StellarParser.TernaryFuncContext ctx) {
     Token<?> elseExpr = popStack();
     Token<?> thenExpr = popStack();
     Token<?> ifExpr = popStack();
@@ -122,7 +118,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   }
 
   @Override
-  public void exitInExpression(TransformationParser.InExpressionContext ctx) {
+  public void exitInExpression(StellarParser.InExpressionContext ctx) {
     Token<?> left = popStack();
     Token<?> right = popStack();
     tokenStack.push(new Token<>(handleIn(left, right), Boolean.class));
@@ -130,48 +126,48 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitNInExpression(TransformationParser.NInExpressionContext ctx) {
+  public void exitNInExpression(StellarParser.NInExpressionContext ctx) {
     Token<?> left = popStack();
     Token<?> right = popStack();
     tokenStack.push(new Token<>(!handleIn(left, right), Boolean.class));
   }
 
   @Override
-  public void exitNotFunc(TransformationParser.NotFuncContext ctx) {
+  public void exitNotFunc(StellarParser.NotFuncContext ctx) {
     Token<Boolean> arg = (Token<Boolean>) popStack();
     tokenStack.push(new Token<>(!arg.getValue(), Boolean.class));
   }
 
   @Override
-  public void exitVariable(TransformationParser.VariableContext ctx) {
+  public void exitVariable(StellarParser.VariableContext ctx) {
     tokenStack.push(new Token<>(resolver.resolve(ctx.getText()), Object.class));
   }
 
   @Override
-  public void exitStringLiteral(TransformationParser.StringLiteralContext ctx) {
+  public void exitStringLiteral(StellarParser.StringLiteralContext ctx) {
     tokenStack.push(new Token<>(ctx.getText().substring(1, ctx.getText().length() - 1), String.class));
   }
 
 
   @Override
-  public void exitIntLiteral(TransformationParser.IntLiteralContext ctx) {
+  public void exitIntLiteral(StellarParser.IntLiteralContext ctx) {
     tokenStack.push(new Token<>(Integer.parseInt(ctx.getText()), Integer.class));
   }
 
   @Override
-  public void exitDoubleLiteral(TransformationParser.DoubleLiteralContext ctx) {
+  public void exitDoubleLiteral(StellarParser.DoubleLiteralContext ctx) {
     tokenStack.push(new Token<>(Double.parseDouble(ctx.getText()), Double.class));
   }
 
   @Override
-  public void exitLogicalExpressionAnd(TransformationParser.LogicalExpressionAndContext ctx) {
+  public void exitLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) {
     Token<?> left = popStack();
     Token<?> right = popStack();
     tokenStack.push(new Token<>(booleanOp(left, right, (l, r) -> l && r, "&&"), Boolean.class));
   }
 
   @Override
-  public void exitLogicalExpressionOr(TransformationParser.LogicalExpressionOrContext ctx) {
+  public void exitLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) {
     Token<?> left = popStack();
     Token<?> right = popStack();
 
@@ -179,7 +175,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   }
 
   @Override
-  public void exitLogicalConst(TransformationParser.LogicalConstContext ctx) {
+  public void exitLogicalConst(StellarParser.LogicalConstContext ctx) {
     Boolean b = null;
     switch(ctx.getText().toUpperCase()) {
       case "TRUE":
@@ -206,15 +202,15 @@ public class TransformationCompiler extends TransformationBaseListener {
   }
 
   @Override
-  public void exitTransformationFunc(TransformationParser.TransformationFuncContext ctx) {
+  public void exitTransformationFunc(StellarParser.TransformationFuncContext ctx) {
     String funcName = ctx.getChild(0).getText();
     Function<List<Object>, Object> func;
     try {
-      func = TransformationFunctions.valueOf(funcName);
+      func = StellarFunctions.valueOf(funcName);
     }
     catch(IllegalArgumentException iae) {
       throw new ParseException("Unable to find string function " + funcName + ".  Valid functions are "
-              + Joiner.on(',').join(TransformationFunctions.values())
+              + Joiner.on(',').join(StellarFunctions.values())
       );
     }
     Token<?> left = popStack();
@@ -231,20 +227,20 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitExistsFunc(TransformationParser.ExistsFuncContext ctx) {
+  public void exitExistsFunc(StellarParser.ExistsFuncContext ctx) {
     String variable = ctx.getChild(2).getText();
     boolean exists = resolver.resolve(variable) != null;
     tokenStack.push(new Token<>(exists, Boolean.class));
   }
 
   @Override
-  public void enterFunc_args(TransformationParser.Func_argsContext ctx) {
+  public void enterFunc_args(StellarParser.Func_argsContext ctx) {
     tokenStack.push(new Token<>(new FunctionMarker(), FunctionMarker.class));
   }
 
 
   @Override
-  public void exitFunc_args(TransformationParser.Func_argsContext ctx) {
+  public void exitFunc_args(StellarParser.Func_argsContext ctx) {
     LinkedList<Object> args = new LinkedList<>();
     while(true) {
       Token<?> token = popStack();
@@ -260,7 +256,7 @@ public class TransformationCompiler extends TransformationBaseListener {
 
 
   @Override
-  public void exitList_entity(TransformationParser.List_entityContext ctx) {
+  public void exitList_entity(StellarParser.List_entityContext ctx) {
     LinkedList<Object> args = new LinkedList<>();
     while(true) {
       Token<?> token = popStack();
@@ -295,7 +291,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   }
 
   @Override
-  public void exitComparisonExpressionWithOperator(TransformationParser.ComparisonExpressionWithOperatorContext ctx) {
+  public void exitComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) {
     String op = ctx.getChild(1).getText();
     Token<?> right = popStack();
     Token<?> left = popStack();
@@ -315,7 +311,7 @@ public class TransformationCompiler extends TransformationBaseListener {
   }
 
   @Override
-  public void enterList_entity(TransformationParser.List_entityContext ctx) {
+  public void enterList_entity(StellarParser.List_entityContext ctx) {
     tokenStack.push(new Token<>(new FunctionMarker(), FunctionMarker.class));
   }
 

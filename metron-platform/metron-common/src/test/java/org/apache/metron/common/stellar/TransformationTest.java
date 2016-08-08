@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.metron.common.transformation;
+package org.apache.metron.common.stellar;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
@@ -30,7 +30,7 @@ public class TransformationTest {
   @Test
   public void testSample() {
     //String query = "TO_UPPER(foo) in [ TO_UPPER('casey'), 'david' ] and IN_SUBNET(ip, '192.168.0.0/24')";
-    String query = "[]";
+    String query = "exi";
     Map<String, Object> variables = new HashMap<String, Object>() {{
       put("foo", "casey");
       put("foo", "casey");
@@ -40,6 +40,7 @@ public class TransformationTest {
     }};
     StellarProcessor processor = new StellarProcessor();
     System.out.println(processor.parse(query, x -> variables.get(x)));
+    System.out.println(processor.validate(query));
   }
 
   @Test

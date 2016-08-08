@@ -1,5 +1,5 @@
-// Generated from org/apache/metron/common/transformation/generated/Transformation.g4 by ANTLR 4.5
-package org.apache.metron.common.transformation.generated;
+// Generated from org/apache/metron/common/stellar/generated/Stellar.g4 by ANTLR 4.5
+package org.apache.metron.common.stellar.generated;
 
 //CHECKSTYLE:OFF
 /**
@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
-public class TransformationParser extends Parser {
+public class StellarParser extends Parser {
 	static { RuntimeMetaData.checkVersion("4.5", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -101,7 +101,7 @@ public class TransformationParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "Transformation.g4"; }
+	public String getGrammarFileName() { return "Stellar.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -112,7 +112,7 @@ public class TransformationParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-	public TransformationParser(TokenStream input) {
+	public StellarParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
@@ -120,18 +120,18 @@ public class TransformationParser extends Parser {
 		public Transformation_exprContext transformation_expr() {
 			return getRuleContext(Transformation_exprContext.class,0);
 		}
-		public TerminalNode EOF() { return getToken(TransformationParser.EOF, 0); }
+		public TerminalNode EOF() { return getToken(StellarParser.EOF, 0); }
 		public TransformationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_transformation; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterTransformation(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterTransformation(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitTransformation(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitTransformation(this);
 		}
 	}
 
@@ -176,48 +176,48 @@ public class TransformationParser extends Parser {
 		public ComparisonExpressionContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterComparisonExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterComparisonExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitComparisonExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitComparisonExpression(this);
 		}
 	}
 	public static class TernaryFuncContext extends Transformation_exprContext {
-		public TerminalNode IF() { return getToken(TransformationParser.IF, 0); }
+		public TerminalNode IF() { return getToken(StellarParser.IF, 0); }
 		public List<Transformation_exprContext> transformation_expr() {
 			return getRuleContexts(Transformation_exprContext.class);
 		}
 		public Transformation_exprContext transformation_expr(int i) {
 			return getRuleContext(Transformation_exprContext.class,i);
 		}
-		public TerminalNode QUESTION() { return getToken(TransformationParser.QUESTION, 0); }
-		public TerminalNode COLON() { return getToken(TransformationParser.COLON, 0); }
+		public TerminalNode QUESTION() { return getToken(StellarParser.QUESTION, 0); }
+		public TerminalNode COLON() { return getToken(StellarParser.COLON, 0); }
 		public TernaryFuncContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterTernaryFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterTernaryFunc(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitTernaryFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitTernaryFunc(this);
 		}
 	}
 	public static class NotFuncContext extends Transformation_exprContext {
-		public TerminalNode NOT() { return getToken(TransformationParser.NOT, 0); }
-		public TerminalNode LPAREN() { return getToken(TransformationParser.LPAREN, 0); }
+		public TerminalNode NOT() { return getToken(StellarParser.NOT, 0); }
+		public TerminalNode LPAREN() { return getToken(StellarParser.LPAREN, 0); }
 		public Transformation_exprContext transformation_expr() {
 			return getRuleContext(Transformation_exprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(TransformationParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(StellarParser.RPAREN, 0); }
 		public NotFuncContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterNotFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterNotFunc(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitNotFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitNotFunc(this);
 		}
 	}
 	public static class TransformationEntityContext extends Transformation_exprContext {
@@ -227,11 +227,11 @@ public class TransformationParser extends Parser {
 		public TransformationEntityContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterTransformationEntity(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterTransformationEntity(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitTransformationEntity(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitTransformationEntity(this);
 		}
 	}
 	public static class ArithExpressionContext extends Transformation_exprContext {
@@ -241,27 +241,27 @@ public class TransformationParser extends Parser {
 		public ArithExpressionContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpression(this);
 		}
 	}
 	public static class TransformationExprContext extends Transformation_exprContext {
-		public TerminalNode LPAREN() { return getToken(TransformationParser.LPAREN, 0); }
+		public TerminalNode LPAREN() { return getToken(StellarParser.LPAREN, 0); }
 		public Transformation_exprContext transformation_expr() {
 			return getRuleContext(Transformation_exprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(TransformationParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(StellarParser.RPAREN, 0); }
 		public TransformationExprContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterTransformationExpr(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterTransformationExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitTransformationExpr(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitTransformationExpr(this);
 		}
 	}
 	public static class LogicalExpressionAndContext extends Transformation_exprContext {
@@ -271,15 +271,15 @@ public class TransformationParser extends Parser {
 		public Transformation_exprContext transformation_expr(int i) {
 			return getRuleContext(Transformation_exprContext.class,i);
 		}
-		public TerminalNode AND() { return getToken(TransformationParser.AND, 0); }
+		public TerminalNode AND() { return getToken(StellarParser.AND, 0); }
 		public LogicalExpressionAndContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterLogicalExpressionAnd(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterLogicalExpressionAnd(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitLogicalExpressionAnd(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitLogicalExpressionAnd(this);
 		}
 	}
 	public static class LogicalExpressionOrContext extends Transformation_exprContext {
@@ -289,15 +289,15 @@ public class TransformationParser extends Parser {
 		public Transformation_exprContext transformation_expr(int i) {
 			return getRuleContext(Transformation_exprContext.class,i);
 		}
-		public TerminalNode OR() { return getToken(TransformationParser.OR, 0); }
+		public TerminalNode OR() { return getToken(StellarParser.OR, 0); }
 		public LogicalExpressionOrContext(Transformation_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterLogicalExpressionOr(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterLogicalExpressionOr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitLogicalExpressionOr(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitLogicalExpressionOr(this);
 		}
 	}
 
@@ -477,19 +477,19 @@ public class TransformationParser extends Parser {
 		}
 	}
 	public static class ComparisonExpressionParensContext extends Comparison_exprContext {
-		public TerminalNode LPAREN() { return getToken(TransformationParser.LPAREN, 0); }
+		public TerminalNode LPAREN() { return getToken(StellarParser.LPAREN, 0); }
 		public Comparison_exprContext comparison_expr() {
 			return getRuleContext(Comparison_exprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(TransformationParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(StellarParser.RPAREN, 0); }
 		public ComparisonExpressionParensContext(Comparison_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterComparisonExpressionParens(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterComparisonExpressionParens(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitComparisonExpressionParens(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitComparisonExpressionParens(this);
 		}
 	}
 	public static class InExpressionContext extends Comparison_exprContext {
@@ -499,15 +499,15 @@ public class TransformationParser extends Parser {
 		public Identifier_operandContext identifier_operand(int i) {
 			return getRuleContext(Identifier_operandContext.class,i);
 		}
-		public TerminalNode IN() { return getToken(TransformationParser.IN, 0); }
+		public TerminalNode IN() { return getToken(StellarParser.IN, 0); }
 		public InExpressionContext(Comparison_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterInExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterInExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitInExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitInExpression(this);
 		}
 	}
 	public static class ComparisonExpressionWithOperatorContext extends Comparison_exprContext {
@@ -523,11 +523,11 @@ public class TransformationParser extends Parser {
 		public ComparisonExpressionWithOperatorContext(Comparison_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterComparisonExpressionWithOperator(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterComparisonExpressionWithOperator(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitComparisonExpressionWithOperator(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitComparisonExpressionWithOperator(this);
 		}
 	}
 	public static class NInExpressionContext extends Comparison_exprContext {
@@ -537,15 +537,15 @@ public class TransformationParser extends Parser {
 		public Identifier_operandContext identifier_operand(int i) {
 			return getRuleContext(Identifier_operandContext.class,i);
 		}
-		public TerminalNode NIN() { return getToken(TransformationParser.NIN, 0); }
+		public TerminalNode NIN() { return getToken(StellarParser.NIN, 0); }
 		public NInExpressionContext(Comparison_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterNInExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterNInExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitNInExpression(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitNInExpression(this);
 		}
 	}
 
@@ -634,11 +634,11 @@ public class TransformationParser extends Parser {
 		public IdentifierOperandContext(Comparison_operandContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterIdentifierOperand(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterIdentifierOperand(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitIdentifierOperand(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitIdentifierOperand(this);
 		}
 	}
 
@@ -674,11 +674,11 @@ public class TransformationParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_transformation_entity; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterTransformation_entity(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterTransformation_entity(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitTransformation_entity(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitTransformation_entity(this);
 		}
 	}
 
@@ -715,20 +715,20 @@ public class TransformationParser extends Parser {
 		}
 	}
 	public static class ComparisonOpContext extends Comp_operatorContext {
-		public TerminalNode EQ() { return getToken(TransformationParser.EQ, 0); }
-		public TerminalNode NEQ() { return getToken(TransformationParser.NEQ, 0); }
-		public TerminalNode LT() { return getToken(TransformationParser.LT, 0); }
-		public TerminalNode LTE() { return getToken(TransformationParser.LTE, 0); }
-		public TerminalNode GT() { return getToken(TransformationParser.GT, 0); }
-		public TerminalNode GTE() { return getToken(TransformationParser.GTE, 0); }
+		public TerminalNode EQ() { return getToken(StellarParser.EQ, 0); }
+		public TerminalNode NEQ() { return getToken(StellarParser.NEQ, 0); }
+		public TerminalNode LT() { return getToken(StellarParser.LT, 0); }
+		public TerminalNode LTE() { return getToken(StellarParser.LTE, 0); }
+		public TerminalNode GT() { return getToken(StellarParser.GT, 0); }
+		public TerminalNode GTE() { return getToken(StellarParser.GTE, 0); }
 		public ComparisonOpContext(Comp_operatorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterComparisonOp(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterComparisonOp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitComparisonOp(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitComparisonOp(this);
 		}
 	}
 
@@ -772,16 +772,16 @@ public class TransformationParser extends Parser {
 		}
 	}
 	public static class ArithOp_plusContext extends Arith_operator_additionContext {
-		public TerminalNode PLUS() { return getToken(TransformationParser.PLUS, 0); }
-		public TerminalNode MINUS() { return getToken(TransformationParser.MINUS, 0); }
+		public TerminalNode PLUS() { return getToken(StellarParser.PLUS, 0); }
+		public TerminalNode MINUS() { return getToken(StellarParser.MINUS, 0); }
 		public ArithOp_plusContext(Arith_operator_additionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithOp_plus(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithOp_plus(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithOp_plus(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithOp_plus(this);
 		}
 	}
 
@@ -825,16 +825,16 @@ public class TransformationParser extends Parser {
 		}
 	}
 	public static class ArithOp_mulContext extends Arith_operator_mulContext {
-		public TerminalNode MUL() { return getToken(TransformationParser.MUL, 0); }
-		public TerminalNode DIV() { return getToken(TransformationParser.DIV, 0); }
+		public TerminalNode MUL() { return getToken(StellarParser.MUL, 0); }
+		public TerminalNode DIV() { return getToken(StellarParser.DIV, 0); }
 		public ArithOp_mulContext(Arith_operator_mulContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithOp_mul(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithOp_mul(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithOp_mul(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithOp_mul(this);
 		}
 	}
 
@@ -876,11 +876,11 @@ public class TransformationParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_func_args; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterFunc_args(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterFunc_args(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitFunc_args(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitFunc_args(this);
 		}
 	}
 
@@ -912,18 +912,18 @@ public class TransformationParser extends Parser {
 		public Op_listContext op_list() {
 			return getRuleContext(Op_listContext.class,0);
 		}
-		public TerminalNode COMMA() { return getToken(TransformationParser.COMMA, 0); }
+		public TerminalNode COMMA() { return getToken(StellarParser.COMMA, 0); }
 		public Op_listContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_op_list; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterOp_list(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterOp_list(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitOp_list(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitOp_list(this);
 		}
 	}
 
@@ -985,22 +985,22 @@ public class TransformationParser extends Parser {
 	}
 
 	public static class List_entityContext extends ParserRuleContext {
-		public TerminalNode LBRACKET() { return getToken(TransformationParser.LBRACKET, 0); }
+		public TerminalNode LBRACKET() { return getToken(StellarParser.LBRACKET, 0); }
 		public Op_listContext op_list() {
 			return getRuleContext(Op_listContext.class,0);
 		}
-		public TerminalNode RBRACKET() { return getToken(TransformationParser.RBRACKET, 0); }
+		public TerminalNode RBRACKET() { return getToken(StellarParser.RBRACKET, 0); }
 		public List_entityContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_list_entity; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterList_entity(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterList_entity(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitList_entity(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitList_entity(this);
 		}
 	}
 
@@ -1061,11 +1061,11 @@ public class TransformationParser extends Parser {
 		public ArithExpr_soloContext(Arithmetic_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpr_solo(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpr_solo(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpr_solo(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpr_solo(this);
 		}
 	}
 	public static class ArithExpr_minusContext extends Arithmetic_exprContext {
@@ -1075,15 +1075,15 @@ public class TransformationParser extends Parser {
 		public Arithmetic_expr_mulContext arithmetic_expr_mul(int i) {
 			return getRuleContext(Arithmetic_expr_mulContext.class,i);
 		}
-		public TerminalNode MINUS() { return getToken(TransformationParser.MINUS, 0); }
+		public TerminalNode MINUS() { return getToken(StellarParser.MINUS, 0); }
 		public ArithExpr_minusContext(Arithmetic_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpr_minus(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpr_minus(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpr_minus(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpr_minus(this);
 		}
 	}
 	public static class ArithExpr_plusContext extends Arithmetic_exprContext {
@@ -1093,15 +1093,15 @@ public class TransformationParser extends Parser {
 		public Arithmetic_expr_mulContext arithmetic_expr_mul(int i) {
 			return getRuleContext(Arithmetic_expr_mulContext.class,i);
 		}
-		public TerminalNode PLUS() { return getToken(TransformationParser.PLUS, 0); }
+		public TerminalNode PLUS() { return getToken(StellarParser.PLUS, 0); }
 		public ArithExpr_plusContext(Arithmetic_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpr_plus(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpr_plus(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpr_plus(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpr_plus(this);
 		}
 	}
 
@@ -1174,15 +1174,15 @@ public class TransformationParser extends Parser {
 		public Arithmetic_expr_mulContext arithmetic_expr_mul(int i) {
 			return getRuleContext(Arithmetic_expr_mulContext.class,i);
 		}
-		public TerminalNode DIV() { return getToken(TransformationParser.DIV, 0); }
+		public TerminalNode DIV() { return getToken(StellarParser.DIV, 0); }
 		public ArithExpr_divContext(Arithmetic_expr_mulContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpr_div(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpr_div(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpr_div(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpr_div(this);
 		}
 	}
 	public static class ArithExpr_mul_soloContext extends Arithmetic_expr_mulContext {
@@ -1192,11 +1192,11 @@ public class TransformationParser extends Parser {
 		public ArithExpr_mul_soloContext(Arithmetic_expr_mulContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpr_mul_solo(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpr_mul_solo(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpr_mul_solo(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpr_mul_solo(this);
 		}
 	}
 	public static class ArithExpr_mulContext extends Arithmetic_expr_mulContext {
@@ -1206,15 +1206,15 @@ public class TransformationParser extends Parser {
 		public Arithmetic_expr_mulContext arithmetic_expr_mul(int i) {
 			return getRuleContext(Arithmetic_expr_mulContext.class,i);
 		}
-		public TerminalNode MUL() { return getToken(TransformationParser.MUL, 0); }
+		public TerminalNode MUL() { return getToken(StellarParser.MUL, 0); }
 		public ArithExpr_mulContext(Arithmetic_expr_mulContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithExpr_mul(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithExpr_mul(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithExpr_mul(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithExpr_mul(this);
 		}
 	}
 
@@ -1308,20 +1308,20 @@ public class TransformationParser extends Parser {
 		}
 	}
 	public static class TransformationFuncContext extends FunctionsContext {
-		public TerminalNode IDENTIFIER() { return getToken(TransformationParser.IDENTIFIER, 0); }
-		public TerminalNode LPAREN() { return getToken(TransformationParser.LPAREN, 0); }
+		public TerminalNode IDENTIFIER() { return getToken(StellarParser.IDENTIFIER, 0); }
+		public TerminalNode LPAREN() { return getToken(StellarParser.LPAREN, 0); }
 		public Func_argsContext func_args() {
 			return getRuleContext(Func_argsContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(TransformationParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(StellarParser.RPAREN, 0); }
 		public TransformationFuncContext(FunctionsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterTransformationFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterTransformationFunc(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitTransformationFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitTransformationFunc(this);
 		}
 	}
 
@@ -1365,15 +1365,15 @@ public class TransformationParser extends Parser {
 		}
 	}
 	public static class VariableContext extends Arithmetic_operandsContext {
-		public TerminalNode IDENTIFIER() { return getToken(TransformationParser.IDENTIFIER, 0); }
+		public TerminalNode IDENTIFIER() { return getToken(StellarParser.IDENTIFIER, 0); }
 		public VariableContext(Arithmetic_operandsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterVariable(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterVariable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitVariable(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitVariable(this);
 		}
 	}
 	public static class NumericFunctionsContext extends Arithmetic_operandsContext {
@@ -1383,51 +1383,51 @@ public class TransformationParser extends Parser {
 		public NumericFunctionsContext(Arithmetic_operandsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterNumericFunctions(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterNumericFunctions(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitNumericFunctions(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitNumericFunctions(this);
 		}
 	}
 	public static class ParenArithContext extends Arithmetic_operandsContext {
-		public TerminalNode LPAREN() { return getToken(TransformationParser.LPAREN, 0); }
+		public TerminalNode LPAREN() { return getToken(StellarParser.LPAREN, 0); }
 		public Arithmetic_exprContext arithmetic_expr() {
 			return getRuleContext(Arithmetic_exprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(TransformationParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(StellarParser.RPAREN, 0); }
 		public ParenArithContext(Arithmetic_operandsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterParenArith(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterParenArith(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitParenArith(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitParenArith(this);
 		}
 	}
 	public static class IntLiteralContext extends Arithmetic_operandsContext {
-		public TerminalNode INT_LITERAL() { return getToken(TransformationParser.INT_LITERAL, 0); }
+		public TerminalNode INT_LITERAL() { return getToken(StellarParser.INT_LITERAL, 0); }
 		public IntLiteralContext(Arithmetic_operandsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterIntLiteral(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterIntLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitIntLiteral(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitIntLiteral(this);
 		}
 	}
 	public static class DoubleLiteralContext extends Arithmetic_operandsContext {
-		public TerminalNode DOUBLE_LITERAL() { return getToken(TransformationParser.DOUBLE_LITERAL, 0); }
+		public TerminalNode DOUBLE_LITERAL() { return getToken(StellarParser.DOUBLE_LITERAL, 0); }
 		public DoubleLiteralContext(Arithmetic_operandsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterDoubleLiteral(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterDoubleLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitDoubleLiteral(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitDoubleLiteral(this);
 		}
 	}
 
@@ -1512,23 +1512,23 @@ public class TransformationParser extends Parser {
 		public ArithmeticOperandsContext(Identifier_operandContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterArithmeticOperands(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterArithmeticOperands(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitArithmeticOperands(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitArithmeticOperands(this);
 		}
 	}
 	public static class StringLiteralContext extends Identifier_operandContext {
-		public TerminalNode STRING_LITERAL() { return getToken(TransformationParser.STRING_LITERAL, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(StellarParser.STRING_LITERAL, 0); }
 		public StringLiteralContext(Identifier_operandContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterStringLiteral(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterStringLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitStringLiteral(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitStringLiteral(this);
 		}
 	}
 	public static class ListContext extends Identifier_operandContext {
@@ -1538,39 +1538,39 @@ public class TransformationParser extends Parser {
 		public ListContext(Identifier_operandContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterList(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterList(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitList(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitList(this);
 		}
 	}
 	public static class LogicalConstContext extends Identifier_operandContext {
-		public TerminalNode TRUE() { return getToken(TransformationParser.TRUE, 0); }
-		public TerminalNode FALSE() { return getToken(TransformationParser.FALSE, 0); }
+		public TerminalNode TRUE() { return getToken(StellarParser.TRUE, 0); }
+		public TerminalNode FALSE() { return getToken(StellarParser.FALSE, 0); }
 		public LogicalConstContext(Identifier_operandContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterLogicalConst(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterLogicalConst(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitLogicalConst(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitLogicalConst(this);
 		}
 	}
 	public static class ExistsFuncContext extends Identifier_operandContext {
-		public TerminalNode EXISTS() { return getToken(TransformationParser.EXISTS, 0); }
-		public TerminalNode LPAREN() { return getToken(TransformationParser.LPAREN, 0); }
-		public TerminalNode IDENTIFIER() { return getToken(TransformationParser.IDENTIFIER, 0); }
-		public TerminalNode RPAREN() { return getToken(TransformationParser.RPAREN, 0); }
+		public TerminalNode EXISTS() { return getToken(StellarParser.EXISTS, 0); }
+		public TerminalNode LPAREN() { return getToken(StellarParser.LPAREN, 0); }
+		public TerminalNode IDENTIFIER() { return getToken(StellarParser.IDENTIFIER, 0); }
+		public TerminalNode RPAREN() { return getToken(StellarParser.RPAREN, 0); }
 		public ExistsFuncContext(Identifier_operandContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).enterExistsFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).enterExistsFunc(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TransformationListener ) ((TransformationListener)listener).exitExistsFunc(this);
+			if ( listener instanceof StellarListener ) ((StellarListener)listener).exitExistsFunc(this);
 		}
 	}
 

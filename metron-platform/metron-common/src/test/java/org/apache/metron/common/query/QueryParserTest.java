@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.VariableResolver;
-import org.apache.metron.common.transformation.PredicateProcessor;
+import org.apache.metron.common.stellar.StellarPredicateProcessor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class QueryParserTest {
 
   @Test
   public void testValidation() throws Exception {
-    PredicateProcessor processor = new PredicateProcessor();
+    StellarPredicateProcessor processor = new StellarPredicateProcessor();
     try {
       processor.validate("'foo'");
       Assert.fail("Invalid rule found to be valid - lone value.");
@@ -55,7 +55,7 @@ public class QueryParserTest {
     return run(rule, new MapVariableResolver(resolver));
   }
   public static boolean run(String rule, VariableResolver resolver) {
-    PredicateProcessor processor = new PredicateProcessor();
+    StellarPredicateProcessor processor = new StellarPredicateProcessor();
     Assert.assertTrue(rule + " not valid.", processor.validate(rule));
     return processor.parse(rule, resolver);
   }

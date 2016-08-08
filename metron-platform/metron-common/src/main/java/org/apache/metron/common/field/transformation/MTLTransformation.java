@@ -20,7 +20,7 @@ package org.apache.metron.common.field.transformation;
 
 import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.dsl.VariableResolver;
-import org.apache.metron.common.transformation.StellarProcessor;
+import org.apache.metron.common.stellar.StellarProcessor;
 
 import java.util.HashMap;
 import java.util.List;

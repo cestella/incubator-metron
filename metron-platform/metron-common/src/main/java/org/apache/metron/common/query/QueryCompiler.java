@@ -281,11 +281,11 @@ class QueryCompiler extends PredicateBaseListener {
     String funcName = ctx.getChild(0).getText();
     Function<List<Object>, Object> func;
     try {
-      func = TransformationFunctions.valueOf(funcName);
+      func = StellarFunctions.valueOf(funcName);
     }
     catch(IllegalArgumentException iae) {
       throw new ParseException("Unable to find string function " + funcName + ".  Valid functions are "
-              + Joiner.on(',').join(TransformationFunctions.values())
+              + Joiner.on(',').join(StellarFunctions.values())
       );
     }
     Token<?> left = popStack();
