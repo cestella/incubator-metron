@@ -21,7 +21,6 @@ package org.apache.metron.common.stellar;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import org.apache.metron.common.dsl.*;
-import org.apache.metron.common.query.BooleanOp;
 import org.apache.metron.common.stellar.generated.StellarBaseListener;
 import org.apache.metron.common.stellar.generated.StellarParser;
 import org.apache.metron.common.utils.ConversionUtils;
