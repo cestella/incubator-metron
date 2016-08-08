@@ -301,18 +301,6 @@ public class StellarBaseListener implements StellarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -320,6 +308,18 @@ public class StellarBaseListener implements StellarListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -138,8 +138,8 @@ list_entity : LBRACKET op_list RBRACKET
             | LBRACKET RBRACKET;
 
 arithmetic_expr: arithmetic_expr_mul #ArithExpr_solo
-               | arithmetic_expr_mul PLUS arithmetic_expr_mul #ArithExpr_plus
-               | arithmetic_expr_mul MINUS arithmetic_expr_mul #ArithExpr_minus
+               | arithmetic_expr PLUS arithmetic_expr_mul #ArithExpr_plus
+               | arithmetic_expr MINUS arithmetic_expr_mul #ArithExpr_minus
                 ;
 arithmetic_expr_mul : arithmetic_operands #ArithExpr_mul_solo
                     | arithmetic_expr_mul MUL arithmetic_expr_mul #ArithExpr_mul

@@ -283,18 +283,6 @@ public interface StellarListener extends ParseTreeListener {
 	 */
 	void exitArithExpr_solo(StellarParser.ArithExpr_soloContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ArithExpr_plus}
-	 * labeled alternative in {@link StellarParser#arithmetic_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code ArithExpr_plus}
-	 * labeled alternative in {@link StellarParser#arithmetic_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code ArithExpr_minus}
 	 * labeled alternative in {@link StellarParser#arithmetic_expr}.
 	 * @param ctx the parse tree
@@ -306,6 +294,18 @@ public interface StellarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArithExpr_minus(StellarParser.ArithExpr_minusContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ArithExpr_plus}
+	 * labeled alternative in {@link StellarParser#arithmetic_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ArithExpr_plus}
+	 * labeled alternative in {@link StellarParser#arithmetic_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ArithExpr_div}
 	 * labeled alternative in {@link StellarParser#arithmetic_expr_mul}.

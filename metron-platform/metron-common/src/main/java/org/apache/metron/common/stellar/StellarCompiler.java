@@ -63,14 +63,37 @@ public class StellarCompiler extends StellarBaseListener {
     return set.contains(key);
   }
 
+  private Double getDouble(Token<?> token) {
+    Number n = (Number)token.getValue();
+    if(n == null) {
+      return 0d;
+    }
+    else {
+      return n.doubleValue();
+    }
+  }
+
+
+
+
+  /*@Override
+  public void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) {
+    tokenStack.push(new Token<>(new ArithmeticMarkers.PlusMarker(), ArithmeticMarkers.PlusMarker.class));
+  }
+
+  @Override
+  public void enterArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) {
+    tokenStack.push(new Token<>(new ArithmeticMarkers.MinusMarker(), ArithmeticMarkers.MinusMarker.class));
+  }*/
 
   @Override
   public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
-    Number r = (Number)right.getValue();
-    Number l = (Number)left.getValue();
-    tokenStack.push(new Token<>(l.doubleValue() + r.doubleValue(), Double.class));
+    Double r = getDouble(right);
+    Double l = getDouble(left);
+    tokenStack.push(new Token<>(l + r, Double.class));
+
   }
 
 
@@ -78,19 +101,20 @@ public class StellarCompiler extends StellarBaseListener {
   public void exitArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
-    Number r = (Number)right.getValue();
-    Number l = (Number)left.getValue();
-    tokenStack.push(new Token<>(l.doubleValue() - r.doubleValue(), Double.class));
+    Double r = getDouble(right);
+    Double l = getDouble(left);
+    tokenStack.push(new Token<>(l - r, Double.class));
   }
+
 
 
   @Override
   public void exitArithExpr_div(StellarParser.ArithExpr_divContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
-    Number r = (Number)right.getValue();
-    Number l = (Number)left.getValue();
-    tokenStack.push(new Token<>(l.doubleValue() / r.doubleValue(), Double.class));
+    Double r = getDouble(right);
+    Double l = getDouble(left);
+    tokenStack.push(new Token<>(l / r, Double.class));
   }
 
 
@@ -98,9 +122,9 @@ public class StellarCompiler extends StellarBaseListener {
   public void exitArithExpr_mul(StellarParser.ArithExpr_mulContext ctx) {
     Token<?> right = popStack();
     Token<?> left = popStack();
-    Number r = (Number)right.getValue();
-    Number l = (Number)left.getValue();
-    tokenStack.push(new Token<>(l.doubleValue() * r.doubleValue(), Double.class));
+    Double r = getDouble(right);
+    Double l = getDouble(left);
+    tokenStack.push(new Token<>(l * r, Double.class));
   }
 
   @Override
@@ -290,6 +314,26 @@ public class StellarCompiler extends StellarBaseListener {
       }
   }
 
+  private boolean compareDouble(Double l, Double r, String op) {
+    if(op.equals("==")) {
+        return Math.abs(l - r) < 1e-6;
+      }
+      else if(op.equals("!=")) {
+        return Math.abs(l - r) >= 1e-6;
+      }
+      else if(op.equals("<")) {
+        return l.compareTo(r) < 0;
+      }
+      else if(op.equals(">")) {
+        return l.compareTo(r) > 0;
+      }
+      else if(op.equals(">=")) {
+        return l.compareTo(r) >= 0;
+      }
+      else {
+        return l.compareTo(r) <= 0;
+      }
+  }
   @Override
   public void exitComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) {
     String op = ctx.getChild(1).getText();
@@ -300,7 +344,7 @@ public class StellarCompiler extends StellarBaseListener {
       ) {
       Double l = ((Number)left.getValue()).doubleValue();
       Double r = ((Number)right.getValue()).doubleValue();
-      tokenStack.push(new Token<>(compare(l, r, op), Boolean.class));
+      tokenStack.push(new Token<>(compareDouble(l, r, op), Boolean.class));
 
     }
     else {
