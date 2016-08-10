@@ -19,7 +19,11 @@
 package org.apache.metron.common.stellar;
 
 
+import org.apache.metron.common.dsl.Context;
+import org.apache.metron.common.dsl.StellarFunction;
 import org.apache.metron.common.dsl.VariableResolver;
+
+import java.util.function.Function;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -30,10 +34,15 @@ public class StellarPredicateProcessor extends BaseStellarProcessor<Boolean> {
   }
 
   @Override
-  public Boolean parse(String rule, VariableResolver resolver) {
+  public Boolean parse( String rule
+                      , VariableResolver variableResolver
+                      , Function<String, StellarFunction> functionResolver
+                      , Context context
+                      )
+  {
     if(rule == null || isEmpty(rule.trim())) {
       return true;
     }
-    return super.parse(rule, resolver);
+    return super.parse(rule, variableResolver, functionResolver, context);
   }
 }

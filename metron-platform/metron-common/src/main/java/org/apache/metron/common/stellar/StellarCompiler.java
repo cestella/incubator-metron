@@ -29,10 +29,18 @@ import java.util.*;
 import java.util.function.Function;
 
 public class StellarCompiler extends StellarBaseListener {
-  private VariableResolver resolver = null;
+  private Context context = null;
   private Stack<Token> tokenStack = new Stack<>();
-  public StellarCompiler(VariableResolver resolver) {
-    this.resolver = resolver;
+  private Function<String, StellarFunction> functionResolver;
+  private VariableResolver variableResolver;
+  public StellarCompiler( VariableResolver variableResolver
+                        , Function<String, StellarFunction> functionResolver
+                        , Context context
+                        )
+  {
+    this.variableResolver = variableResolver;
+    this.functionResolver = functionResolver;
+    this.context = context;
   }
 
   @Override
@@ -74,16 +82,6 @@ public class StellarCompiler extends StellarBaseListener {
 
 
 
-
-  /*@Override
-  public void enterArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) {
-    tokenStack.push(new Token<>(new ArithmeticMarkers.PlusMarker(), ArithmeticMarkers.PlusMarker.class));
-  }
-
-  @Override
-  public void enterArithExpr_minus(StellarParser.ArithExpr_minusContext ctx) {
-    tokenStack.push(new Token<>(new ArithmeticMarkers.MinusMarker(), ArithmeticMarkers.MinusMarker.class));
-  }*/
 
   @Override
   public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) {
@@ -163,7 +161,7 @@ public class StellarCompiler extends StellarBaseListener {
 
   @Override
   public void exitVariable(StellarParser.VariableContext ctx) {
-    tokenStack.push(new Token<>(resolver.resolve(ctx.getText()), Object.class));
+    tokenStack.push(new Token<>(variableResolver.resolve(ctx.getText()), Object.class));
   }
 
   @Override
@@ -227,11 +225,11 @@ public class StellarCompiler extends StellarBaseListener {
   @Override
   public void exitTransformationFunc(StellarParser.TransformationFuncContext ctx) {
     String funcName = ctx.getChild(0).getText();
-    Function<List<Object>, Object> func;
+    StellarFunction func = null;
     try {
-      func = StellarFunctions.valueOf(funcName);
+      func = functionResolver.apply(funcName);
     }
-    catch(IllegalArgumentException iae) {
+    catch(Exception iae) {
       throw new ParseException("Unable to find string function " + funcName + ".  Valid functions are "
               + Joiner.on(',').join(StellarFunctions.values())
       );
@@ -244,7 +242,7 @@ public class StellarCompiler extends StellarBaseListener {
     else {
       throw new ParseException("Unable to process in clause because " + left.getValue() + " is not a set");
     }
-    Object result = func.apply(argList);
+    Object result = func.apply(argList, context);
     tokenStack.push(new Token<>(result, Object.class));
   }
 
@@ -252,7 +250,7 @@ public class StellarCompiler extends StellarBaseListener {
   @Override
   public void exitExistsFunc(StellarParser.ExistsFuncContext ctx) {
     String variable = ctx.getChild(2).getText();
-    boolean exists = resolver.resolve(variable) != null;
+    boolean exists = variableResolver.resolve(variable) != null;
     tokenStack.push(new Token<>(exists, Boolean.class));
   }
 

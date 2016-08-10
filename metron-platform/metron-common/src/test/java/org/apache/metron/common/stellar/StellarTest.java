@@ -20,9 +20,7 @@ package org.apache.metron.common.stellar;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.metron.common.dsl.MapVariableResolver;
-import org.apache.metron.common.dsl.ParseException;
-import org.apache.metron.common.dsl.VariableResolver;
+import org.apache.metron.common.dsl.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -228,9 +226,12 @@ public class StellarTest {
     Assert.assertEquals("google", run("GET(SPLIT(DOMAIN_REMOVE_TLD(foo), '.'), 1)", variables));
   }
   private static Object run(String rule, Map<String, Object> variables) {
+    return run(rule, variables, Context.EMPTY_CONTEXT());
+  }
+  private static Object run(String rule, Map<String, Object> variables, Context context) {
     StellarProcessor processor = new StellarProcessor();
     Assert.assertTrue(rule + " not valid.", processor.validate(rule));
-    return processor.parse(rule, x -> variables.get(x));
+    return processor.parse(rule, x -> variables.get(x), StellarFunctions.FUNCTION_RESOLVER(), context);
   }@Test
   public void testValidation() throws Exception {
     StellarPredicateProcessor processor = new StellarPredicateProcessor();
@@ -251,12 +252,19 @@ public class StellarTest {
   }
 
   public static boolean runPredicate(String rule, Map resolver) {
-    return runPredicate(rule, new MapVariableResolver(resolver));
+    return runPredicate(rule, resolver, Context.EMPTY_CONTEXT());
+
+  }
+  public static boolean runPredicate(String rule, Map resolver, Context context) {
+    return runPredicate(rule, new MapVariableResolver(resolver), context);
   }
   public static boolean runPredicate(String rule, VariableResolver resolver) {
+    return runPredicate(rule, resolver, Context.EMPTY_CONTEXT());
+  }
+  public static boolean runPredicate(String rule, VariableResolver resolver, Context context) {
     StellarPredicateProcessor processor = new StellarPredicateProcessor();
     Assert.assertTrue(rule + " not valid.", processor.validate(rule));
-    return processor.parse(rule, resolver);
+    return processor.parse(rule, resolver, StellarFunctions.FUNCTION_RESOLVER(), context);
   }
 
   @Test
