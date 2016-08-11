@@ -68,6 +68,8 @@ public enum StellarFunctions implements StellarFunction {
   , IS_DATE(new Predicate2Transformation(new DateValidation()))
   , IS_INTEGER(new Predicate2Transformation(new IntegerValidation()))
   , MAP_EXISTS( new MapFunctions.MapExists())
+  , MAAS_GET_ENDPOINT( new MaaSFunctions.GetEndpoint())
+  , MODEL_APPLY(new MaaSFunctions.ModelApply())
   ;
   private static class Predicate2Transformation extends BaseStellarFunction {
     Predicate<List<Object>> pred;

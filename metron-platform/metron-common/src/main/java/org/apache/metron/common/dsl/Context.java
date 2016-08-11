@@ -47,7 +47,9 @@ public class Context {
   {
     this.capabilities = capabilities;
   }
-
+  public Optional<Object> getCapability(Enum<?> capability) {
+    return getCapability(capability.toString());
+  }
   public Optional<Object> getCapability(String capability) {
     Capability c = capabilities.get(capability);
     if(c == null) {
