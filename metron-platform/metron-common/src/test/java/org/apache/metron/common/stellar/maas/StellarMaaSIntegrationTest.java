@@ -32,44 +32,49 @@ public class StellarMaaSIntegrationTest {
   private static CuratorFramework client;
   private static ServiceDiscoverer discoverer;
   private static URL endpointUrl;
+  private static boolean initialized = false;
 
   @BeforeClass
   public static void setup() throws Exception {
-    MockDGAModel.start(8282);
-    testZkServer = new TestingServer(true);
-    zookeeperUrl = testZkServer.getConnectString();
-    RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-    client = CuratorFrameworkFactory.newClient(zookeeperUrl, retryPolicy);
-    client.start();
-    context = new Context.Builder()
-            .with(Context.Capabilities.ZOOKEEPER_CLIENT, () -> client)
-            .build();
-    StellarFunctions.FUNCTION_RESOLVER().initializeFunctions(context);
-    discoverer = (ServiceDiscoverer) context.getCapability(Context.Capabilities.SERVICE_DISCOVERER).get();
-    endpointUrl = new URL("http://localhost:8282");
-    ModelEndpoint endpoint = new ModelEndpoint();
-    {
-      endpoint.setName("dga");
-      endpoint.setContainerId("0");
-      endpoint.setUrl(endpointUrl.toString());
-      endpoint.setVersion("1.0");
-    };
+    if(!initialized) {
+      MockDGAModel.start(8282);
+      testZkServer = new TestingServer(true);
+      zookeeperUrl = testZkServer.getConnectString();
+      RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
+      client = CuratorFrameworkFactory.newClient(zookeeperUrl, retryPolicy);
+      client.start();
+      context = new Context.Builder()
+              .with(Context.Capabilities.ZOOKEEPER_CLIENT, () -> client)
+              .build();
+      StellarFunctions.FUNCTION_RESOLVER().initializeFunctions(context);
+      discoverer = (ServiceDiscoverer) context.getCapability(Context.Capabilities.SERVICE_DISCOVERER).get();
+      endpointUrl = new URL("http://localhost:8282");
+      ModelEndpoint endpoint = new ModelEndpoint();
+      {
+        endpoint.setName("dga");
+        endpoint.setContainerId("0");
+        endpoint.setUrl(endpointUrl.toString());
+        endpoint.setVersion("1.0");
+      }
+      ;
 
-    ServiceInstanceBuilder<ModelEndpoint> builder = ServiceInstance.<ModelEndpoint> builder()
-            .address(endpointUrl.getHost())
-            .id("0")
-            .name("dga")
-            .port(endpointUrl.getPort())
-            .registrationTimeUTC(System.currentTimeMillis())
-            .serviceType(ServiceType.STATIC)
-            .payload(endpoint)
-            ;
-    final ServiceInstance<ModelEndpoint> instance = builder.build();
-    discoverer.getServiceDiscovery().registerService(instance);
+      ServiceInstanceBuilder<ModelEndpoint> builder = ServiceInstance.<ModelEndpoint>builder()
+              .address(endpointUrl.getHost())
+              .id("0")
+              .name("dga")
+              .port(endpointUrl.getPort())
+              .registrationTimeUTC(System.currentTimeMillis())
+              .serviceType(ServiceType.STATIC)
+              .payload(endpoint);
+      final ServiceInstance<ModelEndpoint> instance = builder.build();
+      discoverer.getServiceDiscovery().registerService(instance);
+      initialized = true;
+    }
   }
 
   @Test
-  public void testGetEndpointWithoutVersion() throws IOException, URISyntaxException {
+  public void testGetEndpointWithoutVersion() throws Exception {
+    setup();
     String stellar = "MAAS_GET_ENDPOINT('dga')";
     Object result = StellarTest.run(stellar, new HashMap<>(), context);
     Assert.assertTrue(result instanceof String);
@@ -78,7 +83,8 @@ public class StellarMaaSIntegrationTest {
   }
 
   @Test
-  public void testGetEndpointWithVersion() throws IOException, URISyntaxException {
+  public void testGetEndpointWithVersion() throws Exception {
+    setup();
     String stellar = "MAAS_GET_ENDPOINT('dga', '1.0')";
     Object result = StellarTest.run(stellar, new HashMap<>(), context);
     Assert.assertTrue(result instanceof String);
@@ -86,14 +92,16 @@ public class StellarMaaSIntegrationTest {
   }
 
   @Test
-  public void testGetEndpointWithWrongVersion() throws IOException, URISyntaxException {
+  public void testGetEndpointWithWrongVersion() throws Exception {
+    setup();
     String stellar = "MAAS_GET_ENDPOINT('dga', '2.0')";
     Object result = StellarTest.run(stellar, new HashMap<>(), context);
     Assert.assertNull(result);
   }
 
   @Test
-  public void testModelApply() throws IOException, URISyntaxException {
+  public void testModelApply() throws Exception {
+    setup();
     {
       String stellar = "MAP_GET('is_malicious', MODEL_APPLY(MAAS_GET_ENDPOINT('dga'), 'apply', 'host', host))";
       Object result = StellarTest.run(stellar, ImmutableMap.of("host", "badguy.com"), context);

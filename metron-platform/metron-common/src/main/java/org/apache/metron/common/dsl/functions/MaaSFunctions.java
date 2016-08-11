@@ -84,12 +84,18 @@ public class MaaSFunctions {
       if(modelName == null) {
         return null;
       }
-      if (modelVersion == null) {
-        ModelEndpoint ep =  discoverer.getEndpoint(modelName);
-        return ep == null?null:ep.getUrl();
-      } else {
-        ModelEndpoint ep = discoverer.getEndpoint(modelName, modelVersion);
-        return ep == null?null:ep.getUrl();
+      try {
+        if (modelVersion == null) {
+          ModelEndpoint ep = discoverer.getEndpoint(modelName);
+          return ep == null ? null : ep.getUrl();
+        } else {
+          ModelEndpoint ep = discoverer.getEndpoint(modelName, modelVersion);
+          return ep == null ? null : ep.getUrl();
+        }
+      }
+      catch(Exception ex) {
+        LOG.error("Unable to discover endpoint: " + ex.getMessage(), ex);
+        return null;
       }
 
     }

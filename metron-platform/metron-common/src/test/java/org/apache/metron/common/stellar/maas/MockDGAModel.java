@@ -20,8 +20,7 @@ import java.util.*;
 @Path("/")
 public class MockDGAModel {
   private static HttpServer server;
-  private Map<String, Boolean> isMalicious = ImmutableMap.of("yahoo.com", false
-                                                            ,"badguy.com", true
+  private Map<String, Boolean> isMalicious = ImmutableMap.of( "badguy.com", true
                                                            );
 
   @GET
