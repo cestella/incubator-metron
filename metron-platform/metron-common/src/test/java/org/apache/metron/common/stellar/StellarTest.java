@@ -232,7 +232,6 @@ public class StellarTest {
 
   
 
-  @Test
   public static Object run(String rule, Map<String, Object> variables) {
     return run(rule, variables, Context.EMPTY_CONTEXT());
   }

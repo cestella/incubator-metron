@@ -2,6 +2,7 @@ package org.apache.metron.common.dsl.functions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.hadoop.security.authorize.Service;
 import org.apache.metron.common.dsl.Context;
 import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.StellarFunction;
@@ -14,6 +15,7 @@ import org.apache.metron.maas.util.RESTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ public class MaaSFunctions {
  protected static final Logger LOG = LoggerFactory.getLogger(MaaSFunctions.class);
 
   public static class ModelApply implements StellarFunction {
+    ServiceDiscoverer discoverer;
 
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
@@ -34,8 +37,9 @@ public class MaaSFunctions {
                                  "value 1, ..., param key k, param value k");
       }
       int i = 0;
-      String url = (String)args.get(i++);
+      String origUrl = (String)args.get(i++);
       String method = (String)args.get(i++);
+      String url = origUrl;
       if(url.endsWith("/")) {
         url = url.substring(0, url.length() - 1);
       }
@@ -55,13 +59,28 @@ public class MaaSFunctions {
         return JSONUtils.INSTANCE.load(results, new TypeReference<Map<String, Object>>(){});
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
+        if(discoverer != null) {
+          try {
+            URL u = new URL(origUrl);
+            discoverer.blacklist(u);
+          } catch (MalformedURLException e1) {
+          }
+        }
       }
       return null;
     }
 
     @Override
     public void initialize(Context context) {
-
+      try {
+        Optional<ServiceDiscoverer> discovererOpt = (Optional<ServiceDiscoverer>) context.getCapability(Context.Capabilities.SERVICE_DISCOVERER).get();
+        if (discovererOpt.isPresent()) {
+          discoverer = discovererOpt.get();
+        }
+      }
+      catch(Exception ex) {
+        LOG.error(ex.getMessage(), ex);
+      }
     }
   }
 
