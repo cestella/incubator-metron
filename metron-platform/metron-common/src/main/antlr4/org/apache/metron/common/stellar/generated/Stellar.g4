@@ -68,12 +68,14 @@ GTE : '>=';
 QUESTION : '?' | 'THEN' | 'then';
 COLON : ':' | 'ELSE' | 'else';
 IF : 'IF' | 'if';
+NULL : 'null' | 'NULL';
 
 MINUS : '-';
 PLUS : '+';
 DIV : '/';
 MUL : '*';
-
+LBRACE : '{';
+RBRACE : '}';
 LBRACKET : '[';
 RBRACKET : ']';
 LPAREN : '(' ;
@@ -136,7 +138,11 @@ op_list : identifier_operand
         ;
 list_entity : LBRACKET op_list RBRACKET
             | LBRACKET RBRACKET;
-
+kv_list : identifier_operand ':' identifier_operand
+        | kv_list COMMA identifier_operand ':' identifier_operand
+        ;
+map_entity : LBRACE kv_list RBRACE
+            | LBRACE RBRACE;
 arithmetic_expr: arithmetic_expr_mul #ArithExpr_solo
                | arithmetic_expr PLUS arithmetic_expr_mul #ArithExpr_plus
                | arithmetic_expr MINUS arithmetic_expr_mul #ArithExpr_minus
@@ -158,5 +164,7 @@ identifier_operand : (TRUE | FALSE) # LogicalConst
                    | arithmetic_expr #ArithmeticOperands
                    | STRING_LITERAL # StringLiteral
                    | list_entity #List
+                   | map_entity #MapConst
+                   | NULL #NullConst
                    | EXISTS LPAREN IDENTIFIER RPAREN #ExistsFunc
                    ;

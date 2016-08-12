@@ -271,6 +271,26 @@ public interface StellarListener extends ParseTreeListener {
 	 */
 	void exitList_entity(StellarParser.List_entityContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link StellarParser#kv_list}.
+	 * @param ctx the parse tree
+	 */
+	void enterKv_list(StellarParser.Kv_listContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link StellarParser#kv_list}.
+	 * @param ctx the parse tree
+	 */
+	void exitKv_list(StellarParser.Kv_listContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link StellarParser#map_entity}.
+	 * @param ctx the parse tree
+	 */
+	void enterMap_entity(StellarParser.Map_entityContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link StellarParser#map_entity}.
+	 * @param ctx the parse tree
+	 */
+	void exitMap_entity(StellarParser.Map_entityContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ArithExpr_solo}
 	 * labeled alternative in {@link StellarParser#arithmetic_expr}.
 	 * @param ctx the parse tree
@@ -462,6 +482,30 @@ public interface StellarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitList(StellarParser.ListContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code MapConst}
+	 * labeled alternative in {@link StellarParser#identifier_operand}.
+	 * @param ctx the parse tree
+	 */
+	void enterMapConst(StellarParser.MapConstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code MapConst}
+	 * labeled alternative in {@link StellarParser#identifier_operand}.
+	 * @param ctx the parse tree
+	 */
+	void exitMapConst(StellarParser.MapConstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code NullConst}
+	 * labeled alternative in {@link StellarParser#identifier_operand}.
+	 * @param ctx the parse tree
+	 */
+	void enterNullConst(StellarParser.NullConstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code NullConst}
+	 * labeled alternative in {@link StellarParser#identifier_operand}.
+	 * @param ctx the parse tree
+	 */
+	void exitNullConst(StellarParser.NullConstContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ExistsFunc}
 	 * labeled alternative in {@link StellarParser#identifier_operand}.

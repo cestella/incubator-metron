@@ -30,6 +30,22 @@ import java.util.Map;
 public class StellarTest {
 
   @Test
+  public void testNull() {
+    {
+      String query = "if 1 < 2 then NULL else true";
+      Assert.assertNull(run(query, new HashMap<>()));
+    }
+  }
+
+  @Test
+  public void testMapConstant() {
+    {
+      String query = "MAP_GET('bar', { 'foo' : 1, 'bar' : 'bar' })";
+      Assert.assertEquals("bar", run(query, new HashMap<>()));
+    }
+  }
+
+  @Test
   public void testIfThenElse() {
     {
       String query = "if 1 < 2 then 'one' else 'two'";

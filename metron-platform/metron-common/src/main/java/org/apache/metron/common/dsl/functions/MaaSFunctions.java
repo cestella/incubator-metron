@@ -1,6 +1,8 @@
 package org.apache.metron.common.dsl.functions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.hadoop.security.authorize.Service;
 import org.apache.metron.common.dsl.Context;
@@ -21,12 +23,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class MaaSFunctions {
  protected static final Logger LOG = LoggerFactory.getLogger(MaaSFunctions.class);
 
   public static class ModelApply implements StellarFunction {
-    ServiceDiscoverer discoverer;
+    private ServiceDiscoverer discoverer;
+    private Cache<URL, Boolean> resultCache;
+    public ModelApply() {
+      resultCache = CacheBuilder.newBuilder()
+                            .concurrencyLevel(4)
+                            .weakKeys()
+                            .maximumSize(100000)
+                            .expireAfterWrite(10, TimeUnit.MINUTES)
+                            .build();
+    }
 
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {

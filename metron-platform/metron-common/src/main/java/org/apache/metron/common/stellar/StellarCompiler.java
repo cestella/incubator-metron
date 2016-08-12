@@ -81,7 +81,10 @@ public class StellarCompiler extends StellarBaseListener {
   }
 
 
-
+  @Override
+  public void exitNullConst(StellarParser.NullConstContext ctx) {
+    tokenStack.push(new Token<>(null, Object.class));
+  }
 
   @Override
   public void exitArithExpr_plus(StellarParser.ArithExpr_plusContext ctx) {
@@ -275,6 +278,31 @@ public class StellarCompiler extends StellarBaseListener {
     tokenStack.push(new Token<>(args, List.class));
   }
 
+  @Override
+  public void enterMap_entity(StellarParser.Map_entityContext ctx) {
+    tokenStack.push(new Token<>(new FunctionMarker(), FunctionMarker.class));
+  }
+
+  @Override
+  public void exitMap_entity(StellarParser.Map_entityContext ctx) {
+    HashMap<String, Object> args = new HashMap<>();
+    Object value = null;
+    for(int i = 0;true;i++) {
+      Token<?> token = popStack();
+      if(token.getUnderlyingType().equals(FunctionMarker.class)) {
+        break;
+      }
+      else {
+        if(i % 2 == 0) {
+          value = token.getValue();
+        }
+        else {
+          args.put(token.getValue() + "" , value);
+        }
+      }
+    }
+    tokenStack.push(new Token<>(args, Map.class));
+  }
   @Override
   public void exitList_entity(StellarParser.List_entityContext ctx) {
     LinkedList<Object> args = new LinkedList<>();

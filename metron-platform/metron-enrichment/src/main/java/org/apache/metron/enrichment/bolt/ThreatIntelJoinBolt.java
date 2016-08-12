@@ -24,6 +24,8 @@ import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.configuration.enrichment.threatintel.ThreatTriageConfig;
 import org.apache.metron.common.dsl.FunctionResolver;
 import org.apache.metron.common.dsl.StellarFunctions;
+import org.apache.metron.common.dsl.functions.ConversionFunctions;
+import org.apache.metron.common.utils.ConversionUtils;
 import org.apache.metron.common.utils.MessageUtils;
 import org.apache.metron.threatintel.triage.ThreatTriageProcessor;
 import org.json.simple.JSONObject;
@@ -71,6 +73,13 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
           isAlert = true;
           break;
         }
+      }
+    }
+    else {
+      Object isAlertObj = ret.get("is_alert");
+      isAlert = ConversionUtils.convert(isAlertObj, Boolean.class);
+      if(!isAlert) {
+        ret.remove("is_alert");
       }
     }
     if(isAlert) {
