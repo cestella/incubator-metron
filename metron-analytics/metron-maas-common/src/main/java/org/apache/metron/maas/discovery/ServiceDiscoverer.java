@@ -168,7 +168,7 @@ public class ServiceDiscoverer implements Closeable{
   }
 
   public void blacklist(ModelEndpoint endpoint) {
-    blacklist(toUrl(endpoint.getUrl()));
+    blacklist(toUrl(endpoint.getEndpoint().getUrl()));
   }
 
   public void blacklist(URL url) {
@@ -209,7 +209,7 @@ public class ServiceDiscoverer implements Closeable{
           int i = ThreadLocalRandom.current().nextInt(endpoints.size());
           ret = endpoints.get(i);
           try {
-            if (blacklist.asMap().containsKey(toUrl(ret.getUrl()))) {
+            if (blacklist.asMap().containsKey(toUrl(ret.getEndpoint().getUrl()))) {
               continue;
             }
             else {

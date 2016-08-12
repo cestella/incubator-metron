@@ -13,6 +13,7 @@ import org.apache.curator.x.discovery.ServiceType;
 import org.apache.metron.common.dsl.Context;
 import org.apache.metron.common.dsl.StellarFunctions;
 import org.apache.metron.common.stellar.StellarTest;
+import org.apache.metron.maas.config.Endpoint;
 import org.apache.metron.maas.config.ModelEndpoint;
 import org.apache.metron.maas.discovery.ServiceDiscoverer;
 import org.apache.metron.maas.util.RESTUtil;
@@ -51,7 +52,9 @@ public class StellarMaaSIntegrationTest {
     {
       endpoint.setName("dga");
       endpoint.setContainerId("0");
-      endpoint.setUrl(endpointUrl.toString());
+      Endpoint ep = new Endpoint();
+      ep.setUrl(endpointUrl.toString());
+      endpoint.setEndpoint(ep);
       endpoint.setVersion("1.0");
     }
     ;
@@ -85,8 +88,12 @@ public class StellarMaaSIntegrationTest {
   public void testGetEndpointWithoutVersion() throws Exception {
     String stellar = "MAAS_GET_ENDPOINT('dga')";
     Object result = StellarTest.run(stellar, new HashMap<>(), context);
-    Assert.assertTrue(result instanceof String);
-    Assert.assertEquals(result, "http://localhost:8282");
+    Assert.assertTrue(result instanceof Map);
+    Map<String, String> resMap = (Map<String, String>)result;
+    Assert.assertEquals(resMap.get("url"), "http://localhost:8282");
+    Assert.assertEquals(resMap.get("name"), "dga");
+    Assert.assertEquals(resMap.get("version"), "1.0");
+    Assert.assertEquals(resMap.get("endpoint:apply"), "apply");
 
   }
 
@@ -94,8 +101,12 @@ public class StellarMaaSIntegrationTest {
   public void testGetEndpointWithVersion() throws Exception {
     String stellar = "MAAS_GET_ENDPOINT('dga', '1.0')";
     Object result = StellarTest.run(stellar, new HashMap<>(), context);
-    Assert.assertTrue(result instanceof String);
-    Assert.assertEquals(result, "http://localhost:8282");
+    Assert.assertTrue(result instanceof Map);
+    Map<String, String> resMap = (Map<String, String>)result;
+    Assert.assertEquals(resMap.get("url"), "http://localhost:8282");
+    Assert.assertEquals(resMap.get("name"), "dga");
+    Assert.assertEquals(resMap.get("version"), "1.0");
+    Assert.assertEquals(resMap.get("endpoint:apply"), "apply");
   }
 
   @Test
@@ -108,12 +119,12 @@ public class StellarMaaSIntegrationTest {
   @Test
   public void testModelApply() throws Exception {
     {
-      String stellar = "MAP_GET('is_malicious', MODEL_APPLY(MAAS_GET_ENDPOINT('dga'), 'apply', 'host', host))";
+      String stellar = "MAP_GET('is_malicious', MODEL_APPLY(MAAS_GET_ENDPOINT('dga'), {'host': host}))";
       Object result = StellarTest.run(stellar, ImmutableMap.of("host", "badguy.com"), context);
       Assert.assertTrue((Boolean) result);
     }
     {
-      String stellar = "MAP_GET('is_malicious', MODEL_APPLY(MAAS_GET_ENDPOINT('dga'), 'apply', 'host', host))";
+      String stellar = "MAP_GET('is_malicious', MODEL_APPLY(MAAS_GET_ENDPOINT('dga'), {'host': host}))";
       Object result = StellarTest.run(stellar, ImmutableMap.of("host", "youtube.com"), context);
       Assert.assertFalse((Boolean) result);
     }

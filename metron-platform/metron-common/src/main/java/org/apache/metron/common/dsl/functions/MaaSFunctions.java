@@ -9,6 +9,7 @@ import org.apache.metron.common.dsl.Context;
 import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.StellarFunction;
 import org.apache.metron.common.utils.JSONUtils;
+import org.apache.metron.maas.config.Endpoint;
 import org.apache.metron.maas.config.MaaSConfig;
 import org.apache.metron.maas.config.ModelEndpoint;
 import org.apache.metron.maas.discovery.ServiceDiscoverer;
@@ -27,10 +28,44 @@ import java.util.concurrent.TimeUnit;
 
 public class MaaSFunctions {
  protected static final Logger LOG = LoggerFactory.getLogger(MaaSFunctions.class);
+  private static class ModelCacheKey {
+    String name;
+    String version;
+    String method;
+    Map<String, String> args;
+    public ModelCacheKey(String name, String version, String method, Map<String, String> args) {
+      this.name = name;
+      this.version = version;
+      this.method = method;
+      this.args = args;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      ModelCacheKey that = (ModelCacheKey) o;
+
+      if (name != null ? !name.equals(that.name) : that.name != null) return false;
+      if (version != null ? !version.equals(that.version) : that.version != null) return false;
+      if (method != null ? !method.equals(that.method) : that.method != null) return false;
+      return args != null ? args.equals(that.args) : that.args == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+      int result = name != null ? name.hashCode() : 0;
+      result = 31 * result + (version != null ? version.hashCode() : 0);
+      result = 31 * result + (method != null ? method.hashCode() : 0);
+      result = 31 * result + (args != null ? args.hashCode() : 0);
+      return result;
+    }
+  }
   public static class ModelApply implements StellarFunction {
     private ServiceDiscoverer discoverer;
-    private Cache<URL, Boolean> resultCache;
+    private Cache<ModelCacheKey, Map<String, Object> > resultCache;
     public ModelApply() {
       resultCache = CacheBuilder.newBuilder()
                             .concurrencyLevel(4)
@@ -44,38 +79,82 @@ public class MaaSFunctions {
     public Object apply(List<Object> args, Context context) throws ParseException {
       if(args.size() < 2) {
         throw new ParseException("Unable to execute model_apply. " +
-                                 "Expected arguments: endpoint URL," +
-                                 " endpoint method, param key 1, param " +
-                                 "value 1, ..., param key k, param value k");
+                                 "Expected arguments: endpoint_map:map, " +
+                                 " [endpoint method:string], model_args:map"
+                                 );
       }
       int i = 0;
-      String origUrl = (String)args.get(i++);
-      String method = (String)args.get(i++);
-      String url = origUrl;
-      if(url.endsWith("/")) {
-        url = url.substring(0, url.length() - 1);
+      if(args.size() == 0) {
+        return null;
       }
-      if(method.startsWith("/")) {
-        method = method.substring(1);
+      Object endpointObj = args.get(i++);
+      Map endpoint = null;
+      String modelName;
+      String modelVersion;
+      String modelUrl;
+      if(endpointObj instanceof Map) {
+        endpoint = (Map)endpointObj;
+        modelName = endpoint.get("name") + "";
+        modelVersion = endpoint.get("version") + "";
+        modelUrl = endpoint.get("url") + "";
       }
-      try {
-        URL u = new URL(url + "/" + method);
-
-        Map<String, String> params = new HashMap<>();
-        for(;i < args.size();i += 2) {
-          String key = "" + args.get(i);
-          String value = "" + args.get(i+1);
-          params.put(key, value);
+      else {
+        return null;
+      }
+      String modelFunction = "apply";
+      Map<String, String> modelArgs = new HashMap<>();
+      if(args.get(i) instanceof String) {
+        String func = (String)args.get(i);
+        if(endpoint.containsKey("endpoint:" + func)) {
+          modelFunction = "" + endpoint.get("endpoint:" + func);
         }
-        String results = RESTUtil.INSTANCE.getRESTJSONResults(u, params);
-        return JSONUtils.INSTANCE.load(results, new TypeReference<Map<String, Object>>(){});
-      } catch (Exception e) {
-        LOG.error(e.getMessage(), e);
-        if(discoverer != null) {
-          try {
-            URL u = new URL(origUrl);
-            discoverer.blacklist(u);
-          } catch (MalformedURLException e1) {
+        else {
+          modelFunction = func;
+        }
+        i++;
+      }
+
+      if(args.get(i) instanceof Map) {
+        if(endpoint.containsKey("endpoint:apply")) {
+          modelFunction = "" + endpoint.get("endpoint:apply");
+        }
+        modelArgs = (Map)args.get(i);
+      }
+      if( modelName == null
+       || modelVersion == null
+       || modelFunction == null
+        ) {
+        return null;
+      }
+      ModelCacheKey cacheKey = new ModelCacheKey(modelName, modelVersion, modelFunction, modelArgs);
+      Map<String, Object> ret = resultCache.getIfPresent(cacheKey);
+      if(ret != null) {
+        return ret;
+      }
+      else {
+        String url = modelUrl;
+        if (url.endsWith("/")) {
+          url = url.substring(0, url.length() - 1);
+        }
+        if (modelFunction.startsWith("/")) {
+          modelFunction = modelFunction.substring(1);
+        }
+        try {
+          URL u = new URL(url + "/" + modelFunction);
+
+          String results = RESTUtil.INSTANCE.getRESTJSONResults(u, modelArgs);
+          ret = JSONUtils.INSTANCE.load(results, new TypeReference<Map<String, Object>>() {
+          });
+          resultCache.put(cacheKey, ret);
+          return ret;
+        } catch (Exception e) {
+          LOG.error(e.getMessage(), e);
+          if (discoverer != null) {
+            try {
+              URL u = new URL(modelUrl);
+              discoverer.blacklist(u);
+            } catch (MalformedURLException e1) {
+            }
           }
         }
       }
@@ -85,7 +164,7 @@ public class MaaSFunctions {
     @Override
     public void initialize(Context context) {
       try {
-        Optional<ServiceDiscoverer> discovererOpt = (Optional<ServiceDiscoverer>) context.getCapability(Context.Capabilities.SERVICE_DISCOVERER).get();
+        Optional<ServiceDiscoverer> discovererOpt = (Optional) (context.getCapability(Context.Capabilities.SERVICE_DISCOVERER));
         if (discovererOpt.isPresent()) {
           discoverer = discovererOpt.get();
         }
@@ -116,21 +195,29 @@ public class MaaSFunctions {
         return null;
       }
       try {
+        ModelEndpoint ep = null;
         if (modelVersion == null) {
-          ModelEndpoint ep = discoverer.getEndpoint(modelName);
-          return ep == null ? null : ep.getUrl();
+          ep = discoverer.getEndpoint(modelName);
         } else {
-          ModelEndpoint ep = discoverer.getEndpoint(modelName, modelVersion);
-          return ep == null ? null : ep.getUrl();
+          ep = discoverer.getEndpoint(modelName, modelVersion);
         }
+        return ep == null ? null : endpointToMap(ep.getName(), ep.getVersion(), ep.getEndpoint());
       }
       catch(Exception ex) {
         LOG.error("Unable to discover endpoint: " + ex.getMessage(), ex);
         return null;
       }
-
     }
-
+    public static Map<String, String> endpointToMap(String name, String version, Endpoint ep) {
+      Map<String, String> ret = new HashMap<>();
+      ret.put("url", ep.getUrl());
+      ret.put("name", name);
+      ret.put("version", version);
+      for(Map.Entry<String, String> kv : ep.getEndpoints().entrySet()) {
+        ret.put("endpoint:" + kv.getKey(), kv.getValue());
+      }
+      return ret;
+    }
     @Override
     public void initialize(Context context) {
       Optional<Object> clientOptional = context.getCapability(Context.Capabilities.ZOOKEEPER_CLIENT);
