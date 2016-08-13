@@ -49,61 +49,13 @@ public class StellarBaseListener implements StellarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonExpression(StellarParser.ComparisonExpressionContext ctx) { }
+	@Override public void enterConditionalExpr(StellarParser.ConditionalExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonExpression(StellarParser.ComparisonExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterTernaryFunc(StellarParser.TernaryFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTernaryFunc(StellarParser.TernaryFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNotFunc(StellarParser.NotFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNotFunc(StellarParser.NotFuncContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterTransformationEntity(StellarParser.TransformationEntityContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTransformationEntity(StellarParser.TransformationEntityContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterArithExpression(StellarParser.ArithExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitArithExpression(StellarParser.ArithExpressionContext ctx) { }
+	@Override public void exitConditionalExpr(StellarParser.ConditionalExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -121,37 +73,85 @@ public class StellarBaseListener implements StellarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) { }
+	@Override public void enterArithExpression(StellarParser.ArithExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) { }
+	@Override public void exitArithExpression(StellarParser.ArithExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) { }
+	@Override public void enterTransformationEntity(StellarParser.TransformationEntityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) { }
+	@Override public void exitTransformationEntity(StellarParser.TransformationEntityContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) { }
+	@Override public void enterComparisonExpression(StellarParser.ComparisonExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) { }
+	@Override public void exitComparisonExpression(StellarParser.ComparisonExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTernaryFuncWithoutIf(StellarParser.TernaryFuncWithoutIfContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTernaryFuncWithoutIf(StellarParser.TernaryFuncWithoutIfContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTernaryFuncWithIf(StellarParser.TernaryFuncWithIfContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTernaryFuncWithIf(StellarParser.TernaryFuncWithIfContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNotFunc(StellarParser.NotFuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNotFunc(StellarParser.NotFuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComparisonExpressionParens(StellarParser.ComparisonExpressionParensContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComparisonExpressionParens(StellarParser.ComparisonExpressionParensContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -169,6 +169,30 @@ public class StellarBaseListener implements StellarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComparisonExpressionWithOperator(StellarParser.ComparisonExpressionWithOperatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLogicalExpressionAnd(StellarParser.LogicalExpressionAndContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNInExpression(StellarParser.NInExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -181,13 +205,25 @@ public class StellarBaseListener implements StellarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparisonExpressionParens(StellarParser.ComparisonExpressionParensContext ctx) { }
+	@Override public void enterLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparisonExpressionParens(StellarParser.ComparisonExpressionParensContext ctx) { }
+	@Override public void exitLogicalExpressionOr(StellarParser.LogicalExpressionOrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperand(StellarParser.OperandContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperand(StellarParser.OperandContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

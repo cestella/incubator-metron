@@ -117,7 +117,6 @@ public class StellarCompiler extends StellarBaseListener {
     tokenStack.push(new Token<>(l / r, Double.class));
   }
 
-
   @Override
   public void exitArithExpr_mul(StellarParser.ArithExpr_mulContext ctx) {
     Token<?> right = popStack();
@@ -127,8 +126,7 @@ public class StellarCompiler extends StellarBaseListener {
     tokenStack.push(new Token<>(l * r, Double.class));
   }
 
-  @Override
-  public void exitTernaryFunc(StellarParser.TernaryFuncContext ctx) {
+  private void handleConditional() {
     Token<?> elseExpr = popStack();
     Token<?> thenExpr = popStack();
     Token<?> ifExpr = popStack();
@@ -139,6 +137,18 @@ public class StellarCompiler extends StellarBaseListener {
     else {
       tokenStack.push(elseExpr);
     }
+  }
+
+
+  @Override
+  public void exitTernaryFuncWithoutIf(StellarParser.TernaryFuncWithoutIfContext ctx) {
+    handleConditional();
+  }
+
+
+  @Override
+  public void exitTernaryFuncWithIf(StellarParser.TernaryFuncWithIfContext ctx) {
+    handleConditional();
   }
 
   @Override
@@ -171,8 +181,6 @@ public class StellarCompiler extends StellarBaseListener {
   public void exitStringLiteral(StellarParser.StringLiteralContext ctx) {
     tokenStack.push(new Token<>(ctx.getText().substring(1, ctx.getText().length() - 1), String.class));
   }
-
-
 
   @Override
   public void exitIntLiteral(StellarParser.IntLiteralContext ctx) {
@@ -238,6 +246,7 @@ public class StellarCompiler extends StellarBaseListener {
               + Joiner.on(',').join(StellarFunctions.values())
       );
     }
+
     Token<?> left = popStack();
     List<Object> argList = null;
     if(left.getUnderlyingType().equals(List.class)) {

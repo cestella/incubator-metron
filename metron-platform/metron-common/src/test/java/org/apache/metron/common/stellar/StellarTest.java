@@ -30,23 +30,74 @@ import java.util.Map;
 public class StellarTest {
 
   @Test
+  public void testFunctionEmptyArgs() {
+    {
+      String query = "STARTS_WITH(casey, 'case') or MAP_EXISTS()";
+      Assert.assertTrue((Boolean)run(query, ImmutableMap.of("casey", "casey")));
+    }
+    {
+      String query = "true or MAP_EXISTS()";
+      Assert.assertTrue((Boolean)run(query, new HashMap<>()));
+    }
+    {
+      String query = "MAP_EXISTS() or true";
+      Assert.assertTrue((Boolean)run(query, new HashMap<>()));
+    }
+  }
+  @Test
   public void testNull() {
     {
       String query = "if 1 < 2 then NULL else true";
       Assert.assertNull(run(query, new HashMap<>()));
+    }
+    {
+      String query = "1 < 2 ? NULL : true";
+      Assert.assertNull(run(query, new HashMap<>()));
+    }
+    {
+      String query = "null == null ? true : false";
+      Assert.assertTrue((Boolean)run(query, new HashMap<>()));
     }
   }
 
   @Test
   public void testMapConstant() {
     {
-      String query = "MAP_GET('bar', { 'foo' : 1, 'bar' : 'bar' })";
+      String query = "MAP_GET('bar', { 'foo' : 1, 'bar' : 'bar'})";
       Assert.assertEquals("bar", run(query, new HashMap<>()));
+    }
+    {
+      String query = "MAP_GET('blah', {  'blah' : 1 < 2 })";
+      Assert.assertEquals(true, run(query, new HashMap<>()));
+    }
+    {
+      String query = "MAP_GET('blah', {  'blah' : not(STARTS_WITH(casey, 'case')) })";
+      Assert.assertEquals(false, run(query, ImmutableMap.of("casey", "casey")));
+    }
+    {
+      String query = "MAP_GET('blah', {  'blah' : one })";
+      Assert.assertEquals(1, run(query, ImmutableMap.of("one", 1)));
+    }
+    {
+      String query = "MAP_GET('blah', {  'blah' : null })";
+      Assert.assertNull(run(query, new HashMap<>()));
+    }
+    {
+      String query = "MAP_GET('BLAH', {  TO_UPPER('blah') : null })";
+      Assert.assertNull(run(query, new HashMap<>()));
+    }
+    {
+      String query = "MAP_GET('BLAH', {  TO_UPPER('blah') : 1 < 2 })";
+      Assert.assertEquals(true, run(query, new HashMap<>()));
     }
   }
 
   @Test
   public void testIfThenElse() {
+    {
+      String query = "if STARTS_WITH(casey, 'case') then 'one' else 'two'";
+      Assert.assertEquals("one", run(query, ImmutableMap.of("casey", "casey")));
+    }
     {
       String query = "if 1 < 2 then 'one' else 'two'";
       Assert.assertEquals("one", run(query, new HashMap<>()));
@@ -55,10 +106,7 @@ public class StellarTest {
       String query = "if 1 + 1 < 2 then 'one' else 'two'";
       Assert.assertEquals("two", run(query, new HashMap<>()));
     }
-    {
-      String query = "1 < 2 ? 'one' : 'two'";
-      Assert.assertEquals("one", run(query, new HashMap<>()));
-    }
+
     {
       String query = "if not(1 < 2) then 'one' else 'two'";
       Assert.assertEquals("two", run(query, new HashMap<>()));
@@ -74,6 +122,22 @@ public class StellarTest {
     {
       String query = "if one == very_nearly_one then 'one' else 'two'";
       Assert.assertEquals("one", run(query, ImmutableMap.of("one", 1, "very_nearly_one", 1.000001)));
+    }
+    {
+      String query = "1 < 2 ? 'one' : 'two'";
+      Assert.assertEquals("one", run(query, new HashMap<>()));
+    }
+    {
+      String query = "1 < 2 ? TO_UPPER('one') : 'two'";
+      Assert.assertEquals("ONE", run(query, new HashMap<>()));
+    }
+    {
+      String query = "1 < 2 ? one : 'two'";
+      Assert.assertEquals("one", run(query, ImmutableMap.of("one", "one")));
+    }
+    {
+      String query = "1 < 2 ? one*3 : 'two'";
+      Assert.assertTrue(Math.abs(3.0 - (double)run(query, ImmutableMap.of("one", 1))) < 1e-6);
     }
   }
 
