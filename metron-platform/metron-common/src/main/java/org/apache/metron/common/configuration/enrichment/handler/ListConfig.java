@@ -15,31 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.metron.common.configuration.enrichment.handler;
 
-package org.apache.metron.common.dsl;
+import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-public class MapVariableResolver implements VariableResolver {
-  List<Map> variableMappings = new ArrayList<>();
-  public MapVariableResolver(Map variableMappingOne, Map... variableMapping) {
-    variableMappings.add(variableMappingOne);
-    for(Map m : variableMapping) {
-      if(m != null && m.size() > 0) {
-        this.variableMappings.add(m);
-      }
-    }
-  }
+public class ListConfig implements Config {
+
   @Override
-  public Object resolve(String variable) {
-    for(Map variableMapping : variableMappings) {
-      Object o = variableMapping.get(variable);
-      if(o != null) {
-        return o;
+  public JSONObject splitByFields( JSONObject message
+                                 , Object fieldsObj
+                                 , Function<String, String> fieldToEnrichmentKey
+                                 , Map<String, Object> config
+                                 )
+  {
+    List<String> fields = (List<String>)fieldsObj;
+    JSONObject enrichmentObject = new JSONObject();
+    if (fields != null && fields.size() > 0) {
+      for (String field : fields) {
+        enrichmentObject.put(fieldToEnrichmentKey.apply(field), message.get(field));
       }
+
     }
-    return null;
+    return enrichmentObject;
   }
 }

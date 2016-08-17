@@ -27,6 +27,7 @@ import backtype.storm.tuple.Values;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.bolt.ConfiguredEnrichmentBolt;
 import org.apache.metron.common.configuration.ConfigurationType;
@@ -179,12 +180,12 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
       boolean error = false;
       for (Object o : rawMessage.keySet()) {
         String field = (String) o;
-        String value = (String) rawMessage.get(field);
+        Object value =  rawMessage.get(field);
         if (field.equals(Constants.SENSOR_TYPE)) {
           enrichedMessage.put(Constants.SENSOR_TYPE, value);
         } else {
           JSONObject enrichedField = new JSONObject();
-          if (value != null && value.length() != 0) {
+          if (value != null) {
             SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sourceType);
             if(config == null) {
               LOG.error("Unable to find " + config);
@@ -207,7 +208,12 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
           }
           if (!enrichedField.isEmpty()) {
             for (Object enrichedKey : enrichedField.keySet()) {
-              enrichedMessage.put(field + "." + enrichedKey, enrichedField.get(enrichedKey));
+              if(!StringUtils.isEmpty(field)) {
+                enrichedMessage.put(field + "." + enrichedKey, enrichedField.get(enrichedKey));
+              }
+              else {
+                enrichedMessage.put(enrichedKey, enrichedField.get(enrichedKey));
+              }
             }
           } else {
             enrichedMessage.put(field, "");

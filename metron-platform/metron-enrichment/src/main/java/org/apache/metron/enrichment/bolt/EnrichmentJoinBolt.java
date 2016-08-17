@@ -19,6 +19,7 @@ package org.apache.metron.enrichment.bolt;
 
 import backtype.storm.task.TopologyContext;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
+import org.apache.metron.common.configuration.enrichment.handler.ConfigHandler;
 import org.apache.metron.common.utils.MessageUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -52,9 +53,9 @@ public class EnrichmentJoinBolt extends JoinBolt<JSONObject> {
       String errorMessage = "Unable to find source type for message: " + message;
       throw new IllegalStateException(errorMessage);
     }
-    Map<String, List<String>>  fieldMap = getFieldMap(sourceType);
+    Map<String, Object>  fieldMap = getFieldMap(sourceType);
     if(fieldMap != null) {
-      for (String enrichmentType : getFieldMap(sourceType).keySet()) {
+      for (String enrichmentType : fieldMap.keySet()) {
         streamIds.add(enrichmentType);
       }
     }
@@ -84,7 +85,23 @@ public class EnrichmentJoinBolt extends JoinBolt<JSONObject> {
     return  message;
   }
 
-  public Map<String, List<String>> getFieldMap(String sourceType) {
+  public Map<String, ConfigHandler> getEnrichmentHandlers(String sourceType) {
+    if(sourceType != null) {
+      SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sourceType);
+      if (config != null && config.getEnrichment() != null) {
+        return config.getEnrichment().getEnrichmentConfigs();
+      }
+      else {
+        LOG.error("Unable to retrieve a sensor enrichment config of " + sourceType);
+      }
+    }
+    else {
+      LOG.error("Trying to retrieve a field map with source type of null");
+    }
+    return null;
+  }
+
+  public Map<String, Object> getFieldMap(String sourceType) {
     if(sourceType != null) {
       SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sourceType);
       if (config != null && config.getEnrichment() != null) {

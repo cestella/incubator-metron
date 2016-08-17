@@ -22,6 +22,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
+import org.apache.metron.common.configuration.enrichment.handler.ConfigHandler;
 import org.apache.metron.enrichment.configuration.Enrichment;
 import org.apache.metron.enrichment.utils.EnrichmentUtils;
 import org.apache.metron.common.utils.MessageUtils;
@@ -107,23 +108,41 @@ public class EnrichmentSplitterBolt extends SplitBolt<JSONObject> {
     public Map<String, JSONObject> splitMessage(JSONObject message) {
         Map<String, JSONObject> streamMessageMap = new HashMap<>();
         String sensorType = MessageUtils.getSensorType(message);
-        Map<String, List<String>> enrichmentFieldMap = getFieldMap(sensorType);
-        for (String enrichmentType : enrichmentFieldMap.keySet()) {
-            List<String> fields = enrichmentFieldMap.get(enrichmentType);
-            JSONObject enrichmentObject = new JSONObject();
-            if (fields != null && fields.size() > 0) {
-                for (String field : fields) {
-                    enrichmentObject.put(getKeyName(enrichmentType, field), message.get(field));
-                }
-                enrichmentObject.put(Constants.SENSOR_TYPE, sensorType);
-                streamMessageMap.put(enrichmentType, enrichmentObject);
-            }
+        Map<String, Object> enrichmentFieldMap = getFieldMap(sensorType);
+        Map<String, ConfigHandler> fieldToHandler = getFieldToHandlerMap(sensorType);
+        Set<String> enrichmentTypes = new HashSet<>(enrichmentFieldMap.keySet());
+        enrichmentTypes.addAll(fieldToHandler.keySet());
+        for (String enrichmentType : enrichmentTypes) {
+            Object fields = enrichmentFieldMap.get(enrichmentType);
+            ConfigHandler retriever = fieldToHandler.get(enrichmentType);
+
+            JSONObject enrichmentObject = retriever.getType()
+                                                   .splitByFields( message
+                                                                 , fields
+                                                                 , field -> getKeyName(enrichmentType, field)
+                                                                 , retriever.getConfig()
+                                                                 );
+            enrichmentObject.put(Constants.SENSOR_TYPE, sensorType);
+            streamMessageMap.put(enrichmentType, enrichmentObject);
         }
         message.put(getClass().getSimpleName().toLowerCase() + ".splitter.end.ts", "" + System.currentTimeMillis());
         return streamMessageMap;
     }
 
-    protected Map<String, List<String>> getFieldMap(String sensorType) {
+    protected Map<String, ConfigHandler> getFieldToHandlerMap(String sensorType) {
+        if(sensorType != null) {
+            SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sensorType);
+            if (config != null) {
+                return config.getEnrichment().getEnrichmentConfigs();
+            } else {
+                LOG.error("Unable to retrieve a sensor enrichment config of " + sensorType);
+            }
+        } else {
+            LOG.error("Trying to retrieve a field map with sensor type of null");
+        }
+        return new HashMap<>();
+    }
+    protected Map<String, Object > getFieldMap(String sensorType) {
         if(sensorType != null) {
             SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sensorType);
             if (config != null) {

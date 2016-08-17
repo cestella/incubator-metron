@@ -40,7 +40,7 @@ public class ThreatIntelJoinBolt extends EnrichmentJoinBolt {
   }
 
   @Override
-  public Map<String, List<String>> getFieldMap(String sourceType) {
+  public Map<String, Object> getFieldMap(String sourceType) {
     SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sourceType);
     if(config != null) {
       return config.getThreatIntel().getFieldMap();
