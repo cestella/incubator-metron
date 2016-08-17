@@ -142,4 +142,9 @@ public class ThreatIntelAdapter implements EnrichmentAdapter<CacheKey>,Serializa
       throw new RuntimeException("Unable to cleanup access tracker", e);
     }
   }
+
+  @Override
+  public String getOutputPrefix(CacheKey value) {
+    return value.getField();
+  }
 }

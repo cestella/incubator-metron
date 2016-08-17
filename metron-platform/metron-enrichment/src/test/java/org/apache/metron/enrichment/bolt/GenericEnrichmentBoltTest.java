@@ -177,6 +177,7 @@ public class GenericEnrichmentBoltTest extends BaseEnrichmentBoltTest {
     verify(outputCollector, times(1)).emit(eq("error"), any(Values.class));
     when(tuple.getStringByField("key")).thenReturn(key);
     when(tuple.getValueByField("message")).thenReturn(originalMessage);
+    when(enrichmentAdapter.enrich(any())).thenReturn(new JSONObject());
     genericEnrichmentBolt.execute(tuple);
     verify(outputCollector, times(1)).emit(eq(enrichmentType), argThat(new EnrichedMessageMatcher(key, new JSONObject(ImmutableMap.of("source.type", "test")))));
     reset(enrichmentAdapter);
@@ -185,6 +186,9 @@ public class GenericEnrichmentBoltTest extends BaseEnrichmentBoltTest {
             fromBytes(ConfigurationsUtils.readSensorEnrichmentConfigsFromFile(TestConstants.SAMPLE_CONFIG_PATH).get(sensorType));
     CacheKey cacheKey1 = new CacheKey("field1", "value1", sensorEnrichmentConfig);
     CacheKey cacheKey2 = new CacheKey("field2", "value2", sensorEnrichmentConfig);
+    genericEnrichmentBolt.cache.invalidateAll();
+    when(enrichmentAdapter.getOutputPrefix(cacheKey1)).thenReturn("field1");
+    when(enrichmentAdapter.getOutputPrefix(cacheKey2)).thenReturn("field2");
     when(enrichmentAdapter.enrich(cacheKey1)).thenReturn(enrichedField1);
     when(enrichmentAdapter.enrich(cacheKey2)).thenReturn(enrichedField2);
     genericEnrichmentBolt.execute(tuple);

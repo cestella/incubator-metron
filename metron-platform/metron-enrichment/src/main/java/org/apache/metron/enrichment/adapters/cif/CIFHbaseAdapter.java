@@ -135,4 +135,9 @@ public class CIFHbaseAdapter implements EnrichmentAdapter<CacheKey>,Serializable
 	public void cleanup() {
 
 	}
+
+	@Override
+	public String getOutputPrefix(CacheKey value) {
+		return value.getField();
+	}
 }

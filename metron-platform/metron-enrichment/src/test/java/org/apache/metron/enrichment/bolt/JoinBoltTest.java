@@ -115,6 +115,10 @@ public class JoinBoltTest extends BaseEnrichmentBoltTest {
     when(tuple.getSourceStreamId()).thenReturn("hbaseEnrichment");
     when(tuple.getValueByField("message")).thenReturn(hbaseEnrichmentMessage);
     joinBolt.execute(tuple);
+    when(tuple.getSourceStreamId()).thenReturn("stellar");
+    when(tuple.getValueByField("message")).thenReturn(new JSONObject());
+    verify(outputCollector, times(0)).emit(eq("message"), any(tuple.getClass()), eq(new Values(key, joinedMessage)));
+    joinBolt.execute(tuple);
     verify(outputCollector, times(1)).emit(eq("message"), any(tuple.getClass()), eq(new Values(key, joinedMessage)));
     verify(outputCollector, times(1)).ack(tuple);
   }

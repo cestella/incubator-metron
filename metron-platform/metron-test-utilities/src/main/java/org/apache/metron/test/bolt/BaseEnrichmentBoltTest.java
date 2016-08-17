@@ -87,6 +87,7 @@ public class BaseEnrichmentBoltTest extends BaseBoltTest {
     hostMessage = (JSONObject) parser.parse(hostMessageString);
     hbaseEnrichmentMessage = (JSONObject) parser.parse(hbaseEnrichmentMessageString);
     streamIds.add("geo");
+    streamIds.add("stellar");
     streamIds.add("host");
     streamIds.add("hbaseEnrichment");
   }

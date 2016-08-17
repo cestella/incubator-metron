@@ -46,10 +46,13 @@ public class EnrichmentSplitterBoltTest extends BaseEnrichmentBoltTest {
     host.setType("host");
     final Enrichment hbaseEnrichment = new Enrichment();
     hbaseEnrichment.setType("hbaseEnrichment");
+    final Enrichment stellarEnrichment = new Enrichment();
+    stellarEnrichment.setType("stellar");
     List<Enrichment> enrichments = new ArrayList<Enrichment>() {{
       add(geo);
       add(host);
       add(hbaseEnrichment);
+      add(stellarEnrichment);
     }};
 
     EnrichmentSplitterBolt enrichmentSplitterBolt = new EnrichmentSplitterBolt("zookeeperUrl").withEnrichments(enrichments);
@@ -77,7 +80,7 @@ public class EnrichmentSplitterBoltTest extends BaseEnrichmentBoltTest {
     Assert.assertEquals(streamIds, actualStreamIds);
 
     Map<String, JSONObject> actualSplitMessages = enrichmentSplitterBolt.splitMessage(sampleMessage);
-    Assert.assertEquals(3, actualSplitMessages.size());
+    Assert.assertEquals(enrichments.size(), actualSplitMessages.size());
     Assert.assertEquals(geoMessage, actualSplitMessages.get("geo"));
     Assert.assertEquals(hostMessage, actualSplitMessages.get("host"));
     Assert.assertEquals(hbaseEnrichmentMessage, actualSplitMessages.get("hbaseEnrichment"));

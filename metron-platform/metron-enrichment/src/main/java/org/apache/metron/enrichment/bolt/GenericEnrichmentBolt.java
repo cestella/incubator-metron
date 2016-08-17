@@ -178,6 +178,7 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
         throw new RuntimeException("Source type is missing from enrichment fragment: " + rawMessage.toJSONString());
       }
       boolean error = false;
+      String prefix = null;
       for (Object o : rawMessage.keySet()) {
         String field = (String) o;
         Object value =  rawMessage.get(field);
@@ -195,6 +196,7 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
             CacheKey cacheKey= new CacheKey(field, value, config);
             try {
               adapter.logAccess(cacheKey);
+              prefix = adapter.getOutputPrefix(cacheKey);
               enrichedField = cache.getUnchecked(cacheKey);
               if (enrichedField == null)
                 throw new Exception("[Metron] Could not enrich string: "
@@ -206,17 +208,15 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
               continue;
             }
           }
-          if (!enrichedField.isEmpty()) {
+          if ( !enrichedField.isEmpty()) {
             for (Object enrichedKey : enrichedField.keySet()) {
-              if(!StringUtils.isEmpty(field)) {
+              if(!StringUtils.isEmpty(prefix)) {
                 enrichedMessage.put(field + "." + enrichedKey, enrichedField.get(enrichedKey));
               }
               else {
                 enrichedMessage.put(enrichedKey, enrichedField.get(enrichedKey));
               }
             }
-          } else {
-            enrichedMessage.put(field, "");
           }
         }
       }

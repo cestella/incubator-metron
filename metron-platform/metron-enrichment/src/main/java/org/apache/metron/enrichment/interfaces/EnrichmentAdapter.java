@@ -26,4 +26,5 @@ public interface EnrichmentAdapter<T>
 	JSONObject enrich(T value);
 	boolean initializeAdapter();
 	void cleanup();
+	String getOutputPrefix(T value);
 }

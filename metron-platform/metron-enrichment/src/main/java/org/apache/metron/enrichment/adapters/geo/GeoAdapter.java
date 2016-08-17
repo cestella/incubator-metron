@@ -35,6 +35,10 @@ public class GeoAdapter extends JdbcAdapter {
 
   }
 
+  @Override
+	public String getOutputPrefix(CacheKey value) {
+		return value.getField();
+	}
 
   @SuppressWarnings("unchecked")
   @Override
