@@ -19,6 +19,7 @@ package org.apache.metron.common.configuration.enrichment.handler;
 
 import org.json.simple.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,7 +33,7 @@ public enum Configs implements Config {
   }
 
   @Override
-  public JSONObject splitByFields( JSONObject message
+  public List<JSONObject> splitByFields(JSONObject message
                                  , Object fields
                                  , Function<String, String> fieldToEnrichmentKey
                                  , Map<String, Object> config
@@ -40,4 +41,11 @@ public enum Configs implements Config {
   {
     return configCreator.splitByFields(message, fields, fieldToEnrichmentKey, config);
   }
+
+  @Override
+  public List<String> getSubgroups(Map<String, Object> config) {
+    return configCreator.getSubgroups(config);
+  }
+
+
 }

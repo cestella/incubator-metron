@@ -17,6 +17,7 @@
  */
 package org.apache.metron.common.configuration.enrichment.handler;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.metron.common.stellar.StellarProcessor;
 import org.json.simple.JSONObject;
 
@@ -25,19 +26,60 @@ import java.util.function.Function;
 
 public class StellarConfig implements Config {
 
+  @Override
+  public List<String> getSubgroups(Map<String, Object> config) {
+    boolean includeEmpty = false;
+    List<String> ret = new ArrayList<>();
+    for(Map.Entry<String, Object> kv : config.entrySet()) {
+      if(kv.getValue() instanceof String) {
+        includeEmpty = true;
+      }
+      else if(kv.getValue() instanceof Map) {
+        ret.add(kv.getKey());
+      }
+    }
+    if(includeEmpty) {
+      ret.add("");
+    }
+    return ret;
+  }
 
   @Override
-  public JSONObject splitByFields( JSONObject message
+  public List<JSONObject> splitByFields( JSONObject message
                                  , Object fields
                                  , Function<String, String> fieldToEnrichmentKey
                                  , Map<String, Object> config
                                  )
   {
-    JSONObject ret = new JSONObject();
     StellarProcessor processor = new StellarProcessor();
+    List<JSONObject> messages = new ArrayList<>();
+    Map<String, String> defaultStellarStatementGroup = new HashMap<>();
+    for(Map.Entry<String, Object> kv : config.entrySet()) {
+      if(kv.getValue() instanceof String) {
+        defaultStellarStatementGroup.put(kv.getKey(), (String)kv.getValue());
+      }
+      else if(kv.getValue() instanceof Map) {
+        JSONObject ret = new JSONObject();
+        ret.put(kv.getKey(), getMessage(processor, (Map<String, String>) kv.getValue(), message));
+        messages.add(ret);
+      }
+    }
+    if(defaultStellarStatementGroup.size() > 0)
+    {
+      JSONObject ret = new JSONObject();
+      ret.put("", getMessage(processor, defaultStellarStatementGroup, message));
+      messages.add(ret);
+    }
+    return messages;
+  }
+
+  private Map<String, Object> getMessage( StellarProcessor processor
+                                        , Map<String, String> stellarStatementGroup
+                                        , JSONObject message
+                                        )
+  {
     Set<String> stellarFields = new HashSet<>();
-    for(Object value : config.values()) {
-      String stellarStatement = (String) value;
+    for(String stellarStatement: stellarStatementGroup.values()) {
       Set<String> variables = processor.variablesUsed(stellarStatement);
       if(variables != null) {
         stellarFields.addAll(variables);
@@ -47,7 +89,6 @@ public class StellarConfig implements Config {
     for(String variable : stellarFields) {
       messageSegment.put(variable, message.get(variable));
     }
-    ret.put("", messageSegment);
-    return ret;
+    return messageSegment;
   }
 }

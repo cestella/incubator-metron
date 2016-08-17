@@ -79,7 +79,7 @@ public class EnrichmentSplitterBoltTest extends BaseEnrichmentBoltTest {
     Set<String> actualStreamIds = enrichmentSplitterBolt.getStreamIds();
     Assert.assertEquals(streamIds, actualStreamIds);
 
-    Map<String, JSONObject> actualSplitMessages = enrichmentSplitterBolt.splitMessage(sampleMessage);
+    Map<String, List<JSONObject> > actualSplitMessages = enrichmentSplitterBolt.splitMessage(sampleMessage);
     Assert.assertEquals(enrichments.size(), actualSplitMessages.size());
     Assert.assertEquals(geoMessage, actualSplitMessages.get("geo"));
     Assert.assertEquals(hostMessage, actualSplitMessages.get("host"));

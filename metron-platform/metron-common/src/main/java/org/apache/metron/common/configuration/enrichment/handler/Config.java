@@ -18,15 +18,19 @@
 package org.apache.metron.common.configuration.enrichment.handler;
 
 
+import com.google.common.collect.ImmutableList;
 import org.json.simple.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public interface Config {
-  JSONObject splitByFields( JSONObject message
+  List<JSONObject> splitByFields( JSONObject message
                           , Object fields
                           , Function<String, String> fieldToEnrichmentKey
                           , Map<String, Object> config
                           );
+
+  List<String> getSubgroups(Map<String, Object> config);
 }

@@ -153,7 +153,7 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declareStream(enrichmentType, new Fields("key", "message"));
+    declarer.declareStream(enrichmentType, new Fields("key", "message", "subgroup"));
     declarer.declareStream("error", new Fields("message"));
   }
 
@@ -162,6 +162,7 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
   public void execute(Tuple tuple) {
     String key = tuple.getStringByField("key");
     JSONObject rawMessage = (JSONObject) tuple.getValueByField("message");
+    String subGroup = "";
 
     JSONObject enrichedMessage = new JSONObject();
     enrichedMessage.put("adapter." + adapter.getClass().getSimpleName().toLowerCase() + ".begin.ts", "" + System.currentTimeMillis());
@@ -197,6 +198,7 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
             try {
               adapter.logAccess(cacheKey);
               prefix = adapter.getOutputPrefix(cacheKey);
+              subGroup = adapter.getStreamSubGroup(enrichmentType, field);
               enrichedField = cache.getUnchecked(cacheKey);
               if (enrichedField == null)
                 throw new Exception("[Metron] Could not enrich string: "
@@ -226,13 +228,13 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
         throw new Exception("Unable to enrich " + enrichedMessage + " check logs for specifics.");
       }
       if (enrichedMessage != null && !enrichedMessage.isEmpty()) {
-        collector.emit(enrichmentType, new Values(key, enrichedMessage));
+        collector.emit(enrichmentType, new Values(key, enrichedMessage, subGroup));
       }
     } catch (Exception e) {
       LOG.error("[Metron] Unable to enrich message: " + rawMessage, e);
       JSONObject error = ErrorUtils.generateErrorMessage("Enrichment problem: " + rawMessage, e);
       if (key != null) {
-        collector.emit(enrichmentType, new Values(key, enrichedMessage));
+        collector.emit(enrichmentType, new Values(key, enrichedMessage, subGroup));
       }
       collector.emit("error", new Values(error));
     }

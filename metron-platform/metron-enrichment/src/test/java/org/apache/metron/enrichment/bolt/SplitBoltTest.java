@@ -28,6 +28,7 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,7 +68,7 @@ public class SplitBoltTest extends BaseEnrichmentBoltTest {
     }
 
     @Override
-    public Map<String, JSONObject> splitMessage(JSONObject message) {
+    public Map<String, List<JSONObject>> splitMessage(JSONObject message) {
       return null;
     }
 

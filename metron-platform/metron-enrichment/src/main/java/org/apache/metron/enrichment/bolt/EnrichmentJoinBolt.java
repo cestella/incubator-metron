@@ -18,6 +18,7 @@
 package org.apache.metron.enrichment.bolt;
 
 import backtype.storm.task.TopologyContext;
+import com.google.common.base.Joiner;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.configuration.enrichment.handler.ConfigHandler;
 import org.apache.metron.common.utils.MessageUtils;
@@ -25,11 +26,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class EnrichmentJoinBolt extends JoinBolt<JSONObject> {
 
@@ -54,12 +51,16 @@ public class EnrichmentJoinBolt extends JoinBolt<JSONObject> {
       throw new IllegalStateException(errorMessage);
     }
     Map<String, Object>  fieldMap = getFieldMap(sourceType);
+    Map<String, ConfigHandler> handlerMap = getFieldToHandlerMap(sourceType);
     if(fieldMap != null) {
       for (String enrichmentType : fieldMap.keySet()) {
-        streamIds.add(enrichmentType);
+        ConfigHandler handler = handlerMap.get(enrichmentType);
+        for(String subgroup : handler.getType().getSubgroups(handler.getConfig())) {
+          streamIds.add(Joiner.on(":").join(enrichmentType, subgroup));
+        }
       }
     }
-    streamIds.add("message");
+    streamIds.add("message:");
     return streamIds;
   }
 
@@ -85,6 +86,19 @@ public class EnrichmentJoinBolt extends JoinBolt<JSONObject> {
     return  message;
   }
 
+ protected Map<String, ConfigHandler> getFieldToHandlerMap(String sensorType) {
+    if(sensorType != null) {
+      SensorEnrichmentConfig config = getConfigurations().getSensorEnrichmentConfig(sensorType);
+      if (config != null) {
+        return config.getEnrichment().getEnrichmentConfigs();
+      } else {
+        LOG.error("Unable to retrieve a sensor enrichment config of " + sensorType);
+      }
+    } else {
+      LOG.error("Trying to retrieve a field map with sensor type of null");
+    }
+    return new HashMap<>();
+  }
 
   public Map<String, Object> getFieldMap(String sourceType) {
     if(sourceType != null) {

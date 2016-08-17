@@ -18,7 +18,9 @@
       "stellar" : {
         "type" : "STELLAR"
         ,"config" : {
-          "foo" : "1 + 1"
+          "numeric" : {
+                      "foo": "1 + 1"
+                      }
           ,"ALL_CAPS" : "TO_UPPER(source.type)"
         }
       }

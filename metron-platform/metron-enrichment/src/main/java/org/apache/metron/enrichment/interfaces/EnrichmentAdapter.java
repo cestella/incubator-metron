@@ -18,6 +18,7 @@
 
 package org.apache.metron.enrichment.interfaces;
 
+import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.json.simple.JSONObject;
 
 public interface EnrichmentAdapter<T>
@@ -27,4 +28,7 @@ public interface EnrichmentAdapter<T>
 	boolean initializeAdapter();
 	void cleanup();
 	String getOutputPrefix(T value);
+	default String getStreamSubGroup(String enrichmentType, String field) {
+		return "";
+	}
 }
