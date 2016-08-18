@@ -56,7 +56,7 @@ public class EnrichmentConfig {
         enrichmentConfigs.put(kv.getKey(), new ConfigHandler((List<String>)kv.getValue()));
       }
       else {
-        enrichmentConfigs.put(kv.getKey(), new ConfigHandler((Map<String, Object>)kv.getValue()));
+        enrichmentConfigs.put(kv.getKey(), new ConfigHandler(kv.getKey(), (Map<String, Object>)kv.getValue()));
       }
     }
   }

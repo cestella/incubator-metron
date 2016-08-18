@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,7 +55,11 @@ public class JoinBoltTest extends BaseEnrichmentBoltTest {
 
     @Override
     public Set<String> getStreamIds(JSONObject value) {
-      return streamIds;
+      HashSet<String> ret = new HashSet<>();
+      for(String s : streamIds) {
+        ret.add(s + ":");
+      }
+      return ret;
     }
 
     @Override

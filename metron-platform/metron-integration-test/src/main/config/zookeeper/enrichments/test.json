@@ -16,8 +16,7 @@
         "ip_dst_addr"
       ],
       "stellar" : {
-        "type" : "STELLAR"
-        ,"config" : {
+        "config" : {
           "numeric" : {
                       "foo": "1 + 1"
                       }
@@ -41,8 +40,7 @@
         "ip_dst_addr"
       ],
       "stellar" : {
-        "type" : "STELLAR"
-        ,"config" : {
+        "config" : {
           "bar" : "TO_UPPER(source.type)"
         }
       }

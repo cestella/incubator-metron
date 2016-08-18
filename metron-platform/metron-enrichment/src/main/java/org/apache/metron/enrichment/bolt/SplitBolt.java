@@ -76,6 +76,9 @@ public abstract class SplitBolt<T extends Cloneable> extends
           collector.emit(streamId, new Values(key, streamMessage));
         }
       }
+      else {
+        throw new IllegalArgumentException("Enrichment must send some list of messages, not null.");
+      }
     }
     collector.emit("message", tuple, new Values(key, message, ""));
     collector.ack(tuple);

@@ -24,9 +24,15 @@ import java.util.Map;
 public class ConfigHandler {
   private Map<String, Object> config;
   private Configs type = Configs.LIST;
-  public ConfigHandler(Map<String, Object> obj) {
+  public ConfigHandler(String enrichment, Map<String, Object> obj) {
     config = (Map<String, Object>) obj.get("config");
-    type = Configs.valueOf((String) obj.get("type"));
+    if(obj.containsKey("type")) {
+      type = Configs.valueOf((String) obj.get("type"));
+    }
+    else {
+      //TODO: make this more adaptable
+      type = Configs.valueOf(enrichment.toUpperCase());
+    }
   }
 
   public ConfigHandler(List<String> obj) {

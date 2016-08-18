@@ -17,6 +17,7 @@
  */
 package org.apache.metron.enrichment.bolt;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.metron.test.bolt.BaseEnrichmentBoltTest;
 import org.apache.metron.enrichment.configuration.Enrichment;
@@ -81,9 +82,9 @@ public class EnrichmentSplitterBoltTest extends BaseEnrichmentBoltTest {
 
     Map<String, List<JSONObject> > actualSplitMessages = enrichmentSplitterBolt.splitMessage(sampleMessage);
     Assert.assertEquals(enrichments.size(), actualSplitMessages.size());
-    Assert.assertEquals(geoMessage, actualSplitMessages.get("geo"));
-    Assert.assertEquals(hostMessage, actualSplitMessages.get("host"));
-    Assert.assertEquals(hbaseEnrichmentMessage, actualSplitMessages.get("hbaseEnrichment"));
+    Assert.assertEquals(ImmutableList.of(geoMessage), actualSplitMessages.get("geo"));
+    Assert.assertEquals(ImmutableList.of(hostMessage), actualSplitMessages.get("host"));
+    Assert.assertEquals(ImmutableList.of(hbaseEnrichmentMessage), actualSplitMessages.get("hbaseEnrichment"));
 
 
   }

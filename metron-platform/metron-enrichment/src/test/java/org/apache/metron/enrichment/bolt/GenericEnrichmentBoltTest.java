@@ -170,7 +170,7 @@ public class GenericEnrichmentBoltTest extends BaseEnrichmentBoltTest {
       fail("An exception should be thrown if enrichment adapter initialization fails");
     } catch(IllegalStateException e) {}
     genericEnrichmentBolt.declareOutputFields(declarer);
-    verify(declarer, times(1)).declareStream(eq(enrichmentType), argThat(new FieldsMatcher("key", "message")));
+    verify(declarer, times(1)).declareStream(eq(enrichmentType), argThat(new FieldsMatcher("key", "message", "subgroup")));
     verify(declarer, times(1)).declareStream(eq("error"), argThat(new FieldsMatcher("message")));
     when(tuple.getStringByField("key")).thenReturn(null);
     genericEnrichmentBolt.execute(tuple);

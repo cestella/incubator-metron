@@ -92,7 +92,7 @@ public abstract class JoinBolt<V> extends ConfiguredEnrichmentBolt {
     String streamId = tuple.getSourceStreamId();
     String key = (String) tuple.getValueByField("key");
     String subgroup = (String) tuple.getValueByField("subgroup");
-    streamId = Joiner.on(":").join(streamId, subgroup);
+    streamId = Joiner.on(":").join("" + streamId, subgroup == null?"":subgroup);
     V message = (V) tuple.getValueByField("message");
     try {
       Map<String, V> streamMessageMap = cache.get(key);
