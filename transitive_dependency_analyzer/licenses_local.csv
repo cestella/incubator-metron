@@ -1,0 +1,126 @@
+asm:asm:jar:3.1:compile,Unknown
+com.carrotsearch:hppc:jar:0.7.1:compile,Unknown
+com.codahale.metrics:metrics-core:jar:3.0.2:compile,Unknown
+com.codahale.metrics:metrics-graphite:jar:3.0.2:compile,Unknown
+com.esotericsoftware.kryo:kryo:jar:2.21:compile,New BSD License
+com.esotericsoftware.minlog:minlog:jar:1.2:compile,New BSD License
+com.fasterxml.jackson.core:jackson-annotations:jar:2.2.3:compile,Unknown
+com.fasterxml.jackson.core:jackson-annotations:jar:2.7.4:compile,Unknown
+com.fasterxml.jackson.core:jackson-core:jar:2.2.3:compile,Unknown
+com.fasterxml.jackson.core:jackson-core:jar:2.6.6:compile,Unknown
+com.fasterxml.jackson.core:jackson-core:jar:2.7.4:compile,Unknown
+com.fasterxml.jackson.core:jackson-databind:jar:2.2.3:compile,Unknown
+com.fasterxml.jackson.core:jackson-databind:jar:2.7.4:compile,Unknown
+com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar:2.6.6:compile,Unknown
+com.fasterxml.jackson.dataformat:jackson-dataformat-smile:jar:2.6.6:compile,Unknown
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.6.6:compile,Unknown
+com.google.guava:guava:jar:12.0.1:compile,Unknown
+com.google.guava:guava:jar:12.0:compile,Unknown
+com.google.guava:guava:jar:16.0.1:compile,Unknown
+com.google.guava:guava:jar:17.0:compile,Unknown
+com.google.guava:guava:jar:18.0:compile,Unknown
+com.google.inject.extensions:guice-servlet:jar:3.0:compile,Unknown
+com.google.inject:guice:jar:3.0:compile,Unknown
+com.google.protobuf:protobuf-java:jar:2.5.0:compile,New BSD license
+com.jcraft:jsch:jar:0.1.42:compile,BSD
+com.sun.jersey.contribs:jersey-guice:jar:1.9:compile,Unknown
+com.sun.jersey:jersey-client:jar:1.9:compile,Unknown
+com.sun.jersey:jersey-core:jar:1.9:compile,Unknown
+com.sun.jersey:jersey-json:jar:1.9:compile,Unknown
+com.sun.jersey:jersey-server:jar:1.9:compile,Unknown
+com.sun.xml.bind:jaxb-impl:jar:2.2.3-1:compile,GPL2 w/ CPE
+com.sun.xml.bind:jaxb-impl:jar:2.2.5-2:compile,GPL2 w/ CPE
+com.thoughtworks.paranamer:paranamer:jar:2.3:compile,Unknown
+com.twitter:jsr166e:jar:1.1.0:compile,CC0 1.0 Universal
+com.yammer.metrics:metrics-core:jar:2.2.0:compile,Unknown
+commons-beanutils:commons-beanutils-core:jar:1.8.0:compile,Unknown
+commons-beanutils:commons-beanutils:jar:1.7.0:compile,Unknown
+commons-beanutils:commons-beanutils:jar:1.8.3:compile,Unknown
+commons-cli:commons-cli:jar:1.2:compile,Unknown
+commons-cli:commons-cli:jar:1.3.1:compile,Unknown
+commons-codec:commons-codec:jar:1.10:compile,Unknown
+commons-codec:commons-codec:jar:1.4:compile,Unknown
+commons-codec:commons-codec:jar:1.6:compile,Unknown
+commons-codec:commons-codec:jar:1.9:compile,Unknown
+commons-collections:commons-collections:jar:3.2.1:compile,Unknown
+commons-collections:commons-collections:jar:3.2.2:compile,Unknown
+commons-configuration:commons-configuration:jar:1.10:compile,Unknown
+commons-daemon:commons-daemon:jar:1.0.13:compile,Unknown
+commons-digester:commons-digester:jar:1.8.1:compile,Unknown
+commons-io:commons-io:jar:2.4:compile,Unknown
+commons-lang:commons-lang:jar:2.5:compile,Unknown
+commons-lang:commons-lang:jar:2.6:compile,Unknown
+commons-logging:commons-logging:jar:1.1.1:compile,Unknown
+commons-logging:commons-logging:jar:1.1.3:compile,Unknown
+commons-logging:commons-logging:jar:1.2:compile,Unknown
+commons-net:commons-net:jar:3.1:compile,Unknown
+commons-validator:commons-validator:jar:1.4.0:compile,Unknown
+commons-validator:commons-validator:jar:1.5.1:compile,Unknown
+io.netty:netty-all:jar:4.0.23.Final:compile,Unknown
+javassist:javassist:jar:3.12.1.GA:compile,LGPL 2.1
+javax.activation:activation:jar:1.1:compile,Common Development and Distribution License (CDDL) v1.0
+javax.annotation:jsr250-api:jar:1.0:compile,COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+javax.mail:mail:jar:1.4:compile,Common Development and Distribution License (CDDL) v1.0
+javax.servlet.jsp:jsp-api:jar:2.1:runtime,Unknown
+javax.servlet:javax.servlet-api:jar:3.1.0:compile,CDDL + GPLv2 with classpath exception
+javax.servlet:servlet-api:jar:2.5:compile,Unknown
+javax.xml.bind:jaxb-api:jar:2.2.11:compile,GPL2 w/ CPE
+javax.xml.bind:jaxb-api:jar:2.2.2:compile,GPL2 w/ CPE
+javax.xml.stream:stax-api:jar:1.0-2:compile,COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+jline:jline:jar:0.9.94:compile,BSD
+junit:junit:jar:4.12:compile,Eclipse Public License 1.0
+junit:junit:jar:4.4:compile,Common Public License Version 1.0
+mysql:mysql-connector-java:jar:5.1.31:compile,The GNU General Public License, Version 2
+net.jcip:jcip-annotations:jar:1.0:compile,Unknown
+net.sf.jopt-simple:jopt-simple:jar:3.2:compile,The MIT License
+net.sf.saxon:Saxon-HE:jar:9.5.1-5:compile,Mozilla Public License Version 2.0
+org.abego.treelayout:org.abego.treelayout.core:jar:1.0.1:compile,BSD 3-Clause "New" or "Revised" License (BSD-3-Clause)
+org.adrianwalker:multiline-string:jar:0.1.2:compile,Common Public License Version 1.0
+org.antlr:antlr4-runtime:jar:4.5:compile,BSD 3-Clause License
+org.clojure:clojure:jar:1.6.0:compile,Eclipse Public License 1.0
+org.codehaus.jackson:jackson-jaxrs:jar:1.8.3:compile,GNU Lesser General Public License (LGPL), Version 2.1
+org.codehaus.jackson:jackson-jaxrs:jar:1.9.13:compile,GNU Lesser General Public License (LGPL), Version 2.1
+org.codehaus.jackson:jackson-xc:jar:1.8.3:compile,GNU Lesser General Public License (LGPL), Version 2.1
+org.codehaus.jackson:jackson-xc:jar:1.9.13:compile,GNU Lesser General Public License (LGPL), Version 2.1
+org.codehaus.jettison:jettison:jar:1.1:compile,Unknown
+org.codehaus.woodstox:stax2-api:jar:3.1.4:compile,The BSD License
+org.eclipse.jetty:jetty-http:jar:9.3.0.M0:compile,Unknown
+org.eclipse.jetty:jetty-io:jar:9.3.0.M0:compile,Unknown
+org.eclipse.jetty:jetty-security:jar:9.3.0.M0:compile,Unknown
+org.eclipse.jetty:jetty-server:jar:9.3.0.M0:compile,Unknown
+org.eclipse.jetty:jetty-servlet:jar:9.3.0.M0:compile,Unknown
+org.eclipse.jetty:jetty-util:jar:9.3.0.M0:compile,Unknown
+org.elasticsearch:elasticsearch:jar:2.3.3:compile,Unknown
+org.fusesource.leveldbjni:leveldbjni-all:jar:1.8:compile,Unknown
+org.hamcrest:hamcrest-core:jar:1.1:runtime,Unknown
+org.hamcrest:hamcrest-core:jar:1.3:compile,Unknown
+org.jboss.resteasy:async-http-servlet-3.0:jar:3.0.1.Final:compile,Unknown
+org.jboss.resteasy:jaxrs-api:jar:3.0.4.Final:compile,Unknown
+org.jboss.resteasy:resteasy-jaxb-provider:jar:3.0.1.Final:compile,Unknown
+org.jboss.resteasy:resteasy-jaxrs:jar:3.0.1.Final:compile,Unknown
+org.jruby.jcodings:jcodings:jar:1.0.8:compile,MIT License
+org.jruby.joni:joni:jar:2.1.2:compile,MIT License
+org.jvnet.jaxb2_commons:jaxb2-basics-runtime:jar:0.6.5:compile,Unknown
+org.krakenapps:kraken-api:jar:2.1.1:compile,Unknown
+org.krakenapps:kraken-pcap:jar:1.7.1:compile,Unknown
+org.mitre.taxii:taxii:jar:1.1.0.1:compile,The BSD 3-Clause License
+org.mitre:stix:jar:1.2.0.2:compile,The BSD 3-Clause License
+org.mockito:mockito-core:jar:1.10.19:compile,The MIT License
+org.mortbay.jetty:jetty-util:jar:6.1.26:compile,Unknown
+org.mortbay.jetty:jetty:jar:6.1.26:compile,Unknown
+org.objenesis:objenesis:jar:2.1:runtime,Unknown
+org.ow2.asm:asm:jar:4.0:compile,Unknown
+org.scala-lang:scala-library:jar:2.9.2:compile,BSD-like
+org.slf4j:slf4j-api:jar:1.6.1:compile,Unknown
+org.slf4j:slf4j-api:jar:1.7.10:compile,Unknown
+org.slf4j:slf4j-api:jar:1.7.5:compile,Unknown
+org.slf4j:slf4j-api:jar:1.7.7:compile,Unknown
+org.slf4j:slf4j-log4j12:jar:1.6.1:compile,Unknown
+org.slf4j:slf4j-log4j12:jar:1.7.10:compile,Unknown
+org.slf4j:slf4j-log4j12:jar:1.7.10:runtime,Unknown
+org.slf4j:slf4j-log4j12:jar:1.7.5:compile,Unknown
+org.slf4j:slf4j-log4j12:jar:1.7.7:compile,Unknown
+org.slf4j:slf4j-simple:jar:1.7.7:compile,Unknown
+xerces:xercesImpl:jar:2.9.1:compile,Unknown
+xml-apis:xml-apis:jar:1.3.04:compile,Unknown
+xmlenc:xmlenc:jar:0.52:compile,The BSD License

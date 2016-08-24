@@ -1,358 +1,65 @@
-asm:asm:jar:3.1:compile,Unknown
-com.carrotsearch.randomizedtesting:junit4-ant:jar:2.1.13:test,Unknown
-com.carrotsearch.randomizedtesting:randomizedtesting-runner:jar:2.1.13:test,Unknown
-com.carrotsearch.randomizedtesting:randomizedtesting-runner:jar:2.1.14:test,Unknown
-com.carrotsearch:hppc:jar:0.5.2:test,Unknown
-com.carrotsearch:hppc:jar:0.7.1:compile,Unknown
-com.codahale.metrics:metrics-core:jar:3.0.2:compile,Unknown
-com.codahale.metrics:metrics-graphite:jar:3.0.2:compile,Unknown
 com.esotericsoftware.kryo:kryo:jar:2.21:compile,New BSD License
-com.esotericsoftware.kryo:kryo:jar:2.21:test,New BSD License
 com.esotericsoftware.minlog:minlog:jar:1.2:compile,New BSD License
-com.esotericsoftware.minlog:minlog:jar:1.2:test,New BSD License
-com.fasterxml.jackson.core:jackson-annotations:jar:2.2.3:compile,Unknown
-com.fasterxml.jackson.core:jackson-annotations:jar:2.7.4:compile,Unknown
-com.fasterxml.jackson.core:jackson-core:jar:2.2.3:compile,Unknown
-com.fasterxml.jackson.core:jackson-core:jar:2.6.6:compile,Unknown
-com.fasterxml.jackson.core:jackson-core:jar:2.7.4:compile,Unknown
-com.fasterxml.jackson.core:jackson-databind:jar:2.2.3:compile,Unknown
-com.fasterxml.jackson.core:jackson-databind:jar:2.7.4:compile,Unknown
-com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar:2.6.6:compile,Unknown
-com.fasterxml.jackson.dataformat:jackson-dataformat-smile:jar:2.6.6:compile,Unknown
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.6.6:compile,Unknown
-com.google.guava:guava:jar:12.0.1:compile,Unknown
-com.google.guava:guava:jar:12.0:compile,Unknown
-com.google.guava:guava:jar:16.0.1:compile,Unknown
-com.google.guava:guava:jar:17.0:compile,Unknown
-com.google.guava:guava:jar:18.0:compile,Unknown
-com.google.inject.extensions:guice-servlet:jar:3.0:compile,Unknown
-com.google.inject.extensions:guice-servlet:jar:3.0:test,Unknown
-com.google.inject:guice:jar:3.0:compile,Unknown
-com.google.inject:guice:jar:3.0:test,Unknown
 com.google.protobuf:protobuf-java:jar:2.5.0:compile,New BSD license
-com.googlecode.libphonenumber:libphonenumber:jar:6.2:test,Unknown
 com.jcraft:jsch:jar:0.1.42:compile,BSD
-com.sun.jersey.contribs:jersey-guice:jar:1.9:compile,Unknown
-com.sun.jersey.contribs:jersey-guice:jar:1.9:test,Unknown
-com.sun.jersey:jersey-client:jar:1.19:test,Unknown
-com.sun.jersey:jersey-client:jar:1.9:compile,Unknown
-com.sun.jersey:jersey-client:jar:1.9:test,Unknown
-com.sun.jersey:jersey-core:jar:1.9:compile,Unknown
-com.sun.jersey:jersey-json:jar:1.9:compile,Unknown
-com.sun.jersey:jersey-server:jar:1.9:compile,Unknown
 com.sun.xml.bind:jaxb-impl:jar:2.2.3-1:compile,GPL2 w/ CPE
 com.sun.xml.bind:jaxb-impl:jar:2.2.5-2:compile,GPL2 w/ CPE
-com.thoughtworks.paranamer:paranamer:jar:2.3:compile,Unknown
 com.twitter:jsr166e:jar:1.1.0:compile,CC0 1.0 Universal
-com.yammer.metrics:metrics-core:jar:2.2.0:compile,Unknown
-com.yammer.metrics:metrics-core:jar:2.2.0:test,Unknown
-commons-beanutils:commons-beanutils-core:jar:1.8.0:compile,Unknown
-commons-beanutils:commons-beanutils:jar:1.7.0:compile,Unknown
-commons-beanutils:commons-beanutils:jar:1.8.3:compile,Unknown
-commons-cli:commons-cli:jar:1.2:compile,Unknown
-commons-cli:commons-cli:jar:1.3.1:compile,Unknown
-commons-codec:commons-codec:jar:1.10:compile,Unknown
-commons-codec:commons-codec:jar:1.4:compile,Unknown
-commons-codec:commons-codec:jar:1.6:compile,Unknown
-commons-codec:commons-codec:jar:1.9:compile,Unknown
-commons-collections:commons-collections:jar:3.2.1:compile,Unknown
-commons-collections:commons-collections:jar:3.2.2:compile,Unknown
-commons-configuration:commons-configuration:jar:1.10:compile,Unknown
-commons-daemon:commons-daemon:jar:1.0.13:compile,Unknown
-commons-digester:commons-digester:jar:1.8.1:compile,Unknown
-commons-fileupload:commons-fileupload:jar:1.2.1:test,Unknown
-commons-io:commons-io:jar:2.4:compile,Unknown
-commons-lang:commons-lang:jar:2.5:compile,Unknown
-commons-lang:commons-lang:jar:2.6:compile,Unknown
-commons-logging:commons-logging:jar:1.1.1:compile,Unknown
-commons-logging:commons-logging:jar:1.1.3:compile,Unknown
-commons-logging:commons-logging:jar:1.2:compile,Unknown
-commons-net:commons-net:jar:3.1:compile,Unknown
-commons-validator:commons-validator:jar:1.4.0:compile,Unknown
-commons-validator:commons-validator:jar:1.5.1:compile,Unknown
-dom4j:dom4j:jar:1.6.1:test,Unknown
-io.netty:netty-all:jar:4.0.23.Final:compile,Unknown
 javassist:javassist:jar:3.12.1.GA:compile,LGPL 2.1
 javax.activation:activation:jar:1.1:compile,Common Development and Distribution License (CDDL) v1.0
 javax.annotation:jsr250-api:jar:1.0:compile,COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.mail:mail:jar:1.4:compile,Common Development and Distribution License (CDDL) v1.0
-javax.mail:mailapi:jar:1.4.3:test,Unknown
-javax.servlet.jsp:jsp-api:jar:2.1:runtime,Unknown
-javax.servlet.jsp:jsp-api:jar:2.1:test,Unknown
 javax.servlet:javax.servlet-api:jar:3.1.0:compile,CDDL + GPLv2 with classpath exception
-javax.servlet:javax.servlet-api:jar:3.1.0:test,CDDL + GPLv2 with classpath exception
-javax.servlet:servlet-api:jar:2.5:compile,Unknown
-javax.servlet:servlet-api:jar:2.5:test,Unknown
 javax.xml.bind:jaxb-api:jar:2.2.11:compile,GPL2 w/ CPE
 javax.xml.bind:jaxb-api:jar:2.2.2:compile,GPL2 w/ CPE
 javax.xml.stream:stax-api:jar:1.0-2:compile,COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 jline:jline:jar:0.9.94:compile,BSD
 junit:junit:jar:4.12:compile,Eclipse Public License 1.0
-junit:junit:jar:4.12:test,Eclipse Public License 1.0
 junit:junit:jar:4.4:compile,Common Public License Version 1.0
-junit:junit:jar:4.4:test,Common Public License Version 1.0
 mysql:mysql-connector-java:jar:5.1.31:compile,The GNU General Public License, Version 2
-mysql:mysql-connector-java:jar:5.1.31:test,The GNU General Public License, Version 2
-net.jcip:jcip-annotations:jar:1.0:compile,Unknown
 net.sf.jopt-simple:jopt-simple:jar:3.2:compile,The MIT License
-net.sf.jopt-simple:jopt-simple:jar:3.2:test,The MIT License
 net.sf.saxon:Saxon-HE:jar:9.5.1-5:compile,Mozilla Public License Version 2.0
 org.abego.treelayout:org.abego.treelayout.core:jar:1.0.1:compile,BSD 3-Clause "New" or "Revised" License (BSD-3-Clause)
 org.adrianwalker:multiline-string:jar:0.1.2:compile,Common Public License Version 1.0
-org.adrianwalker:multiline-string:jar:0.1.2:test,Common Public License Version 1.0
-org.antlr:antlr-runtime:jar:3.5:test,Unknown
 org.antlr:antlr4-runtime:jar:4.5:compile,BSD 3-Clause License
-org.apache.ant:ant:jar:1.8.2:test,Unknown
-org.apache.avro:avro:jar:1.7.4:compile,Unknown
-org.apache.commons:commons-compress:jar:1.4.1:compile,Unknown
-org.apache.commons:commons-jexl:jar:2.1.1:compile,Unknown
-org.apache.commons:commons-lang3:jar:3.1:compile,Unknown
-org.apache.commons:commons-lang3:jar:3.3.2:compile,Unknown
-org.apache.commons:commons-math3:jar:3.1.1:compile,Unknown
-org.apache.commons:commons-math:jar:2.2:compile,Unknown
-org.apache.commons:commons-math:jar:2.2:test,Unknown
-org.apache.curator:curator-client:jar:2.7.1:compile,Unknown
-org.apache.curator:curator-framework:jar:2.5.0:compile,Unknown
-org.apache.curator:curator-framework:jar:2.7.1:compile,Unknown
-org.apache.curator:curator-recipes:jar:2.7.1:compile,Unknown
-org.apache.curator:curator-test:jar:2.7.1:compile,Unknown
-org.apache.curator:curator-test:jar:2.7.1:test,Unknown
-org.apache.curator:curator-x-discovery:jar:2.7.1:compile,Unknown
-org.apache.directory.api:api-asn1-api:jar:1.0.0-M20:compile,Unknown
-org.apache.directory.api:api-util:jar:1.0.0-M20:compile,Unknown
-org.apache.directory.server:apacheds-i18n:jar:2.0.0-M15:compile,Unknown
-org.apache.directory.server:apacheds-kerberos-codec:jar:2.0.0-M15:compile,Unknown
-org.apache.hadoop:hadoop-annotations:jar:2.5.1:compile,Unknown
-org.apache.hadoop:hadoop-annotations:jar:2.6.0:compile,Unknown
-org.apache.hadoop:hadoop-annotations:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-auth:jar:2.4.0:compile,Unknown
-org.apache.hadoop:hadoop-auth:jar:2.5.1:compile,Unknown
-org.apache.hadoop:hadoop-auth:jar:2.6.0:compile,Unknown
-org.apache.hadoop:hadoop-auth:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-client:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-client:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-common:jar:2.5.1:compile,Unknown
-org.apache.hadoop:hadoop-common:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-hdfs:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-app:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-app:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-common:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-common:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-core:jar:2.5.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-core:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-core:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-hs:jar:2.5.1:test,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-jobclient:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-jobclient:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-shuffle:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-mapreduce-client-shuffle:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-minicluster:jar:2.5.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-api:jar:2.5.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-api:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-api:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-client:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-client:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-common:jar:2.5.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-common:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-common:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-applicationhistoryservice:jar:2.5.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-applicationhistoryservice:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-common:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-server-common:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-nodemanager:jar:2.5.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-nodemanager:jar:2.7.1:compile,Unknown
-org.apache.hadoop:hadoop-yarn-server-nodemanager:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-resourcemanager:jar:2.5.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-resourcemanager:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-tests:jar:2.7.1:test,Unknown
-org.apache.hadoop:hadoop-yarn-server-web-proxy:jar:2.5.1:test,Unknown
-org.apache.hbase:hbase-annotations:jar:1.1.1:compile,Unknown
-org.apache.hbase:hbase-annotations:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-client:jar:1.1.1:compile,Unknown
-org.apache.hbase:hbase-client:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-common:jar:1.1.1:compile,Unknown
-org.apache.hbase:hbase-common:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-hadoop-compat:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-hadoop2-compat:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-prefix-tree:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-procedure:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-protocol:jar:1.1.1:compile,Unknown
-org.apache.hbase:hbase-protocol:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-server:jar:1.1.1:test,Unknown
-org.apache.hbase:hbase-testing-util:jar:1.1.1:test,Unknown
-org.apache.htrace:htrace-core:jar:3.1.0-incubating:compile,Unknown
-org.apache.httpcomponents:fluent-hc:jar:4.3.5:compile,Unknown
-org.apache.httpcomponents:httpclient-cache:jar:4.3.5:compile,Unknown
-org.apache.httpcomponents:httpclient:jar:4.1.2:compile,Unknown
-org.apache.httpcomponents:httpclient:jar:4.2.1:compile,Unknown
-org.apache.httpcomponents:httpclient:jar:4.2.5:compile,Unknown
-org.apache.httpcomponents:httpclient:jar:4.3.2:compile,Unknown
-org.apache.httpcomponents:httpclient:jar:4.4.1:compile,Unknown
-org.apache.httpcomponents:httpcore:jar:4.1.2:compile,Unknown
-org.apache.httpcomponents:httpcore:jar:4.2.4:compile,Unknown
-org.apache.httpcomponents:httpcore:jar:4.3.1:compile,Unknown
-org.apache.httpcomponents:httpcore:jar:4.3.2:compile,Unknown
-org.apache.httpcomponents:httpcore:jar:4.4.1:compile,Unknown
-org.apache.httpcomponents:httpmime:jar:4.3.5:compile,Unknown
-org.apache.httpcomponents:httpmime:jar:4.4.1:compile,Unknown
-org.apache.logging.log4j:log4j-api:jar:2.1:compile,Unknown
-org.apache.logging.log4j:log4j-api:jar:2.1:test,Unknown
-org.apache.logging.log4j:log4j-core:jar:2.1:compile,Unknown
-org.apache.logging.log4j:log4j-core:jar:2.1:test,Unknown
-org.apache.logging.log4j:log4j-slf4j-impl:jar:2.1:compile,Unknown
-org.apache.logging.log4j:log4j-slf4j-impl:jar:2.1:test,Unknown
-org.apache.lucene:lucene-analyzers-common:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-analyzers-common:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-analyzers-kuromoji:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-analyzers-phonetic:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-backward-codecs:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-backward-codecs:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-codecs:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-codecs:jar:5.5.0:test,Unknown
-org.apache.lucene:lucene-core:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-core:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-expressions:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-grouping:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-grouping:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-highlighter:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-highlighter:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-join:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-join:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-memory:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-memory:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-misc:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-misc:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-queries:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-queries:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-queryparser:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-queryparser:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-sandbox:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-spatial3d:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-spatial:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-spatial:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-suggest:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-suggest:jar:5.5.0:compile,Unknown
-org.apache.lucene:lucene-test-framework:jar:5.2.1:test,Unknown
-org.apache.lucene:lucene-test-framework:jar:5.5.0:test,Unknown
-org.apache.metron:elasticsearch-shaded:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-common:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-enrichment:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-hbase:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-hbase:jar:0.2.0BETA:test,Unknown
-org.apache.metron:metron-indexing:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-integration-test:jar:0.2.0BETA:test,Unknown
-org.apache.metron:metron-maas-common:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-pcap:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-test-utilities:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-test-utilities:jar:0.2.0BETA:test,Unknown
-org.apache.metron:metron-writer:jar:0.2.0BETA:compile,Unknown
-org.apache.metron:metron-writer:jar:0.2.0BETA:test,Unknown
-org.apache.solr:solr-core:jar:5.2.1:test,Unknown
-org.apache.solr:solr-solrj:jar:5.2.1:compile,Unknown
-org.apache.solr:solr-test-framework:jar:5.2.1:test,Unknown
-org.apache.storm:flux-core:jar:0.10.0:compile,Unknown
-org.apache.storm:flux-core:jar:0.10.0:test,Unknown
-org.apache.storm:storm-core:jar:0.10.0:compile,Unknown
-org.apache.storm:storm-core:jar:0.10.0:test,Unknown
-org.apache.storm:storm-hbase:jar:0.10.0:compile,Unknown
-org.apache.storm:storm-hdfs:jar:0.10.0:compile,Unknown
-org.apache.storm:storm-kafka:jar:0.10.0:compile,Unknown
-org.apache.zookeeper:zookeeper:jar:3.4.6:compile,Unknown
 org.clojure:clojure:jar:1.6.0:compile,Eclipse Public License 1.0
-org.clojure:clojure:jar:1.6.0:test,Eclipse Public License 1.0
 org.codehaus.jackson:jackson-jaxrs:jar:1.8.3:compile,GNU Lesser General Public License (LGPL), Version 2.1
 org.codehaus.jackson:jackson-jaxrs:jar:1.9.13:compile,GNU Lesser General Public License (LGPL), Version 2.1
 org.codehaus.jackson:jackson-xc:jar:1.8.3:compile,GNU Lesser General Public License (LGPL), Version 2.1
 org.codehaus.jackson:jackson-xc:jar:1.9.13:compile,GNU Lesser General Public License (LGPL), Version 2.1
-org.codehaus.jettison:jettison:jar:1.1:compile,Unknown
 org.codehaus.woodstox:stax2-api:jar:3.1.4:compile,The BSD License
-org.easymock:easymock:jar:3.4:test,Unknown
-org.eclipse.jetty:jetty-continuation:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-deploy:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-http:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-http:jar:9.3.0.M0:compile,Unknown
-org.eclipse.jetty:jetty-io:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-io:jar:9.3.0.M0:compile,Unknown
-org.eclipse.jetty:jetty-jmx:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-rewrite:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-security:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-security:jar:9.3.0.M0:compile,Unknown
-org.eclipse.jetty:jetty-server:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-server:jar:9.3.0.M0:compile,Unknown
-org.eclipse.jetty:jetty-servlet:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-servlet:jar:9.3.0.M0:compile,Unknown
-org.eclipse.jetty:jetty-servlets:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-util:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-util:jar:9.3.0.M0:compile,Unknown
-org.eclipse.jetty:jetty-webapp:jar:9.2.10.v20150310:test,Unknown
-org.eclipse.jetty:jetty-xml:jar:9.2.10.v20150310:test,Unknown
-org.elasticsearch:elasticsearch:jar:2.3.3:compile,Unknown
-org.fusesource.leveldbjni:leveldbjni-all:jar:1.8:compile,Unknown
-org.hamcrest:hamcrest-all:jar:1.3:test,Unknown
-org.hamcrest:hamcrest-core:jar:1.1:runtime,Unknown
-org.hamcrest:hamcrest-core:jar:1.1:test,Unknown
-org.hamcrest:hamcrest-core:jar:1.3:compile,Unknown
-org.hamcrest:hamcrest-core:jar:1.3:test,Unknown
-org.htrace:htrace-core:jar:3.0.4:test,Unknown
-org.jamon:jamon-runtime:jar:2.3.1:test,Unknown
-org.jboss.resteasy:async-http-servlet-3.0:jar:3.0.1.Final:compile,Unknown
-org.jboss.resteasy:jaxrs-api:jar:3.0.4.Final:compile,Unknown
-org.jboss.resteasy:resteasy-jaxb-provider:jar:3.0.1.Final:compile,Unknown
-org.jboss.resteasy:resteasy-jaxrs:jar:3.0.1.Final:compile,Unknown
 org.jruby.jcodings:jcodings:jar:1.0.8:compile,MIT License
-org.jruby.jcodings:jcodings:jar:1.0.8:test,MIT License
 org.jruby.joni:joni:jar:2.1.2:compile,MIT License
-org.jruby.joni:joni:jar:2.1.2:test,MIT License
-org.jvnet.jaxb2_commons:jaxb2-basics-runtime:jar:0.6.5:compile,Unknown
-org.krakenapps:kraken-api:jar:2.1.1:compile,Unknown
-org.krakenapps:kraken-pcap:jar:1.7.1:compile,Unknown
 org.mitre.taxii:taxii:jar:1.1.0.1:compile,The BSD 3-Clause License
 org.mitre:stix:jar:1.2.0.2:compile,The BSD 3-Clause License
-org.mockito:mockito-all:jar:1.10.19:test,The MIT License
-org.mockito:mockito-all:jar:1.9.5:test,The MIT License
 org.mockito:mockito-core:jar:1.10.19:compile,The MIT License
-org.mockito:mockito-core:jar:1.10.19:test,The MIT License
-org.mortbay.jetty:jetty-util:jar:6.1.26:compile,Unknown
-org.mortbay.jetty:jetty:jar:6.1.26:compile,Unknown
-org.mortbay.jetty:jsp-2.1:jar:6.1.14:test,CDDL 1.0
-org.mortbay.jetty:jsp-api-2.1:jar:6.1.14:test,Unknown
-org.mortbay.jetty:servlet-api-2.5:jar:6.1.14:test,CDDL 1.0
-org.mozilla:rhino:jar:1.7R4:test,Mozilla Public License, Version 2.0
-org.objenesis:objenesis:jar:1.2:test,Unknown
-org.objenesis:objenesis:jar:2.1:runtime,Unknown
-org.objenesis:objenesis:jar:2.1:test,Unknown
-org.ow2.asm:asm-commons:jar:4.1:test,Unknown
-org.ow2.asm:asm:jar:4.0:compile,Unknown
-org.ow2.asm:asm:jar:4.0:test,Unknown
-org.powermock:powermock-api-easymock:jar:1.6.2:test,Unknown
-org.powermock:powermock-api-mockito:jar:1.5:test,Unknown
-org.powermock:powermock-api-mockito:jar:1.6.2:test,Unknown
-org.powermock:powermock-api-support:jar:1.5:test,Unknown
-org.powermock:powermock-api-support:jar:1.6.2:test,Unknown
-org.powermock:powermock-core:jar:1.5:test,Unknown
-org.powermock:powermock-core:jar:1.6.2:test,Unknown
-org.powermock:powermock-module-junit4-common:jar:1.5:test,Unknown
-org.powermock:powermock-module-junit4-common:jar:1.6.2:test,Unknown
-org.powermock:powermock-module-junit4:jar:1.5:test,Unknown
-org.powermock:powermock-module-junit4:jar:1.6.2:test,Unknown
-org.powermock:powermock-reflect:jar:1.5:test,Unknown
-org.powermock:powermock-reflect:jar:1.6.2:test,Unknown
-org.restlet.jee:org.restlet.ext.servlet:jar:2.3.0:test,Unknown
-org.restlet.jee:org.restlet:jar:2.3.0:test,Unknown
 org.scala-lang:scala-library:jar:2.9.2:compile,BSD-like
-org.scala-lang:scala-library:jar:2.9.2:test,BSD-like
-org.slf4j:slf4j-api:jar:1.6.1:compile,Unknown
-org.slf4j:slf4j-api:jar:1.7.10:compile,Unknown
-org.slf4j:slf4j-api:jar:1.7.5:compile,Unknown
-org.slf4j:slf4j-api:jar:1.7.7:compile,Unknown
-org.slf4j:slf4j-log4j12:jar:1.6.1:compile,Unknown
-org.slf4j:slf4j-log4j12:jar:1.7.10:compile,Unknown
-org.slf4j:slf4j-log4j12:jar:1.7.10:runtime,Unknown
-org.slf4j:slf4j-log4j12:jar:1.7.5:compile,Unknown
-org.slf4j:slf4j-log4j12:jar:1.7.7:compile,Unknown
-org.slf4j:slf4j-simple:jar:1.7.7:compile,Unknown
-tomcat:jasper-compiler:jar:5.5.23:test,Unknown
-tomcat:jasper-runtime:jar:5.5.23:test,Unknown
-xerces:xercesImpl:jar:2.9.1:compile,Unknown
-xml-apis:xml-apis:jar:1.3.04:compile,Unknown
 xmlenc:xmlenc:jar:0.52:compile,The BSD License
+asm:asm:jar:3.1:compile,BSD
+com.sun.jersey.contribs:jersey-guice:jar:1.9:compile,CDDL 1.1
+com.sun.jersey:jersey-client:jar:1.9:compile,CDDL 1.1
+com.sun.jersey:jersey-core:jar:1.9:compile,CDDL 1.1
+com.sun.jersey:jersey-json:jar:1.9:compile,CDDL 1.1
+com.sun.jersey:jersey-server:jar:1.9:compile,CDDL 1.1
+com.thoughtworks.paranamer:paranamer:jar:2.3:compile,BSD
+javax.servlet.jsp:jsp-api:jar:2.1:runtime,CDDL
+javax.servlet:servlet-api:jar:2.5:compile,CDDL
+net.jcip:jcip-annotations:jar:1.0:compile,Public
+org.codehaus.jettison:jettison:jar:1.1:compile,
+org.fusesource.leveldbjni:leveldbjni-all:jar:1.8:compile,BSD 3-clause
+org.hamcrest:hamcrest-core:jar:1.1:runtime,BSD 2-clause
+org.hamcrest:hamcrest-core:jar:1.3:compile,BSD 2-clause
+org.jvnet.jaxb2_commons:jaxb2-basics-runtime:jar:0.6.5:compile,BSD
+org.krakenapps:kraken-api:jar:2.1.1:compile,
+org.krakenapps:kraken-pcap:jar:1.7.1:compile,
+org.ow2.asm:asm:jar:4.0:compile,BSD
+org.slf4j:slf4j-api:jar:1.6.1:compile,MIT
+org.slf4j:slf4j-api:jar:1.7.10:compile,MIT
+org.slf4j:slf4j-api:jar:1.7.5:compile,MIT
+org.slf4j:slf4j-api:jar:1.7.7:compile,MIT
+org.slf4j:slf4j-log4j12:jar:1.6.1:compile,MIT
+org.slf4j:slf4j-log4j12:jar:1.7.10:compile,MIT
+org.slf4j:slf4j-log4j12:jar:1.7.10:runtime,MIT
+org.slf4j:slf4j-log4j12:jar:1.7.5:compile,MIT
+org.slf4j:slf4j-log4j12:jar:1.7.7:compile,MIT
+org.slf4j:slf4j-simple:jar:1.7.7:compile,MIT
