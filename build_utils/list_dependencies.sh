@@ -16,8 +16,4 @@
 #  limitations under the License.
 #
 
-TLD=$(pwd)
-LICENSE_FILE="src/main/resources/META-INF/LICENSE"
-pushd $1
-$TLD/build_utils/list_dependencies.sh | python $TLD/build_utils/generate_license.py $TLD/dependencies_with_url.csv $TLD/LICENSE 1> $LICENSE_FILE
-popd
+mvn dependency:list | grep "^\[INFO\]   " | awk '{print $2}' | grep -v "org.apache" | grep -v "test" | grep -v "provided" | grep -v "runtime" | grep -v ":system" |  sort | uniq 
