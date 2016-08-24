@@ -2,7 +2,7 @@ import xml.etree.ElementTree
 import sys
 import os
 import re
-good_licenses = ['apache', 'asf', 'public domain' ]
+good_licenses = [ ]
 def get_license(pom) :
     ret = None
     with open(pom, 'r') as fp:
