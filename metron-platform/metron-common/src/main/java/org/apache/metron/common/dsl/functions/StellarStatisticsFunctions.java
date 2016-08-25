@@ -21,6 +21,7 @@
 package org.apache.metron.common.dsl.functions;
 
 import org.apache.metron.common.dsl.BaseStellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +58,7 @@ public class StellarStatisticsFunctions {
    *             Using no rolling window is less memory intensive, but cannot
    *             calculate certain statistics like percentiles and kurtosis.
    */
+  @Stellar(namespace="STATS", name="INIT")
   public static class Init extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -69,6 +71,7 @@ public class StellarStatisticsFunctions {
    *
    *  STATS_ADD (stats, value [, value2, value3, ...])
    */
+  @Stellar(namespace="STATS", name="ADD")
   public static class Add extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -95,6 +98,7 @@ public class StellarStatisticsFunctions {
    *
    *  STATS_MEAN (stats)
    */
+  @Stellar(namespace="STATS", name="MEAN")
   public static class Mean extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -106,6 +110,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the geometric mean.
    */
+  @Stellar(namespace="STATS", name="GEOMETRIC_MEAN")
   public static class GeometricMean extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -117,6 +122,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the sum.
    */
+  @Stellar(namespace="STATS", name="SUM")
   public static class Sum extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -128,6 +134,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the max.
    */
+  @Stellar(namespace="STATS", name="MAX")
   public static class Max extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -139,6 +146,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the min.
    */
+  @Stellar(namespace="STATS", name="MIN")
   public static class Min extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -150,6 +158,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the count of elements
    */
+  @Stellar(namespace="STATS", name="COUNT")
   public static class Count extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -161,6 +170,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the population variance.
    */
+  @Stellar(namespace="STATS", name="POPULATION_VARIANCE")
   public static class PopulationVariance extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -172,6 +182,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the variance.
    */
+  @Stellar(namespace="STATS", name="VARIANCE")
   public static class Variance extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -183,6 +194,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the quadratic mean.
    */
+  @Stellar(namespace="STATS", name="QUADRATIC_MEAN")
   public static class QuadraticMean extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -194,6 +206,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the standard deviation.
    */
+  @Stellar(namespace="STATS", name="SD")
   public static class StandardDeviation extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -205,6 +218,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the sum of logs.
    */
+  @Stellar(namespace="STATS", name="SUM_LOGS")
   public static class SumLogs extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -216,6 +230,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the sum of squares.
    */
+  @Stellar(namespace="STATS", name="SUM_SQUARES")
   public static class SumSquares extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -227,6 +242,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the kurtosis.
    */
+  @Stellar(namespace="STATS", name="KURTOSIS")
   public static class Kurtosis extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -238,6 +254,7 @@ public class StellarStatisticsFunctions {
   /**
    * Calculates the skewness.
    */
+  @Stellar(namespace="STATS", name="SKEWNESS")
   public static class Skewness extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -251,6 +268,7 @@ public class StellarStatisticsFunctions {
    *
    * STATS_PERCENTILE(stats, 0.90)
    */
+  @Stellar(namespace="STATS", name="PERCENTILE")
   public static class Percentile extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {

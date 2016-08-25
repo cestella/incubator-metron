@@ -19,11 +19,22 @@
 package org.apache.metron.common.field.validation.network;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.metron.common.dsl.Predicate2StellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 import org.apache.metron.common.field.validation.SimpleValidation;
 
 import java.util.function.Predicate;
 
 public class URLValidation extends SimpleValidation {
+
+  @Stellar(name="IS_URL")
+  public static class IS_URL extends Predicate2StellarFunction {
+
+    public IS_URL() {
+      super(new URLValidation());
+    }
+  }
+
   @Override
   public Predicate<Object> getPredicate() {
     return url -> UrlValidator.getInstance().isValid(url == null?null:url.toString());

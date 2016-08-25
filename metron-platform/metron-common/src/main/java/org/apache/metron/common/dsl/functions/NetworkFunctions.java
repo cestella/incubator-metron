@@ -23,6 +23,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.net.InternetDomainName;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.metron.common.dsl.BaseStellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class NetworkFunctions {
+  @Stellar(name="IN_SUBNET")
   public static class InSubnet extends BaseStellarFunction {
 
     @Override
@@ -55,6 +57,8 @@ public class NetworkFunctions {
       return inSubnet;
     }
   }
+
+  @Stellar(name="DOMAIN_REMOVE_SUBDOMAINS")
   public static class RemoveSubdomains extends BaseStellarFunction {
 
     @Override
@@ -81,6 +85,8 @@ public class NetworkFunctions {
       return null;
     }
   }
+
+  @Stellar(name="DOMAIN_REMOVE_TLD")
   public static class RemoveTLD extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {
@@ -102,6 +108,7 @@ public class NetworkFunctions {
     }
   }
 
+  @Stellar(name="DOMAIN_TO_TLD")
   public static class ExtractTLD extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {
@@ -114,6 +121,7 @@ public class NetworkFunctions {
     }
   }
 
+  @Stellar(name="URL_TO_PORT")
   public static class URLToPort extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {
@@ -126,6 +134,7 @@ public class NetworkFunctions {
     }
   }
 
+  @Stellar(name="URL_TO_PATH")
   public static class URLToPath extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {
@@ -133,6 +142,8 @@ public class NetworkFunctions {
       return url == null?null:url.getPath();
     }
   }
+
+  @Stellar(name="URL_TO_HOST")
   public static class URLToHost extends BaseStellarFunction {
 
     @Override
@@ -142,6 +153,7 @@ public class NetworkFunctions {
     }
   }
 
+  @Stellar(name="URL_TO_PROTOCOL")
   public static class URLToProtocol extends BaseStellarFunction {
 
     @Override
@@ -150,6 +162,7 @@ public class NetworkFunctions {
       return url == null?null:url.getProtocol();
     }
   }
+
   private static InternetDomainName toDomainName(Object dnObj) {
     if(dnObj != null) {
       String dn = dnObj.toString();

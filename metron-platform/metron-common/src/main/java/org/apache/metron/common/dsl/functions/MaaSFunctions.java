@@ -23,6 +23,7 @@ import com.google.common.cache.CacheBuilder;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.metron.common.dsl.Context;
 import org.apache.metron.common.dsl.ParseException;
+import org.apache.metron.common.dsl.Stellar;
 import org.apache.metron.common.dsl.StellarFunction;
 import org.apache.metron.common.utils.JSONUtils;
 import org.apache.metron.maas.config.Endpoint;
@@ -79,6 +80,8 @@ public class MaaSFunctions {
       return result;
     }
   }
+
+  @Stellar(name="MODEL_APPLY", namespace="MAAS")
   public static class ModelApply implements StellarFunction {
     private ServiceDiscoverer discoverer;
     private Cache<ModelCacheKey, Map<String, Object> > resultCache;
@@ -191,6 +194,7 @@ public class MaaSFunctions {
     }
   }
 
+  @Stellar(name="GET_ENDPOINT", namespace="MAAS")
   public static class GetEndpoint implements StellarFunction {
     ServiceDiscoverer discoverer;
     @Override

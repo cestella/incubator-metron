@@ -22,12 +22,15 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import org.apache.metron.common.dsl.BaseStellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 public class StringFunctions {
+
+  @Stellar(name="REGEXP_MATCH")
   public static class RegexpMatch extends BaseStellarFunction {
 
     @Override
@@ -44,6 +47,7 @@ public class StringFunctions {
     }
   }
 
+  @Stellar(name="ENDS_WITH")
   public static class EndsWith extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> list) {
@@ -58,6 +62,8 @@ public class StringFunctions {
       return str.endsWith(prefix);
     }
   }
+
+  @Stellar(name="STARTS_WITH")
   public static class StartsWith extends BaseStellarFunction {
 
     @Override
@@ -73,30 +79,40 @@ public class StringFunctions {
       return str.startsWith(prefix);
     }
   }
+
+  @Stellar(name="TO_LOWER")
   public static class ToLower extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
       return strings.get(0)==null?null:strings.get(0).toString().toLowerCase();
     }
   }
+
+  @Stellar(name="TO_UPPER")
   public static class ToUpper extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
       return strings.get(0)==null?null:strings.get(0).toString().toUpperCase();
     }
   }
+
+  @Stellar(name="TO_STRING")
   public static class ToString extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
       return strings.get(0)==null?null:strings.get(0).toString();
     }
   }
+
+  @Stellar(name="TRIM")
   public static class Trim extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
       return strings.get(0)==null?null:strings.get(0).toString().trim();
     }
   }
+
+  @Stellar(name="JOIN")
   public static class JoinFunction extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -105,6 +121,8 @@ public class StringFunctions {
       return Joiner.on(delim).join(Iterables.filter(arg1, x -> x != null));
     }
   }
+
+  @Stellar(name="SPLIT")
   public static class SplitFunction extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -119,6 +137,7 @@ public class StringFunctions {
     }
   }
 
+  @Stellar(name="GET_LAST")
   public static class GetLast extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -126,6 +145,8 @@ public class StringFunctions {
       return Iterables.getLast(arg1, null);
     }
   }
+
+  @Stellar(name="GET_FIRST")
   public static class GetFirst extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -134,6 +155,7 @@ public class StringFunctions {
     }
   }
 
+  @Stellar(name="GET")
   public static class Get extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {

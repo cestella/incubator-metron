@@ -20,11 +20,20 @@ package org.apache.metron.common.field.validation.primitive;
 
 import org.apache.commons.validator.routines.DoubleValidator;
 import org.apache.commons.validator.routines.LongValidator;
+import org.apache.metron.common.dsl.Predicate2StellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 import org.apache.metron.common.field.validation.SimpleValidation;
 
 import java.util.function.Predicate;
 
 public class IntegerValidation extends SimpleValidation{
+  @Stellar(name="IS_INTEGER")
+  public static class IS_INTEGER extends Predicate2StellarFunction {
+
+    public IS_INTEGER() {
+      super(new IntegerValidation());
+    }
+  }
   @Override
   public Predicate<Object> getPredicate() {
     return x -> LongValidator.getInstance().isValid(x == null?null:x.toString());

@@ -22,6 +22,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.apache.metron.common.dsl.BaseStellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -103,6 +104,7 @@ public class DateFunctions {
   }
 
 
+  @Stellar(name="TO_EPOCH_TIMESTAMP")
   public static class ToTimestamp extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {

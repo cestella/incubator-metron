@@ -19,12 +19,15 @@
 package org.apache.metron.common.dsl.functions;
 
 import org.apache.metron.common.dsl.BaseStellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public class MapFunctions {
+
+  @Stellar(name="MAP_EXISTS")
   public static class MapExists extends BaseStellarFunction {
 
     @Override
@@ -40,6 +43,8 @@ public class MapFunctions {
       return false;
     }
   }
+
+  @Stellar(name="MAP_GET")
   public static class MapGet extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {

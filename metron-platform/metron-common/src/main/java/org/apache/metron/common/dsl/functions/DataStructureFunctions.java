@@ -18,11 +18,13 @@
 package org.apache.metron.common.dsl.functions;
 
 import org.apache.metron.common.dsl.BaseStellarFunction;
+import org.apache.metron.common.dsl.Stellar;
 
 import java.util.Collection;
 import java.util.List;
 
 public class DataStructureFunctions {
+  @Stellar(name="IS_EMPTY")
   public static class IsEmpty extends BaseStellarFunction {
 
     @Override
