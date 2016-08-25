@@ -154,13 +154,6 @@ public class FunctionResolverImpl implements FunctionResolver {
   }
 
   @Override
-  public void initializeFunctions(Context context) {
-    for(StellarFunctionInfo s : _getFunctions().values()) {
-      s.getFunction().initialize(context);
-    }
-  }
-
-  @Override
   public Iterable<StellarFunctionInfo> getFunctionInfo() {
     return _getFunctions().values();
   }
