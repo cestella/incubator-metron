@@ -22,5 +22,5 @@ import java.util.function.Function;
 public interface FunctionResolver extends Function<String, StellarFunction> {
   Iterable<StellarFunctionInfo> getFunctionInfo();
   Iterable<String> getFunctions();
-
+  void initialize(Context context);
 }

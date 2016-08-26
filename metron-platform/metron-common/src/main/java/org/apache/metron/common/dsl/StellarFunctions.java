@@ -34,4 +34,8 @@ public class StellarFunctions {
   public static FunctionResolver FUNCTION_RESOLVER() {
     return FunctionResolverImpl.getInstance();
   }
+
+  public static void initialize(Context context) {
+    FunctionResolverImpl.getInstance().initialize(context);
+  }
 }

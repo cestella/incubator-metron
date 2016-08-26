@@ -163,6 +163,12 @@ public class FunctionResolverImpl implements FunctionResolver {
     return _getFunctions().keySet();
   }
 
+  @Override
+  public void initialize(Context context) {
+    //forces a load of the stellar functions.
+    _getFunctions();
+  }
+
   /**
    * Applies this function to the given argument.
    *
