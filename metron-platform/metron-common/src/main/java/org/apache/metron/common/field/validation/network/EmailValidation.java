@@ -28,7 +28,12 @@ import java.util.function.Predicate;
 
 public class EmailValidation extends SimpleValidation{
 
-  @Stellar(name="IS_EMAIL")
+  @Stellar(name="IS_EMAIL"
+          ,description = "Tests if a string is a valid email address"
+          ,params = {
+              "address - The String to test"
+                    }
+          , returns = "True if the string is a valid email address and false otherwise.")
   public static class IS_EMAIL extends Predicate2StellarFunction {
 
     public IS_EMAIL() {

@@ -24,12 +24,16 @@ public class StellarFunctionInfo {
   String name;
   String[] params;
   StellarFunction function;
-  public StellarFunctionInfo(String description, String name, String[] params, StellarFunction function) {
+  String returns;
+  public StellarFunctionInfo(String description, String name, String[] params, String returns, StellarFunction function) {
     this.description = description;
     this.name = name;
     this.params = params;
     this.function = function;
+    this.returns = returns;
   }
+
+  public String getReturns() { return returns;}
 
   public String getDescription() {
     return description;

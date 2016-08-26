@@ -27,7 +27,13 @@ import java.util.function.Predicate;
 
 public class URLValidation extends SimpleValidation {
 
-  @Stellar(name="IS_URL")
+  @Stellar(name="IS_URL"
+          ,description = "Tests if a string is a valid URL"
+          ,params = {
+              "url - The String to test"
+                    }
+          , returns = "True if the string is a valid URL and false otherwise."
+          )
   public static class IS_URL extends Predicate2StellarFunction {
 
     public IS_URL() {

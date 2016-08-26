@@ -30,7 +30,13 @@ import java.util.function.Function;
 
 public class StringFunctions {
 
-  @Stellar(name="REGEXP_MATCH")
+  @Stellar(name="REGEXP_MATCH"
+          ,description = "Determines whether a regex matches a string"
+          , params = {
+             "string - The string to test"
+            ,"pattern - The proposed regex pattern"
+            }
+          , returns = "True if the regex pattern matches the string and false otherwise.")
   public static class RegexpMatch extends BaseStellarFunction {
 
     @Override
@@ -47,7 +53,13 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="ENDS_WITH")
+  @Stellar(name="ENDS_WITH"
+          ,description = "Determines whether a string ends with a prefix"
+          , params = {
+             "string - The string to test"
+            ,"suffix - The proposed suffix"
+            }
+          , returns = "True if the string ends with the specified suffix and false otherwise.")
   public static class EndsWith extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> list) {
@@ -63,7 +75,14 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="STARTS_WITH")
+  @Stellar(name="STARTS_WITH"
+          ,description = "Determines whether a string starts with a prefix"
+          , params = {
+             "string - The string to test"
+            ,"prefix - The proposed prefix"
+            }
+          , returns = "True if the string starts with the specified prefix and false otherwise."
+          )
   public static class StartsWith extends BaseStellarFunction {
 
     @Override

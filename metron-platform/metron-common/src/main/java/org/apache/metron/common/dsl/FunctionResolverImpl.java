@@ -85,6 +85,7 @@ public class FunctionResolverImpl implements FunctionResolver {
       StellarFunctionInfo info = new StellarFunctionInfo(stellarAnnotation.description()
                                                         , fqn
                                                         , stellarAnnotation.params()
+                                                        , stellarAnnotation.returns()
                                                         , f
                                                         );
       return new AbstractMap.SimpleEntry<>(fqn, info);

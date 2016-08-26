@@ -31,7 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@Stellar(name="PROTOCOL_TO_NAME")
+@Stellar(name="PROTOCOL_TO_NAME"
+        , description="Convert the IANA protocol number to the protocol name"
+        , params = {
+                    "IANA Number"
+                   }
+        , returns = "The protocol name associated with the IANA number."
+        )
 public class IPProtocolTransformation extends SimpleFieldTransformation implements StellarFunction {
 
   private final static Map<Integer, String> PROTOCOLS = new HashMap<>();

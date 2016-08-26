@@ -32,7 +32,14 @@ import java.util.function.Predicate;
 
 public class DateValidation implements FieldValidation, Predicate<List<Object>> {
 
-  @Stellar(name="IS_DATE")
+  @Stellar(name="IS_DATE"
+          ,description = "Determines if a string passed is a date of a given format."
+          ,params = {
+            "date - The date in string form."
+          , "format - The format of the date."
+                    }
+          ,returns = "True if the date is of the specified format and false otherwise."
+          )
   public static class IS_DATE extends Predicate2StellarFunction {
 
     public IS_DATE() {
