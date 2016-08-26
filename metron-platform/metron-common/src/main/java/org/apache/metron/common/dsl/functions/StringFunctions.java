@@ -80,7 +80,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="TO_LOWER")
+  @Stellar( name="TO_LOWER"
+          , description = "Transforms the first argument to a lowercase string"
+          , params = { "input - String" }
+          , returns = "String"
+          )
   public static class ToLower extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
@@ -88,7 +92,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="TO_UPPER")
+  @Stellar( name="TO_UPPER"
+          , description = "Transforms the first argument to an uppercase string"
+          , params = { "input - String" }
+          , returns = "String"
+          )
   public static class ToUpper extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
@@ -96,7 +104,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="TO_STRING")
+  @Stellar(name="TO_STRING"
+          , description = "Transforms the first argument to a string"
+          , params = { "input - Object" }
+          , returns = "String"
+          )
   public static class ToString extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
@@ -104,7 +116,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="TRIM")
+  @Stellar(name="TRIM"
+          , description = "Trims whitespace from both sides of a string."
+          , params = { "input - String" }
+          , returns = "String"
+          )
   public static class Trim extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> strings) {
@@ -112,7 +128,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="JOIN")
+  @Stellar( name="JOIN"
+          , description="Joins the components of the list with the specified delimiter."
+          , params = { "list - List of Strings", "delim - String delimiter"}
+          , returns = "String"
+          )
   public static class JoinFunction extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -122,7 +142,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="SPLIT")
+  @Stellar(name="SPLIT"
+          , description="Splits the string by the delimiter."
+          , params = { "input - String to split", "delim - String delimiter"}
+          , returns = "List of Strings"
+          )
   public static class SplitFunction extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -137,7 +161,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="GET_LAST")
+  @Stellar(name="GET_LAST"
+          , description="Returns the last element of the list"
+          , params = { "input - List"}
+          , returns = "Last element of the list"
+          )
   public static class GetLast extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -146,7 +174,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="GET_FIRST")
+  @Stellar(name="GET_FIRST"
+          , description="Returns the first element of the list"
+          , params = { "input - List"}
+          , returns = "First element of the list"
+          )
   public static class GetFirst extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
@@ -155,7 +187,11 @@ public class StringFunctions {
     }
   }
 
-  @Stellar(name="GET")
+  @Stellar(name="GET"
+          , description="Returns the i'th element of the list "
+          , params = { "input - List", "i - the index (0-based)"}
+          , returns = "First element of the list"
+          )
   public static class Get extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> args) {
