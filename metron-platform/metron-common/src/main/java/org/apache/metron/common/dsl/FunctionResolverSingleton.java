@@ -62,7 +62,7 @@ public class FunctionResolverSingleton implements FunctionResolver {
   }
 
   /**
-   * This allows the lazy loading of the functions.  We do not want to take a 8+ second hit to analyze the full classpath
+   * This allows the lazy loading of the functions.  We do not want to take a multi-second hit to analyze the full classpath
    * every time a unit test starts up.  That would cause the runtime of things to blow right up.  Instead, we only want
    * to take the hit if a function is actually called from a stellar expression.
    *
