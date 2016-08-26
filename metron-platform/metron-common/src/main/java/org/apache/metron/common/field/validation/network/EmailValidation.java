@@ -26,7 +26,7 @@ import org.apache.metron.common.field.validation.SimpleValidation;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class EmailValidation extends SimpleValidation{
+public class EmailValidation extends SimpleValidation {
 
   @Stellar(name="IS_EMAIL"
           ,description = "Tests if a string is a valid email address"

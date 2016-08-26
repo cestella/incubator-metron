@@ -17,6 +17,7 @@
  */
 package org.apache.metron.common.dsl;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class StellarFunctionInfo {
@@ -49,5 +50,30 @@ public class StellarFunctionInfo {
 
   public StellarFunction getFunction() {
     return function;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    StellarFunctionInfo that = (StellarFunctionInfo) o;
+
+    if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null)
+      return false;
+    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
+    // Probably incorrect - comparing Object[] arrays with Arrays.equals
+    if (!Arrays.equals(getParams(), that.getParams())) return false;
+    return getReturns() != null ? getReturns().equals(that.getReturns()) : that.getReturns() == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getDescription() != null ? getDescription().hashCode() : 0;
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+    result = 31 * result + Arrays.hashCode(getParams());
+    result = 31 * result + (getReturns() != null ? getReturns().hashCode() : 0);
+    return result;
   }
 }

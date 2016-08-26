@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.apache.metron.common.dsl.FunctionResolverImpl.effectiveClassPathUrls;
+import static org.apache.metron.common.dsl.FunctionResolverSingleton.effectiveClassPathUrls;
 
 public class StellarTest {
 

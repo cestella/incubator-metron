@@ -27,7 +27,8 @@ import java.util.function.Function;
 
 public class MapFunctions {
 
-  @Stellar(name="MAP_EXISTS"
+  @Stellar(name="EXISTS"
+          ,namespace="MAP"
           , description="Checks for existence of a key in a map."
           , params = {
                       "key - The key to check for existence"
@@ -51,7 +52,8 @@ public class MapFunctions {
     }
   }
 
-  @Stellar(name="MAP_GET"
+  @Stellar(name="GET"
+          ,namespace="MAP"
           , description="Gets the value associated with a key from a map"
           , params = {
                       "key - The key"

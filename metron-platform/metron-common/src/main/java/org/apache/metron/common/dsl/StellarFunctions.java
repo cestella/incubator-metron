@@ -18,24 +18,13 @@
 
 package org.apache.metron.common.dsl;
 
-import org.apache.metron.common.dsl.functions.*;
-import org.apache.metron.common.field.transformation.IPProtocolTransformation;
-import org.apache.metron.common.field.validation.network.DomainValidation;
-import org.apache.metron.common.field.validation.network.EmailValidation;
-import org.apache.metron.common.field.validation.network.IPValidation;
-import org.apache.metron.common.field.validation.network.URLValidation;
-import org.apache.metron.common.field.validation.primitive.DateValidation;
-import org.apache.metron.common.field.validation.primitive.IntegerValidation;
-
-import java.util.List;
-
 public class StellarFunctions {
 
   public static FunctionResolver FUNCTION_RESOLVER() {
-    return FunctionResolverImpl.getInstance();
+    return FunctionResolverSingleton.getInstance();
   }
 
   public static void initialize(Context context) {
-    FunctionResolverImpl.getInstance().initialize(context);
+    FunctionResolverSingleton.getInstance().initialize(context);
   }
 }
