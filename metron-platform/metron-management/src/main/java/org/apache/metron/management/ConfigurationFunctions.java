@@ -37,6 +37,7 @@ import org.apache.metron.common.dsl.Context;
 import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.Stellar;
 import org.apache.metron.common.dsl.StellarFunction;
+import org.apache.metron.common.utils.ConversionUtils;
 import org.apache.metron.common.utils.JSONUtils;
 
 import java.util.*;
@@ -144,6 +145,7 @@ public class ConfigurationFunctions {
           ,description = "Retrieve a Metron configuration from zookeeper."
           ,params = {"type - One of ENRICHMENT, PARSER, GLOBAL, PROFILER"
                     , "sensor - Sensor to retrieve (required for enrichment and parser, not used for profiler and global)"
+                    , "emptyIfNotPresent - If true, then return an empty, minimally viable config"
                     }
           ,returns = "The String representation of the config in zookeeper"
           )
@@ -152,15 +154,20 @@ public class ConfigurationFunctions {
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
       ConfigurationType type = ConfigurationType.valueOf((String)args.get(0));
+      boolean emptyIfNotPresent = true;
+
       switch(type) {
         case GLOBAL:
         case PROFILER:
           return configMap.get(type);
         case PARSER: {
           String sensor = (String) args.get(1);
+          if(args.size() > 2) {
+            emptyIfNotPresent = ConversionUtils.convert(args.get(2), Boolean.class);
+          }
           Map<String, String> sensorMap = (Map<String, String>) configMap.get(type);
           String ret = sensorMap.get(sensor);
-          if (ret == null) {
+          if (ret == null && emptyIfNotPresent ) {
             SensorParserConfig config = new SensorParserConfig();
             config.setSensorTopic(sensor);
             try {
@@ -174,9 +181,12 @@ public class ConfigurationFunctions {
         }
         case ENRICHMENT: {
           String sensor = (String) args.get(1);
+          if(args.size() > 2) {
+            emptyIfNotPresent = ConversionUtils.convert(args.get(2), Boolean.class);
+          }
           Map<String, String> sensorMap = (Map<String, String>) configMap.get(type);
           String ret = sensorMap.get(sensor);
-          if (ret == null) {
+          if (ret == null && emptyIfNotPresent ) {
             SensorEnrichmentConfig config = new SensorEnrichmentConfig();
             config.setIndex(sensor);
             try {
@@ -222,10 +232,15 @@ public class ConfigurationFunctions {
           )
   public static class ConfigPut implements StellarFunction {
     private CuratorFramework client;
+    private boolean initialized = false;
+
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
       ConfigurationType type = ConfigurationType.valueOf((String)args.get(0));
       String config = (String)args.get(1);
+      if(config == null) {
+        return null;
+      }
       try {
         switch (type) {
           case GLOBAL:
@@ -237,12 +252,18 @@ public class ConfigurationFunctions {
           case ENRICHMENT:
           {
             String sensor = (String) args.get(2);
+            if(sensor == null) {
+              return null;
+            }
             ConfigurationsUtils.writeSensorEnrichmentConfigToZookeeper(sensor, config.getBytes(), client);
           }
           break;
           case PARSER:
             {
             String sensor = (String) args.get(2);
+              if(sensor == null) {
+              return null;
+            }
             ConfigurationsUtils.writeSensorParserConfigToZookeeper(sensor, config.getBytes(), client);
           }
           break;
@@ -250,6 +271,7 @@ public class ConfigurationFunctions {
       }
       catch(Exception ex) {
         LOG.error("Unable to put config: " + ex.getMessage(), ex);
+        throw new ParseException("Unable to put config: " + ex.getMessage(), ex);
       }
       return null;
     }
@@ -261,11 +283,19 @@ public class ConfigurationFunctions {
         throw new IllegalStateException("I expected a zookeeper client to exist and it did not.  Please connect to zookeeper.");
       }
       client = (CuratorFramework) clientOpt.get();
+      try {
+        setupTreeCache(context);
+      } catch (Exception e) {
+        LOG.error("Unable to initialize: " + e.getMessage(), e);
+      }
+      finally {
+        initialized = true;
+      }
     }
 
     @Override
     public boolean isInitialized() {
-      return client != null;
+      return initialized;
     }
   }
 }

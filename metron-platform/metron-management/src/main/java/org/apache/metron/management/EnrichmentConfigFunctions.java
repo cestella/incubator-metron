@@ -82,8 +82,9 @@ public class EnrichmentConfigFunctions {
     public Object apply(List<Object> args, Context context) throws ParseException {
       String config = (String) args.get(0);
       SensorEnrichmentConfig configObj;
+      String[] headers = new String[] { "Group", "Field", "Transformation"};
       if(config == null || config.isEmpty()) {
-        configObj = new SensorEnrichmentConfig();
+        return FlipTable.of(headers, new String[0][3]);
       }
       else {
         configObj = (SensorEnrichmentConfig) ENRICHMENT.deserialize(config);
@@ -93,7 +94,6 @@ public class EnrichmentConfigFunctions {
 
       Map<String, Object> stellarHandler = getStellarHandler(enrichmentConfig);
       Map<String, Object> transforms = (Map<String, Object>) stellarHandler.get("config");
-      String[] headers = new String[] { "Group", "Field", "Transformation"};
       List<String[]> objs = new ArrayList<>();
       for(Map.Entry<String, Object> kv : transforms.entrySet()) {
         if(kv.getValue() instanceof Map) {
@@ -143,7 +143,7 @@ public class EnrichmentConfigFunctions {
       String config = (String) args.get(i++);
       SensorEnrichmentConfig configObj;
       if(config == null || config.isEmpty()) {
-        configObj = new SensorEnrichmentConfig();
+        throw new IllegalStateException("Invalid config: " + config);
       }
       else {
         configObj = (SensorEnrichmentConfig) ENRICHMENT.deserialize(config);
@@ -166,6 +166,9 @@ public class EnrichmentConfigFunctions {
       }
       for(Map.Entry<String, String> kv : transformsToAdd.entrySet()) {
         groupMap.put(kv.getKey(), kv.getValue());
+      }
+      if(group != null && groupMap.isEmpty()) {
+        baseTransforms.remove(group);
       }
       try {
         return JSONUtils.INSTANCE.toJSON(configObj, true);
@@ -205,7 +208,7 @@ public class EnrichmentConfigFunctions {
       String config = (String) args.get(i++);
       SensorEnrichmentConfig configObj;
       if(config == null || config.isEmpty()) {
-        configObj = new SensorEnrichmentConfig();
+        throw new IllegalStateException("Invalid config: " + config);
       }
       else {
         configObj = (SensorEnrichmentConfig) ENRICHMENT.deserialize(config);
@@ -254,7 +257,7 @@ public class EnrichmentConfigFunctions {
   @Stellar(
            namespace = "ENRICHMENT"
           ,name = "SET_BATCH_SIZE"
-          ,description = "Add stellar field transformation."
+          ,description = "Set batch size"
           ,params = {"sensorConfig - Sensor config to add transformation to."
                     ,"size - batch size (integer)"
                     }
@@ -268,7 +271,7 @@ public class EnrichmentConfigFunctions {
       String config = (String) args.get(i++);
       SensorEnrichmentConfig configObj;
       if(config == null || config.isEmpty()) {
-        configObj = new SensorEnrichmentConfig();
+        throw new IllegalStateException("Invalid config: " + config);
       }
       else {
         configObj = (SensorEnrichmentConfig) ENRICHMENT.deserialize(config);
@@ -278,6 +281,49 @@ public class EnrichmentConfigFunctions {
         batchSize = ConversionUtils.convert(args.get(i++), Integer.class);
       }
       configObj.setBatchSize(batchSize);
+      try {
+        return JSONUtils.INSTANCE.toJSON(configObj, true);
+      } catch (JsonProcessingException e) {
+        LOG.error("Unable to convert object to JSON: " + configObj, e);
+        return config;
+      }
+    }
+
+    @Override
+    public void initialize(Context context) {
+
+    }
+
+    @Override
+    public boolean isInitialized() {
+      return true;
+    }
+  }
+
+  @Stellar(
+           namespace = "ENRICHMENT"
+          ,name = "SET_INDEX"
+          ,description = "Set the index for the enrichment"
+          ,params = {"sensorConfig - Sensor config to add transformation to."
+                    ,"sensor - sensor name"
+                    }
+          ,returns = "The String representation of the config in zookeeper"
+          )
+  public static class SetIndex implements StellarFunction{
+
+    @Override
+    public Object apply(List<Object> args, Context context) throws ParseException {
+      int i = 0;
+      String config = (String) args.get(i++);
+      SensorEnrichmentConfig configObj;
+      if(config == null || config.isEmpty()) {
+        configObj = new SensorEnrichmentConfig();
+      }
+      else {
+        configObj = (SensorEnrichmentConfig) ENRICHMENT.deserialize(config);
+      }
+      String sensorName = ConversionUtils.convert(args.get(i++), String.class);
+      configObj.setIndex(sensorName);
       try {
         return JSONUtils.INSTANCE.toJSON(configObj, true);
       } catch (JsonProcessingException e) {

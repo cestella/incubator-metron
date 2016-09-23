@@ -136,10 +136,10 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
     // create the executor
     if(commandLine.hasOption("z")) {
       String zookeeperUrl = commandLine.getOptionValue("z");
-      executor = new StellarExecutor(zookeeperUrl, console);
+      executor = new StellarExecutor(zookeeperUrl);
 
     } else {
-      executor = new StellarExecutor(console);
+      executor = new StellarExecutor();
     }
 
     if(commandLine.hasOption("v")) {

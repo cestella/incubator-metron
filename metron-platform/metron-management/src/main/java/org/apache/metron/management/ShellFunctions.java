@@ -23,6 +23,7 @@ import org.apache.metron.common.dsl.*;
 import org.apache.metron.common.stellar.shell.StellarExecutor;
 import org.apache.metron.common.utils.ConversionUtils;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,13 @@ public class ShellFunctions {
 
     @Override
     public Object apply(List<Object> args) {
+      if(args.size() < 1) {
+        return null;
+      }
       Map<Object, Object> map = (Map<Object, Object>) args.get(0);
+      if(map == null) {
+        map = new HashMap<>();
+      }
       String[] headers = {"KEY", "VALUE"};
       String[][] data = new String[map.size()][2];
       int i = 0;
@@ -118,6 +125,9 @@ public class ShellFunctions {
       Map<String, StellarExecutor.VariableResult> variables = (Map<String, StellarExecutor.VariableResult>) context.getCapability(StellarExecutor.SHELL_VARIABLES).get();
       LinkedHashMap<String, String> ret = new LinkedHashMap<>();
       for(Object arg : args) {
+        if(arg == null) {
+          continue;
+        }
         String variable = (String)arg;
         StellarExecutor.VariableResult result = variables.get(variable);
         if(result != null && result.getExpression() != null) {
@@ -151,7 +161,13 @@ public class ShellFunctions {
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
       Map<String, StellarExecutor.VariableResult> variables = (Map<String, StellarExecutor.VariableResult>) context.getCapability(StellarExecutor.SHELL_VARIABLES).get();
+      if(args.size() == 0) {
+        return null;
+      }
       String variable = (String) args.get(0);
+      if(variable == null) {
+        return null;
+      }
       StellarExecutor.VariableResult result = variables.get(variable);
       if(result != null && result.getExpression() != null) {
         return result.getExpression();

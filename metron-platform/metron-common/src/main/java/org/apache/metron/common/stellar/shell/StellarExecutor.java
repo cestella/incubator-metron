@@ -54,7 +54,7 @@ public class StellarExecutor {
     private String expression;
     private Object result;
 
-    VariableResult(String expression, Object result) {
+    public VariableResult(String expression, Object result) {
       this.expression = expression;
       this.result = result;
     }
@@ -101,7 +101,6 @@ public class StellarExecutor {
    */
   private Context context;
 
-  private Console console;
 
   public enum OperationType {
     DOC,MAGIC,NORMAL;
@@ -136,15 +135,14 @@ public class StellarExecutor {
 
   }
 
-  public StellarExecutor(Console console) throws Exception {
-    this(null, console);
+  public StellarExecutor() throws Exception {
+    this(null);
   }
 
-  public StellarExecutor(String zookeeperUrl, Console console) throws Exception {
+  public StellarExecutor(String zookeeperUrl) throws Exception {
     this.variables = new HashMap<>();
     this.functionResolver = new StellarFunctions().FUNCTION_RESOLVER();
     this.client = createClient(zookeeperUrl);
-    this.console = console;
     this.context = createContext();
     this.autocompleteIndex = initializeIndex();
     //Asynchronously update the index with function names found from a classpath scan.

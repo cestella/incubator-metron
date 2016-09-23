@@ -39,6 +39,21 @@ import static org.apache.metron.common.configuration.ConfigurationType.PARSER;
 public class ParserConfigFunctions {
   private static final Logger LOG = Logger.getLogger(ConfigurationFunctions.class);
 
+  private static void pruneEmptyStellarTransformers(SensorParserConfig config) {
+    List<FieldTransformer> toRemove = new ArrayList<>();
+    List<FieldTransformer> fieldTransformations = config.getFieldTransformations();
+    for(FieldTransformer transformer : fieldTransformations) {
+      if(transformer.getFieldTransformation().getClass().getName()
+              .equals(FieldTransformations.STELLAR.getMappingClass().getName())) {
+        if(transformer == null || transformer.getConfig().isEmpty()) {
+          toRemove.add(transformer);
+        }
+      }
+    }
+    for(FieldTransformer t : toRemove) {
+      fieldTransformations.remove(t);
+    }
+  }
   private static FieldTransformer getStellarTransformer(SensorParserConfig config) {
     List<FieldTransformer> fieldTransformations = config.getFieldTransformations();
     FieldTransformer stellarTransformer = null;
@@ -65,11 +80,14 @@ public class ParserConfigFunctions {
                     }
           ,returns = "The String representation of the transformations"
           )
-  public static class GetStellarTransformation implements StellarFunction {
+  public static class PrintStellarTransformation implements StellarFunction {
 
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
       String config = (String) args.get(0);
+      if(config == null) {
+        return null;
+      }
       SensorParserConfig configObj = (SensorParserConfig) PARSER.deserialize(config);
       FieldTransformer stellarTransformer = getStellarTransformer(configObj);
       String[] headers = new String[] { "Field", "Transformation"};
@@ -106,9 +124,15 @@ public class ParserConfigFunctions {
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
       String config = (String) args.get(0);
+      if(config == null) {
+        return null;
+      }
       SensorParserConfig configObj = (SensorParserConfig) PARSER.deserialize(config);
       FieldTransformer stellarTransformer = getStellarTransformer(configObj);
       List<String> removals = (List<String>)args.get(1);
+      if(removals == null || removals.isEmpty()) {
+        return config;
+      }
       for(String removal : removals) {
         stellarTransformer.getConfig().remove(removal);
       }
@@ -117,7 +141,7 @@ public class ParserConfigFunctions {
         output.add(key);
       }
       stellarTransformer.setOutput(output);
-
+      pruneEmptyStellarTransformers(configObj);
       try {
         return JSONUtils.INSTANCE.toJSON(configObj, true);
       } catch (JsonProcessingException e) {
@@ -151,9 +175,15 @@ public class ParserConfigFunctions {
     @Override
     public Object apply(List<Object> args, Context context) throws ParseException {
       String config = (String) args.get(0);
+      if(config == null) {
+        return null;
+      }
       SensorParserConfig configObj = (SensorParserConfig) PARSER.deserialize(config);
       FieldTransformer stellarTransformer = getStellarTransformer(configObj);
       Map<String, String> additionalTransforms = (Map<String, String>) args.get(1);
+      if(additionalTransforms == null || additionalTransforms.isEmpty()) {
+        return config;
+      }
       for(Map.Entry<String, String> kv : additionalTransforms.entrySet()) {
         stellarTransformer.getConfig().put(kv.getKey(), kv.getValue());
 
