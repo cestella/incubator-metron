@@ -124,22 +124,6 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
       System.exit(0);
     }
 
-    // create the executor
-    if(commandLine.hasOption("z")) {
-      String zookeeperUrl = commandLine.getOptionValue("z");
-      executor = new StellarExecutor(zookeeperUrl);
-
-    } else {
-      executor = new StellarExecutor();
-    }
-
-    if(commandLine.hasOption("v")) {
-      Map<String, Object> variables = JSONUtils.INSTANCE.load(new File(commandLine.getOptionValue("v")), new TypeReference<Map<String, Object>>() {
-      });
-      for(Map.Entry<String, Object> kv : variables.entrySet()) {
-        executor.assign(kv.getKey(), kv.getValue());
-      }
-    }
     SettingsBuilder settings = new SettingsBuilder().enableAlias(true)
                                                     .enableMan(true)
                                                     .parseOperators(false)
@@ -149,6 +133,23 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
     }
 
     console = new Console(settings.create());
+    // create the executor
+    if(commandLine.hasOption("z")) {
+      String zookeeperUrl = commandLine.getOptionValue("z");
+      executor = new StellarExecutor(zookeeperUrl, console);
+
+    } else {
+      executor = new StellarExecutor(console);
+    }
+
+    if(commandLine.hasOption("v")) {
+      Map<String, Object> variables = JSONUtils.INSTANCE.load(new File(commandLine.getOptionValue("v")), new TypeReference<Map<String, Object>>() {
+      });
+      for(Map.Entry<String, Object> kv : variables.entrySet()) {
+        executor.assign(kv.getKey(), null, kv.getValue());
+      }
+    }
+
     if(!commandLine.hasOption("na")) {
       console.setPrompt(new Prompt(EXPRESSION_PROMPT));
     }
@@ -194,11 +195,11 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
       stellarExpression = stellarExpression.trim();
     }
     Object result = executeStellar(stellarExpression);
-    if(result != null) {
+    if(result != null && variable == null) {
       writeLine(result.toString());
     }
     if(variable != null) {
-      executor.assign(variable, result);
+      executor.assign(variable, stellarExpression, result);
     }
   }
 
@@ -221,6 +222,7 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
     } else if(MAGIC_VARS.equals(expression)) {
 
       // list all variables
+
       executor.getVariables()
               .forEach((k,v) -> writeLine(String.format("%s = %s", k, v)));
 
