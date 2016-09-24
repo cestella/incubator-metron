@@ -162,27 +162,4 @@ public class ShellFunctionsTest {
     Assert.assertNull(out );
   }
 
-  @Test
-  public void dummy() {
-
-    List<StellarFunctionInfo> functions = Lists.newArrayList(FunctionResolverSingleton.getInstance().getFunctionInfo());
-    Collections.sort(functions, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-    for(StellarFunctionInfo info: functions) {
-      if(info.getName().startsWith("SHELL_")
-      || info.getName().startsWith("PARSER_")
-              || info.getName().startsWith("ENRICHMENT_STELLAR")
-              || info.getName().startsWith("ENRICHMENT_SET")
-              || info.getName().startsWith("THREAT_TRIAGE")
-              || info.getName().startsWith("CONFIG_")
-              ) {
-        System.out.println("* `" + info.getName() + "`");
-        System.out.println("  * Description: " + info.getDescription());
-        System.out.println("  * Input:");
-        for (String param : info.getParams()) {
-          System.out.println("    * " + param);
-        }
-        System.out.println("  * Returns: " + info.getReturns());
-      }
-    }
-  }
 }
