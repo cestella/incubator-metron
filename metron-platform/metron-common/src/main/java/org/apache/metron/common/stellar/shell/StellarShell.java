@@ -123,9 +123,10 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
       formatter.printHelp("stellar", options);
       System.exit(0);
     }
-
+    boolean useAnsi = !commandLine.hasOption("na");
     SettingsBuilder settings = new SettingsBuilder().enableAlias(true)
                                                     .enableMan(true)
+                                                    .ansi(useAnsi)
                                                     .parseOperators(false)
                                                     ;
     if(commandLine.hasOption("irc")) {
@@ -149,13 +150,7 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
         executor.assign(kv.getKey(), null, kv.getValue());
       }
     }
-
-    if(!commandLine.hasOption("na")) {
-      console.setPrompt(new Prompt(EXPRESSION_PROMPT));
-    }
-    else {
-      console.setPrompt(new Prompt("[Stellar]$"));
-    }
+    console.setPrompt(new Prompt(EXPRESSION_PROMPT));
     console.addCompletion(this);
     console.setConsoleCallback(this);
   }
@@ -168,7 +163,7 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
     // welcome message and print globals
     writeLine(WELCOME);
     executor.getContext()
-            .getCapability(Context.Capabilities.GLOBAL_CONFIG)
+            .getCapability(Context.Capabilities.GLOBAL_CONFIG, false)
             .ifPresent(conf -> writeLine(conf.toString()));
 
     console.start();
@@ -312,7 +307,7 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
   @Override
   public int execute(ConsoleOperation output) throws InterruptedException {
     String expression = output.getBuffer().trim();
-    if(StringUtils.isNotBlank(expression)) {
+    if(StringUtils.isNotBlank(expression) ) {
       if(isMagic(expression)) {
         handleMagic( expression);
 
@@ -325,6 +320,9 @@ public class StellarShell extends AeshConsoleCallback implements Completion {
         } catch (Throwable e) {
           e.printStackTrace();
         }
+      }
+      else if(expression.charAt(0) == '#') {
+        return 0;
       }
       else {
         handleStellar(expression);

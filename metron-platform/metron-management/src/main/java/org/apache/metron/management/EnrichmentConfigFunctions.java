@@ -192,7 +192,7 @@ public class EnrichmentConfigFunctions {
   @Stellar(
            namespace = "ENRICHMENT_STELLAR_TRANSFORM"
           ,name = "REMOVE"
-          ,description = "Add stellar field transformation."
+          ,description = "Remove one or more stellar field transformations."
           ,params = {"sensorConfig - Sensor config to add transformation to."
                     ,"type - ENRICHMENT or THREAT_INTEL"
                     ,"stellarTransforms - A list of removals"
@@ -234,6 +234,9 @@ public class EnrichmentConfigFunctions {
       }
       if(group != null && groupMap.isEmpty()) {
         baseTransforms.remove(group);
+      }
+      if(baseTransforms.isEmpty()) {
+        enrichmentConfig.getFieldMap().remove("stellar");
       }
       try {
         return JSONUtils.INSTANCE.toJSON(configObj, true);

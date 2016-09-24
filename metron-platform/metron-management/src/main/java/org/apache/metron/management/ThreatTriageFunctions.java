@@ -105,7 +105,7 @@ public class ThreatTriageFunctions {
   @Stellar(
            namespace = "THREAT_TRIAGE"
           ,name = "ADD"
-          ,description = "Retrieve stellar enrichment transformations."
+          ,description = "Add a threat triage rule."
           ,params = {"sensorConfig - Sensor config to add transformation to."
                     ,"stellarTransforms - A Map associating stellar rules to scores"
                     }
@@ -169,7 +169,7 @@ public class ThreatTriageFunctions {
   @Stellar(
            namespace = "THREAT_TRIAGE"
           ,name = "REMOVE"
-          ,description = "Remove stellar enrichment transformations."
+          ,description = "Remove stellar threat triage rule(s)."
           ,params = {"sensorConfig - Sensor config to add transformation to."
                     ,"stellarTransforms - A list of stellar rules to remove"
                     }
@@ -229,7 +229,7 @@ public class ThreatTriageFunctions {
   @Stellar(
            namespace = "THREAT_TRIAGE"
           ,name = "SET_AGGREGATOR"
-          ,description = "Remove stellar enrichment transformations."
+          ,description = "Set the threat triage aggregator."
           ,params = {"sensorConfig - Sensor config to add transformation to."
                     ,"aggregator - Aggregator to use.  One of MIN, MAX, MEAN, SUM, POSITIVE_MEAN"
                     ,"aggregatorConfig - Optional config for aggregator"

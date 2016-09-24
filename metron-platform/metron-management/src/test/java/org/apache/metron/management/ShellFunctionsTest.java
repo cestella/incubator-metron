@@ -19,14 +19,19 @@ package org.apache.metron.management;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.adrianwalker.multilinestring.Multiline;
 import org.apache.metron.common.dsl.Context;
+import org.apache.metron.common.dsl.FunctionResolverSingleton;
+import org.apache.metron.common.dsl.StellarFunctionInfo;
 import org.apache.metron.common.stellar.StellarTest;
 import org.apache.metron.common.stellar.shell.StellarExecutor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShellFunctionsTest {
@@ -155,5 +160,29 @@ public class ShellFunctionsTest {
   public void testGetExpressionEmpty() {
     Object out = StellarTest.run("SHELL_GET_EXPRESSION()", new HashMap<>(), context);
     Assert.assertNull(out );
+  }
+
+  @Test
+  public void dummy() {
+
+    List<StellarFunctionInfo> functions = Lists.newArrayList(FunctionResolverSingleton.getInstance().getFunctionInfo());
+    Collections.sort(functions, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+    for(StellarFunctionInfo info: functions) {
+      if(info.getName().startsWith("SHELL_")
+      || info.getName().startsWith("PARSER_")
+              || info.getName().startsWith("ENRICHMENT_STELLAR")
+              || info.getName().startsWith("ENRICHMENT_SET")
+              || info.getName().startsWith("THREAT_TRIAGE")
+              || info.getName().startsWith("CONFIG_")
+              ) {
+        System.out.println("* `" + info.getName() + "`");
+        System.out.println("  * Description: " + info.getDescription());
+        System.out.println("  * Input:");
+        for (String param : info.getParams()) {
+          System.out.println("    * " + param);
+        }
+        System.out.println("  * Returns: " + info.getReturns());
+      }
+    }
   }
 }

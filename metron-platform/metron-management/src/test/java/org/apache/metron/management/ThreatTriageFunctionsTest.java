@@ -65,6 +65,19 @@ public class ThreatTriageFunctionsTest {
   }
 
   @Test
+  public void testSetAggregation() {
+
+    String newConfig = (String) run(
+            "THREAT_TRIAGE_SET_AGGREGATOR(config, 'MIN' )"
+            , toMap("config", configStr
+            )
+    );
+
+    SensorEnrichmentConfig sensorConfig = (SensorEnrichmentConfig) ENRICHMENT.deserialize(newConfig);
+    Assert.assertEquals("MIN", sensorConfig.getThreatIntel().getTriageConfig().getAggregator().toString());
+  }
+
+  @Test
   public void testAddEmpty() {
 
     String newConfig = (String) run(
@@ -245,5 +258,6 @@ Aggregation: MAX*/
     );
     Assert.assertEquals(out, testPrintEmptyExpected);
   }
+
 
 }
