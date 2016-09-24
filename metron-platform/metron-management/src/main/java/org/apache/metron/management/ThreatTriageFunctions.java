@@ -43,7 +43,7 @@ public class ThreatTriageFunctions {
   private static final Logger LOG = Logger.getLogger(ConfigurationFunctions.class);
 
   @Stellar(
-           namespace = "ENRICHMENT_THREAT_TRIAGE"
+           namespace = "THREAT_TRIAGE"
           ,name = "PRINT"
           ,description = "Retrieve stellar enrichment transformations."
           ,params = {"sensorConfig - Sensor config to add transformation to."
@@ -103,7 +103,7 @@ public class ThreatTriageFunctions {
   }
 
   @Stellar(
-           namespace = "ENRICHMENT_THREAT_TRIAGE"
+           namespace = "THREAT_TRIAGE"
           ,name = "ADD"
           ,description = "Retrieve stellar enrichment transformations."
           ,params = {"sensorConfig - Sensor config to add transformation to."
@@ -140,6 +140,9 @@ public class ThreatTriageFunctions {
       }
       Map<String, Object> newRules = (Map<String, Object>) args.get(1);
       for(Map.Entry<String, Object> kv : newRules.entrySet()) {
+        if(kv.getKey() == null || kv.getKey().equals("null")) {
+          continue;
+        }
         Double ret = ConversionUtils.convert(kv.getValue(), Double.class);
         triageConfig.getRiskLevelRules().put(kv.getKey(), ret);
       }
@@ -164,7 +167,7 @@ public class ThreatTriageFunctions {
   }
 
   @Stellar(
-           namespace = "ENRICHMENT_THREAT_TRIAGE"
+           namespace = "THREAT_TRIAGE"
           ,name = "REMOVE"
           ,description = "Remove stellar enrichment transformations."
           ,params = {"sensorConfig - Sensor config to add transformation to."
@@ -224,7 +227,7 @@ public class ThreatTriageFunctions {
   }
 
   @Stellar(
-           namespace = "ENRICHMENT_THREAT_TRIAGE"
+           namespace = "THREAT_TRIAGE"
           ,name = "SET_AGGREGATOR"
           ,description = "Remove stellar enrichment transformations."
           ,params = {"sensorConfig - Sensor config to add transformation to."

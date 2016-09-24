@@ -256,7 +256,7 @@ public class EnrichmentConfigFunctions {
 
   @Stellar(
            namespace = "ENRICHMENT"
-          ,name = "SET_BATCH_SIZE"
+          ,name = "SET_BATCH"
           ,description = "Set batch size"
           ,params = {"sensorConfig - Sensor config to add transformation to."
                     ,"size - batch size (integer)"
@@ -317,12 +317,15 @@ public class EnrichmentConfigFunctions {
       String config = (String) args.get(i++);
       SensorEnrichmentConfig configObj;
       if(config == null || config.isEmpty()) {
-        configObj = new SensorEnrichmentConfig();
+        throw new IllegalStateException("Invalid config: " + config);
       }
       else {
         configObj = (SensorEnrichmentConfig) ENRICHMENT.deserialize(config);
       }
       String sensorName = ConversionUtils.convert(args.get(i++), String.class);
+      if(sensorName == null) {
+        throw new IllegalStateException("Invalid sensor name: " + config);
+      }
       configObj.setIndex(sensorName);
       try {
         return JSONUtils.INSTANCE.toJSON(configObj, true);

@@ -1,3 +1,20 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.metron.management;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
@@ -5,6 +22,7 @@ import org.adrianwalker.multilinestring.Multiline;
 import org.apache.metron.common.configuration.enrichment.EnrichmentConfig;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.dsl.Context;
+import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.StellarFunctions;
 import org.apache.metron.common.stellar.StellarProcessor;
 import org.apache.metron.common.stellar.StellarTest;
@@ -21,8 +39,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.metron.TestConstants.PARSER_CONFIGS_PATH;
-import static org.apache.metron.management.utils.FileUtils.slurp;
 import static org.apache.metron.common.configuration.ConfigurationType.ENRICHMENT;
 
 @RunWith(Parameterized.class)
@@ -74,7 +90,7 @@ public class EnrichmentConfigFunctionsTest {
             .build();
   }
 
-  private static Map<String, Object> toMap(String... k) {
+  static Map<String, Object> toMap(String... k) {
     Map<String, Object> ret = new HashMap<>();
     for(int i = 0;i < k.length;i+=2) {
       ret.put(k[i], k[i+1]);
@@ -326,8 +342,44 @@ public class EnrichmentConfigFunctionsTest {
   public void testPrintNull() {
 
     String out = (String) run("ENRICHMENT_STELLAR_TRANSFORM_PRINT(config, type)"
-            , new HashMap<>()
+            , toMap("config", configStr ,"type", enrichmentType)
     );
     Assert.assertEquals(testPrintEmptyExpected, out);
+  }
+
+  @Test
+  public void testSetBatch() {
+    String out = (String) run("ENRICHMENT_SET_BATCH(config, 10)"
+                             , toMap("config", configStr)
+    );
+    SensorEnrichmentConfig config = (SensorEnrichmentConfig)ENRICHMENT.deserialize(out);
+    Assert.assertEquals(config.getBatchSize(), 10);
+  }
+
+  @Test(expected=ParseException.class)
+  public void testSetBatchBad() {
+    String out = (String) run("ENRICHMENT_SET_BATCH(config, 10)"
+                             , new HashMap<>()
+    );
+    SensorEnrichmentConfig config = (SensorEnrichmentConfig)ENRICHMENT.deserialize(out);
+    Assert.assertEquals(config.getBatchSize(), 10);
+  }
+
+  @Test
+  public void testSetIndex() {
+    String out = (String) run("ENRICHMENT_SET_INDEX(config, 'foo')"
+            , toMap("config", configStr)
+    );
+    SensorEnrichmentConfig config = (SensorEnrichmentConfig)ENRICHMENT.deserialize(out);
+    Assert.assertEquals("foo", config.getIndex());
+  }
+
+  @Test(expected= ParseException.class)
+  public void testSetIndexBad() {
+    String out = (String) run("ENRICHMENT_SET_INDEX(config, NULL)"
+            , new HashMap<>()
+    );
+    SensorEnrichmentConfig config = (SensorEnrichmentConfig)ENRICHMENT.deserialize(out);
+    Assert.assertNotNull(config.getIndex());
   }
 }
