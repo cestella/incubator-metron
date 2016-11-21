@@ -28,7 +28,20 @@ public class PreprocessingIntegrationTest implements Serializable {
 
   /**
    {
-    "" :
+    "state" : {
+          "size" : {
+            "stateProjection" : "STATS_ADD(size)",
+            "stateUpdate" : "STATS_MERGE(left, right)"
+                   }
+              },
+    "words" : [
+            "ip_src_addr"
+           ,"ip_dst_addr"
+           ,"STATS_BIN(size_state, size)"
+              ],
+    "vocabSize" : 100,
+    "k" : 0.1,
+    "maxIter" : 100
    }
    */
   @Multiline
