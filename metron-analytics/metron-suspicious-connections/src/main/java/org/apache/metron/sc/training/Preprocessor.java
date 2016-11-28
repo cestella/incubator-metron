@@ -1,3 +1,23 @@
+/*
+ *
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package org.apache.metron.sc.training;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -16,21 +36,31 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.ml.Pipeline;
 import org.apache.spark.ml.clustering.LDA;
 import org.apache.spark.ml.feature.CountVectorizer;
 import org.apache.spark.ml.feature.CountVectorizerModel;
 import org.apache.spark.ml.linalg.*;
+import org.apache.spark.ml.linalg.Vector;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.*;
 import scala.Tuple2;
 
 import java.util.*;
 
 public class Preprocessor {
+  JavaSparkContext sc;
+  SQLContext sqlContext;
+  public Preprocessor(JavaSparkContext sc) {
+    this.sc = sc;
+    sqlContext = new SQLContext(sc);
+  }
+
   public static class KeyedState {
     private String key;
     private Object state;
@@ -101,22 +131,34 @@ public class Preprocessor {
   }
   public static class Tokenizer implements Function<Map<String,Object>, Row> {
     private WordTransformer transformer;
-    public Tokenizer(Map<String, Object> state, List<String> words) {
-      HashMap<String, Object> adjustedState= new HashMap<>();
-      for(Map.Entry<String, Object> kv : state.entrySet()) {
-        state.put(kv.getKey() + "_state", kv.getValue());
-      }
-      transformer = new WordTransformer(adjustedState, words);
+    private Broadcast<Map<String, Object>> state;
+    public Tokenizer(Broadcast<Map<String, Object>> state, List<String> words) {
+      this.state = state;
+      transformer = new WordTransformer( words);
     }
 
     @Override
     public Row call(Map<String, Object> message) throws Exception {
-      List<String> words = transformer.transform(message, Context.EMPTY_CONTEXT());
-      return RowFactory.create(words);
+      return tokenize(state.getValue(), message, transformer);
     }
+
+    public static Row tokenize(Map<String, Object> state, Map<String, Object> message, WordTransformer transformer) {
+      HashMap<String, Object> adjustedState= new HashMap<>();
+      for(Map.Entry<String, Object> kv : state.entrySet()) {
+        adjustedState.put(kv.getKey() + "_state", kv.getValue());
+      }
+      List<String> words = transformer.transform(adjustedState, message, Context.EMPTY_CONTEXT());
+      String[] row = new String[words.size()];
+      for(int i = 0;i < words.size();++i) {
+        row[i] = words.get(i);
+      }
+      Row ret = new GenericRowWithSchema(new Object[] { row }, SCHEMA);
+      return ret;
+    }
+
   }
 
-  public static Map<String, Object> gatherState(Map<String, State> config, JavaRDD<Map<String, Object>> messages) {
+  public Map<String, Object> gatherState(Map<String, State> config, JavaRDD<Map<String, Object>> messages) {
     Map<String, KeyedState> stateCollection =
     messages.flatMapToPair(new Projection(config))
             .reduceByKey(new Reduction(config))
@@ -128,20 +170,20 @@ public class Preprocessor {
     return ret;
   }
 
-  public static JavaRDD<Map<String, Object>> parseMessages(JavaRDD<String> messages) {
+  public JavaRDD<Map<String, Object>> parseMessages(JavaRDD<String> messages) {
     return
     messages.map( s -> JSONUtils.INSTANCE.load(s, new TypeReference<Map<String, Object>>() { }) );
   }
-
-  public static Dataset<Row> tokenize(final Map<String, Object> state, Config config, JavaRDD<Map<String, Object>> messages, SQLContext sqlContext) {
-    StructType schema = new StructType(new StructField [] {
+  public static StructType SCHEMA = new StructType(new StructField [] {
             new StructField("tokens", new ArrayType(DataTypes.StringType, true), false, Metadata.empty())
     });
-    JavaRDD<Row> rows = messages.map(new Tokenizer(state, config.getWords()));
-    return sqlContext.createDataFrame(rows, schema);
+  public Dataset<Row> tokenize(final Map<String, Object> state, Config config, JavaRDD<Map<String, Object>> messages) {
+    Broadcast<Map<String, Object> > stateBc = sc.broadcast(state);
+    JavaRDD<Row> rows = messages.map(new Tokenizer(stateBc, config.getWords()));
+    return new SQLContext(sc).createDataFrame(rows, SCHEMA);
   }
 
-  public static CountVectorizerModel createVectorizer(Config config, Dataset<Row> df) {
+  public CountVectorizerModel createVectorizer(Config config, Dataset<Row> df) {
     CountVectorizer countVectorizer = new CountVectorizer()
             .setVocabSize(config.getVocabSize())
             .setInputCol("tokens")
@@ -150,5 +192,16 @@ public class Preprocessor {
     return vectorizerModel;
   }
 
+  public Vector vectorize( Config config
+                         , Map<String, Object> state
+                         , Map<String, Object> message
+                         , CountVectorizerModel model
+                         )
+  {
+    Row r = Tokenizer.tokenize(state, message, new WordTransformer(config.getWords()));
+    Dataset df = model.transform(sqlContext.createDataFrame(Arrays.asList(r), SCHEMA));
+    GenericRowWithSchema ret = (GenericRowWithSchema) df.collectAsList().get(0);
+    return (Vector) ret.get(1);
+  }
 
 }

@@ -28,6 +28,7 @@ import com.tdunning.math.stats.AVLTreeDigest;
 import com.tdunning.math.stats.TDigest;
 import org.apache.commons.math3.util.FastMath;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 /**
@@ -36,7 +37,7 @@ import java.nio.ByteBuffer;
  * to return the statistics results.  This is intended to provide a
  * mergeable implementation for a statistics provider.
  */
-public class OnlineStatisticsProvider implements StatisticsProvider, KryoSerializable {
+public class OnlineStatisticsProvider implements StatisticsProvider, KryoSerializable{
   /**
    * A sensible default for compression to use in the T-Digest.
    * As per https://github.com/tdunning/t-digest/blob/master/src/main/java/com/tdunning/math/stats/TDigest.java#L86

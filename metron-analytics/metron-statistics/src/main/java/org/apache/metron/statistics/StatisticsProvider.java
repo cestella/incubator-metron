@@ -20,10 +20,12 @@
 package org.apache.metron.statistics;
 
 
+import java.io.Serializable;
+
 /**
  * Provides statistical functions.
  */
-public interface StatisticsProvider {
+public interface StatisticsProvider extends Serializable {
   void addValue(double value);
   long getCount();
   double getMin();
