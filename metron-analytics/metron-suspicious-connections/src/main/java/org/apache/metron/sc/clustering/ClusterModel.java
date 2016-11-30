@@ -20,24 +20,83 @@
 
 package org.apache.metron.sc.clustering;
 
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.metron.common.dsl.Context;
+import org.apache.metron.sc.preprocessing.WordConfig;
+import org.apache.metron.sc.word.WordTransformer;
 import org.apache.spark.ml.clustering.LDAModel;
 import org.apache.spark.ml.feature.CountVectorizerModel;
+import org.apache.spark.ml.linalg.DenseVector;
+import org.apache.spark.ml.linalg.Vector;
+import scala.collection.Iterator;
 
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ClusterModel {
-  private CountVectorizerModel vectorizerModel;
-  private LDAModel ldaModel;
-  public ClusterModel(CountVectorizerModel vectorizerModel, LDAModel ldaModel) {
-    this.vectorizerModel = vectorizerModel;
-    this.ldaModel = ldaModel;
+public class ClusterModel implements Serializable {
+  private List<Vector> ldaModel;
+  private Map<String, Integer> word2Index;
+  private Vector defaultTopicDistribution;
+  private WordConfig wordConfig;
+
+  public ClusterModel(WordConfig wordConfig, List<String> vocabulary, LDAModel ldaModel) {
+    this.wordConfig = wordConfig;
+    this.ldaModel = new ArrayList<>();
+    for(Iterator<Vector> it = ldaModel.topicsMatrix().rowIter();it.hasNext();) {
+      Vector v  = it.next();
+      this.ldaModel.add(v);
+    }
+    word2Index = new HashMap<>();
+    int index = 0;
+    for(String word : vocabulary) {
+      word2Index.put(word, index++);
+    }
+    double[] dist = new double[ldaModel.getK()];
+    for(int i = 0;i < ldaModel.getK();++i) {
+      dist[i] = 1.0/ldaModel.getK();
+    }
+    defaultTopicDistribution = new DenseVector(dist);
   }
 
-  public static ClusterModel load(File path) {
-    return null;
+  public Vector getTopicProbabilities(String word) {
+    Integer index = word2Index.get(word);
+    if(index == null) {
+      return defaultTopicDistribution;
+    }
+    else {
+      return ldaModel.get(index);
+    }
   }
 
-  public void save(File path) {
+  public double score(String specialWord, String ip) {
+    Vector wordProbabilities = getTopicProbabilities(specialWord);
+    Vector ipProbabilities = getTopicProbabilities(ip);
+    //inner product between the two vectors
+    double ret = 0.0;
+    for(int i = 0;i < wordProbabilities.size();++i) {
+      ret += wordProbabilities.apply(i) * ipProbabilities.apply(i);
+    }
+    return ret;
+  }
 
+  public String computeSpecialWord(  Map<String, Object> state
+                         , Map<String, Object> message
+                         )
+  {
+    List<String> words = new ArrayList<>();
+    words.add(wordConfig.getSpecialWord());
+    words.addAll(wordConfig.getWords());
+    return new WordTransformer(ImmutableList.of(wordConfig.getSpecialWord())).transform(state, message, Context.EMPTY_CONTEXT()).get(0);
+  }
+  public static ClusterModel load(File path) throws FileNotFoundException {
+    return SerializationUtils.deserialize(new FileInputStream(path));
+  }
+
+  public void save(File path) throws FileNotFoundException {
+    SerializationUtils.serialize(this, new FileOutputStream(path));
   }
 }

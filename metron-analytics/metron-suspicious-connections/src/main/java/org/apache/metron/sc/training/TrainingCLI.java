@@ -23,8 +23,8 @@ package org.apache.metron.sc.training;
 import com.google.common.base.Joiner;
 import org.apache.metron.common.utils.JSONUtils;
 import org.apache.metron.sc.clustering.ClusterModel;
-import org.apache.metron.sc.clustering.Clusterer;
-import org.apache.metron.sc.word.Config;
+import org.apache.metron.sc.preprocessing.Preprocessor;
+import org.apache.metron.sc.preprocessing.WordConfig;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -41,27 +41,27 @@ import java.util.Map;
 public class TrainingCLI {
   public static void main(String... argv) throws IOException {
     File configFile = new File(argv[0]);
-    Config config = JSONUtils.INSTANCE.load(configFile, Config.class);
+    File trainingConfigFile = new File(argv[1]);
+    WordConfig wordConfig = JSONUtils.INSTANCE.load(configFile, WordConfig.class);
+    TrainingConfig trainingConfig = JSONUtils.INSTANCE.load(trainingConfigFile, TrainingConfig.class);
     SparkConf conf = new SparkConf().setAppName("metron-suspicious-connections");
     JavaSparkContext context = new JavaSparkContext(conf);
-    ClusterModel model = createModel(config, context);
-    model.save(new File(config.getOutputPath()));
-    //todo figure out how to save
+    ClusterModel model = createModel(trainingConfig, wordConfig, context);
+    model.save(new File(trainingConfig.getOutputPath()));
   }
 
 
-  public static ClusterModel createModel(Config config, JavaSparkContext context) {
-    SQLContext sqlContext = new SQLContext(context);
+  public static ClusterModel createModel(TrainingConfig trainingConfig, WordConfig wordConfig, JavaSparkContext context) {
     Preprocessor preprocessor = new Preprocessor(context);
-    JavaRDD<String> inputDocs = context.textFile(Joiner.on(",").join(config.getInputDocs()));
+    JavaRDD<String> inputDocs = context.textFile(Joiner.on(",").join(trainingConfig.getInputDocs()));
     JavaRDD<Map<String, Object>> messages = preprocessor.parseMessages(inputDocs);
     messages.cache();
-    Map<String, Object> state = preprocessor.gatherState(config.getState(), messages);
-    Dataset<Row> tokens = preprocessor.tokenize(state, config, messages);
-    CountVectorizerModel vectorizationModel = preprocessor.createVectorizer(config, tokens);
+    Map<String, Object> state = preprocessor.gatherState(wordConfig.getState(), messages);
+    Dataset<Row> tokens = preprocessor.tokenize(state, wordConfig, messages);
+    CountVectorizerModel vectorizationModel = preprocessor.createVectorizer(trainingConfig, tokens);
     Dataset<Row> vectorized = vectorizationModel.transform(tokens);
-    LDAModel model = Clusterer.trainModel(config, vectorized);
-    return new ClusterModel(vectorizationModel, model);
+    LDAModel model = Clusterer.trainModel(trainingConfig, vectorized);
+    return new ClusterModel(wordConfig, vectorizationModel, model);
   }
 
 }

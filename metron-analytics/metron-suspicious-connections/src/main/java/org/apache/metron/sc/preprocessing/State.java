@@ -18,7 +18,7 @@
  *
  */
 
-package org.apache.metron.sc.word;
+package org.apache.metron.sc.preprocessing;
 
 import java.io.Serializable;
 

@@ -18,34 +18,27 @@
  *
  */
 
-package org.apache.metron.sc.training;
+package org.apache.metron.sc.preprocessing;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.collections.map.HashedMap;
+import com.google.common.collect.ImmutableList;
 import org.apache.metron.common.dsl.Context;
 import org.apache.metron.common.dsl.FunctionResolverSingleton;
 import org.apache.metron.common.dsl.MapVariableResolver;
 import org.apache.metron.common.stellar.StellarProcessor;
 import org.apache.metron.common.utils.JSONUtils;
-import org.apache.metron.sc.word.Config;
-import org.apache.metron.sc.word.State;
+import org.apache.metron.sc.training.TrainingConfig;
 import org.apache.metron.sc.word.WordTransformer;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.ml.Pipeline;
-import org.apache.spark.ml.clustering.LDA;
 import org.apache.spark.ml.feature.CountVectorizer;
 import org.apache.spark.ml.feature.CountVectorizerModel;
-import org.apache.spark.ml.linalg.*;
-import org.apache.spark.ml.linalg.Vector;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.*;
@@ -177,31 +170,24 @@ public class Preprocessor {
   public static StructType SCHEMA = new StructType(new StructField [] {
             new StructField("tokens", new ArrayType(DataTypes.StringType, true), false, Metadata.empty())
     });
-  public Dataset<Row> tokenize(final Map<String, Object> state, Config config, JavaRDD<Map<String, Object>> messages) {
+  public Dataset<Row> tokenize(final Map<String, Object> state, WordConfig wordConfig, JavaRDD<Map<String, Object>> messages) {
     Broadcast<Map<String, Object> > stateBc = sc.broadcast(state);
-    JavaRDD<Row> rows = messages.map(new Tokenizer(stateBc, config.getWords()));
+    List<String> wordsWithSpecial = new ArrayList<>();
+    wordsWithSpecial.add(wordConfig.getSpecialWord());
+    wordsWithSpecial.addAll(wordConfig.getWords());
+    JavaRDD<Row> rows = messages.map(new Tokenizer(stateBc, wordsWithSpecial));
     return new SQLContext(sc).createDataFrame(rows, SCHEMA);
   }
 
-  public CountVectorizerModel createVectorizer(Config config, Dataset<Row> df) {
+  public CountVectorizerModel createVectorizer(TrainingConfig wordConfig, Dataset<Row> df) {
     CountVectorizer countVectorizer = new CountVectorizer()
-            .setVocabSize(config.getVocabSize())
+            .setVocabSize(wordConfig.getVocabSize())
             .setInputCol("tokens")
-            .setOutputCol(Config.FEATURES_COL);
+            .setOutputCol(WordConfig.FEATURES_COL);
     CountVectorizerModel vectorizerModel = countVectorizer.fit(df);
     return vectorizerModel;
   }
 
-  public Vector vectorize( Config config
-                         , Map<String, Object> state
-                         , Map<String, Object> message
-                         , CountVectorizerModel model
-                         )
-  {
-    Row r = Tokenizer.tokenize(state, message, new WordTransformer(config.getWords()));
-    Dataset df = model.transform(sqlContext.createDataFrame(Arrays.asList(r), SCHEMA));
-    GenericRowWithSchema ret = (GenericRowWithSchema) df.collectAsList().get(0);
-    return (Vector) ret.get(1);
-  }
+
 
 }
