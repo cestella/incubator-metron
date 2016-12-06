@@ -20,36 +20,32 @@
 
 package org.apache.metron.profiler.bolt;
 
-import org.apache.commons.beanutils.BeanMap;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.apache.metron.common.bolt.ConfiguredProfilerBolt;
+import org.apache.metron.common.configuration.profiler.ProfileConfig;
+import org.apache.metron.common.utils.ConversionUtils;
+import org.apache.metron.profiler.ProfileBuilder;
+import org.apache.metron.profiler.ProfileMeasurement;
+import org.apache.metron.profiler.clock.WallClock;
 import org.apache.storm.Config;
-import org.apache.storm.Constants;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import org.apache.metron.common.bolt.ConfiguredProfilerBolt;
-import org.apache.metron.common.configuration.profiler.ProfileConfig;
-import org.apache.metron.common.dsl.Context;
-import org.apache.metron.common.dsl.ParseException;
-import org.apache.metron.common.dsl.StellarFunctions;
-import org.apache.metron.profiler.ProfileMeasurement;
-import org.apache.metron.profiler.stellar.StellarExecutor;
+import org.apache.storm.utils.TupleUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 /**
  * A bolt that is responsible for building a Profile.
@@ -58,17 +54,12 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
  * period expires, the data is summarized as a ProfileMeasurement, all state is
  * flushed, and the ProfileMeasurement is emitted.
  *
- * Each instance of this bolt is responsible for maintaining the state for a single
- * Profile-Entity pair.
  */
 public class ProfileBuilderBolt extends ConfiguredProfilerBolt {
 
   protected static final Logger LOG = LoggerFactory.getLogger(ProfileBuilderBolt.class);
 
-  /**
-   * Executes Stellar code and maintains state across multiple invocations.
-   */
-  private StellarExecutor executor;
+  private OutputCollector collector;
 
   /**
    * The duration of each profile period in milliseconds.
@@ -76,22 +67,22 @@ public class ProfileBuilderBolt extends ConfiguredProfilerBolt {
   private long periodDurationMillis;
 
   /**
-   * A ProfileMeasurement is created and emitted each window period.  A Profile
-   * itself is composed of many ProfileMeasurements.
+   * If a message has not been applied to a Profile in this number of milliseconds,
+   * the Profile will be forgotten and its resources will be cleaned up.
+   *
+   * The TTL must be at least greater than the period duration.
    */
-  private transient ProfileMeasurement measurement;
+  private long timeToLiveMillis;
 
   /**
-   * The definition of the Profile that the bolt is building.
+   * Maintains the state of a profile which is unique to a profile/entity pair.
    */
-  private transient ProfileConfig profileConfig;
+  private transient Cache<String, ProfileBuilder> profileCache;
 
   /**
    * Parses JSON messages.
    */
   private transient JSONParser parser;
-
-  private OutputCollector collector;
 
   /**
    * @param zookeeperUrl The Zookeeper URL that contains the configuration data.
@@ -112,21 +103,22 @@ public class ProfileBuilderBolt extends ConfiguredProfilerBolt {
     return conf;
   }
 
-  protected void initializeStellar() {
-    Context context = new Context.Builder()
-            .with(Context.Capabilities.ZOOKEEPER_CLIENT, () -> client)
-            .with(Context.Capabilities.GLOBAL_CONFIG, () -> getConfigurations().getGlobalConfig())
-            .build();
-    StellarFunctions.initialize(context);
-    executor.setContext(context);
-  }
-
   @Override
   public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
     super.prepare(stormConf, context, collector);
+
+    if(timeToLiveMillis < periodDurationMillis) {
+      throw new IllegalStateException(format(
+              "invalid configuration: expect profile TTL (%d) to be greater than period duration (%d)",
+              timeToLiveMillis,
+              periodDurationMillis));
+    }
     this.collector = collector;
     this.parser = new JSONParser();
-    initializeStellar();
+    this.profileCache = CacheBuilder
+            .newBuilder()
+            .expireAfterAccess(timeToLiveMillis, TimeUnit.MILLISECONDS)
+            .build();
   }
 
   /**
@@ -159,205 +151,88 @@ public class ProfileBuilderBolt extends ConfiguredProfilerBolt {
    * and reset the execution environment.
    * @param input The tuple to execute.
    */
-  private void doExecute(Tuple input) {
+  private void doExecute(Tuple input) throws ExecutionException {
 
-    if(!isTickTuple(input)) {
-      if (!isInitialized()) {
-        init(input);
-      }
-      update(input);
+    if(TupleUtils.isTick(input)) {
+
+      // when a 'tick' is received, flush the profile and emit the completed profile measurement
+      profileCache.asMap().forEach((key, profileBuilder) -> {
+        ProfileMeasurement measurement = profileBuilder.flush();
+        collector.emit(new Values(measurement, profileBuilder.getDefinition()));
+      });
+
+      // cache maintenance
+      profileCache.cleanUp();
 
     } else {
-      if(isInitialized()) {
-        flush(input);
-      }
+
+      // telemetry message provides additional context for 'init' and 'update' expressions
+      JSONObject message = getField("message", input, JSONObject.class);
+      getBuilder(input).apply(message);
     }
   }
 
   /**
-   * Initialize the bolt.  Occurs when the first tuple is received at the start
-   * of each window period.
-   * @param input The input tuple
+   * Builds the key that is used to lookup the ProfileState within the cache.
+   * @param tuple A tuple.
    */
-  private void init(Tuple input) {
-
-    // save the profile definition - needed later during a flush
-    profileConfig = (ProfileConfig) input.getValueByField("profile");
-
-    // create the measurement which will be saved at the end of the window period
-    measurement = new ProfileMeasurement(
-            profileConfig.getProfile(),
-            input.getStringByField("entity"),
-            getTimestamp(),
-            periodDurationMillis,
-            TimeUnit.MILLISECONDS);
-
-    // execute the 'init' expression
-    try {
-      JSONObject message = (JSONObject) input.getValueByField("message");
-      Map<String, String> expressions = profileConfig.getInit();
-      expressions.forEach((var, expr) -> executor.assign(var, expr, message));
-
-    } catch(ParseException e) {
-      String msg = format("Bad 'init' expression: %s, profile=%s, entity=%s",
-              e.getMessage(), measurement.getProfileName(), measurement.getEntity());
-      throw new ParseException(msg, e);
-    }
+  private String cacheKey(Tuple tuple) {
+    return format("%s:%s",
+            getField("profile", tuple, ProfileConfig.class),
+            getField("entity", tuple, String.class));
   }
 
   /**
-   * Update the Profile based on data contained in a new message.
-   * @param input The tuple containing a new message.
+   * Retrieves the cached ProfileBuilder that is used to build and maintain the Profile.  If none exists,
+   * one will be created and returned.
+   * @param tuple The tuple.
    */
-  private void update(Tuple input) {
-    JSONObject message = (JSONObject) input.getValueByField("message");
-
-    // execute each of the 'update' expressions
-    try {
-      Map<String, String> expressions = profileConfig.getUpdate();
-      expressions.forEach((var, expr) -> executor.assign(var, expr, message));
-
-    } catch(ParseException e) {
-      String msg = format("Bad 'update' expression: %s, profile=%s, entity=%s",
-              e.getMessage(), measurement.getProfileName(), measurement.getEntity());
-      throw new ParseException(msg, e);
-    }
+  protected ProfileBuilder getBuilder(Tuple tuple) throws ExecutionException {
+    return profileCache.get(
+            cacheKey(tuple),
+            () -> new ProfileBuilder.Builder()
+                    .withDefinition(getField("profile", tuple, ProfileConfig.class))
+                    .withEntity(getField("entity", tuple, String.class))
+                    .withPeriodDurationMillis(periodDurationMillis)
+                    .withGlobalConfiguration(getConfigurations().getGlobalConfig())
+                    .withZookeeperClient(client)
+                    .withClock(new WallClock())
+                    .build());
   }
 
   /**
-   * Flush the Profile.
-   *
-   * Executed on a fixed time period when a tick tuple is received.  Completes
-   * and emits the ProfileMeasurement.  Clears all state in preparation for
-   * the next window period.
+   * Retrieves an expected field from a Tuple.  If the field is missing an exception is thrown to
+   * indicate a fatal error.
+   * @param fieldName The name of the field.
+   * @param tuple The tuple from which to retrieve the field.
+   * @param clazz The type of the field value.
+   * @param <T> The type of the field value.
    */
-  private void flush(Tuple tickTuple) {
-    LOG.info(String.format("Flushing profile: profile=%s, entity=%s",
-            measurement.getProfileName(), measurement.getEntity()));
-
-    // calculate the result
-    Object result = executeResult(profileConfig.getResult());
-    measurement.setValue(result);
-
-    // calculate the groups
-    List<Object> groups = executeGroupBy(profileConfig.getGroupBy());
-    measurement.setGroups(groups);
-
-    // emit the completed profile measurement
-    emit(measurement, tickTuple);
-
-    // Execute the update with the old state
-    Map<String, String> tickUpdate = profileConfig.getTickUpdate();
-    Map<String, Object> state = executor.getState();
-    if(tickUpdate != null) {
-      tickUpdate.forEach((var, expr) -> executor.assign(var, expr, Collections.singletonMap("result", result)));
-    }
-    // clear the execution state to prepare for the next window
-    executor.clearState();
-    //make sure that we bring along the update state
-    if(tickUpdate != null) {
-      tickUpdate.forEach((var, expr) -> executor.getState().put(var, state.get(var)));
+  private <T> T getField(String fieldName, Tuple tuple, Class<T> clazz) {
+    T value = ConversionUtils.convert(tuple.getValueByField(fieldName), clazz);
+    if(value == null) {
+      throw new IllegalStateException(format("invalid tuple received: missing field '%s'", fieldName));
     }
 
-    // reset measurement - used as a flag to indicate if initialized
-    measurement = null;
+    return value;
   }
 
-  /**
-   * Executes the 'result' expression of a Profile.
-   * @return The result of evaluating the 'result' expression.
-   */
-  private Object executeResult(String expression) {
-    Object result;
-    try {
-      result = executor.execute(expression, new JSONObject(), Object.class);
-
-    } catch(ParseException e) {
-      String msg = format("Bad 'result' expression: %s, profile=%s, entity=%s",
-              e.getMessage(), measurement.getProfileName(), measurement.getEntity());
-      throw new ParseException(msg, e);
-    }
-    return result;
-  }
-
-
-  /**
-   * Executes each of the 'groupBy' expressions.  The result of each
-   * expression are the groups used to sort the data as part of the
-   * row key.
-   * @param expressions The 'groupBy' expressions to execute.
-   * @return The result of executing the 'groupBy' expressions.
-   */
-  private List<Object> executeGroupBy(List<String> expressions) {
-    List<Object> groups = new ArrayList<>();
-
-    if(!isEmpty(expressions)) {
-      try {
-        // allows each 'groupBy' expression to refer to the fields of the ProfileMeasurement
-        BeanMap measureAsMap = new BeanMap(measurement);
-
-        for (String expr : expressions) {
-          Object result = executor.execute(expr, measureAsMap, Object.class);
-          groups.add(result);
-        }
-
-      } catch(Throwable e) {
-        String msg = format("Bad 'groupBy' expression: %s, profile=%s, entity=%s",
-                e.getMessage(), measurement.getProfileName(), measurement.getEntity());
-        throw new ParseException(msg, e);
-      }
-    }
-
-    return groups;
-  }
-
-  /**
-   * Emits a message containing a ProfileMeasurement and the Profile configuration.
-   * @param measurement The completed ProfileMeasurement.
-   * @param anchor The original tuple to be used as the anchor.
-   */
-  private void emit(ProfileMeasurement measurement, Tuple anchor) {
-    collector.emit(anchor, new Values(measurement, profileConfig));
-  }
-
-  /**
-   * Returns a value that can be used as the current timestamp.  Allows subclasses
-   * to override, if necessary.
-   */
-  private long getTimestamp() {
-    return System.currentTimeMillis();
-  }
-
-  /**
-   * Has the Stellar execution environment already been initialized
-   * @return True, it it has been initialized.
-   */
-  private boolean isInitialized() {
-    return measurement != null;
-  }
-
-  /**
-   * Is this a tick tuple?
-   * @param tuple The tuple
-   */
-  protected static boolean isTickTuple(Tuple tuple) {
-    return Constants.SYSTEM_COMPONENT_ID.equals(tuple.getSourceComponent()) &&
-            Constants.SYSTEM_TICK_STREAM_ID.equals(tuple.getSourceStreamId());
-  }
-
-  public StellarExecutor getExecutor() {
-    return executor;
-  }
-
-  public void setExecutor(StellarExecutor executor) {
-    this.executor = executor;
-  }
-
-  public void setPeriodDurationMillis(long periodDurationMillis) {
+  public ProfileBuilderBolt withPeriodDurationMillis(long periodDurationMillis) {
     this.periodDurationMillis = periodDurationMillis;
+    return this;
   }
 
-  public void withPeriodDuration(int duration, TimeUnit units) {
-    setPeriodDurationMillis(units.toMillis(duration));
+  public ProfileBuilderBolt withPeriodDuration(int duration, TimeUnit units) {
+    return withPeriodDurationMillis(units.toMillis(duration));
   }
+
+  public ProfileBuilderBolt withTimeToLiveMillis(long timeToLiveMillis) {
+    this.timeToLiveMillis = timeToLiveMillis;
+    return this;
+  }
+
+  public ProfileBuilderBolt withTimeToLive(int duration, TimeUnit units) {
+    return withTimeToLiveMillis(units.toMillis(duration));
+  }
+
 }
