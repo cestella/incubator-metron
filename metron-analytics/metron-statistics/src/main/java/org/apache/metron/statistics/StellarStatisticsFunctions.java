@@ -432,7 +432,7 @@ public class StellarStatisticsFunctions {
           , params = {
           "stats - The Stellar statistics object"
           , "value - The value to bin"
-          , "range - A list of percentile bin ranges"
+          , "range? - A list of percentile bin ranges"
 
   }
           , returns = "Which bin the value falls in"
@@ -440,6 +440,7 @@ public class StellarStatisticsFunctions {
   public static class Bin extends BaseStellarFunction {
     private enum BinSplits {
       QUARTILE(ImmutableList.of(0.25, 0.50, 0.75)),
+      QUINTILE(ImmutableList.of(0.2, 0.4, 0.6, 0.8)),
       DECILE(ImmutableList.of(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9))
       ;
       List<Double> split;

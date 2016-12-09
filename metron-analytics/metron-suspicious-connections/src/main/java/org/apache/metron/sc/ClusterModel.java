@@ -18,15 +18,13 @@
  *
  */
 
-package org.apache.metron.sc.clustering;
+package org.apache.metron.sc;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.metron.common.dsl.Context;
 import org.apache.metron.sc.preprocessing.WordConfig;
-import org.apache.metron.sc.word.WordTransformer;
 import org.apache.spark.ml.clustering.LDAModel;
-import org.apache.spark.ml.feature.CountVectorizerModel;
 import org.apache.spark.ml.linalg.DenseVector;
 import org.apache.spark.ml.linalg.Vector;
 import scala.collection.Iterator;
@@ -42,9 +40,11 @@ public class ClusterModel implements Serializable {
   private Map<String, Integer> word2Index;
   private Vector defaultTopicDistribution;
   private WordConfig wordConfig;
+  private Map<String, Object> state;
 
-  public ClusterModel(WordConfig wordConfig, List<String> vocabulary, LDAModel ldaModel) {
+  public ClusterModel(Map<String, Object> state, WordConfig wordConfig, String[] vocabulary, LDAModel ldaModel) {
     this.wordConfig = wordConfig;
+    this.state = state;
     this.ldaModel = new ArrayList<>();
     for(Iterator<Vector> it = ldaModel.topicsMatrix().rowIter();it.hasNext();) {
       Vector v  = it.next();
@@ -72,6 +72,11 @@ public class ClusterModel implements Serializable {
     }
   }
 
+  public double score(Map<String, Object> message, String ip) {
+    String specialWord = computeSpecialWord(message);
+    return score(specialWord, ip);
+  }
+
   public double score(String specialWord, String ip) {
     Vector wordProbabilities = getTopicProbabilities(specialWord);
     Vector ipProbabilities = getTopicProbabilities(ip);
@@ -83,9 +88,13 @@ public class ClusterModel implements Serializable {
     return ret;
   }
 
-  public String computeSpecialWord(  Map<String, Object> state
-                         , Map<String, Object> message
-                         )
+  public String computeSpecialWord(   Map<String, Object> message ) {
+    return computeSpecialWord( message, state, wordConfig);
+  }
+  public static String computeSpecialWord( Map<String, Object> message
+                                         , Map<String, Object> state
+                                         , WordConfig wordConfig
+                                         )
   {
     List<String> words = new ArrayList<>();
     words.add(wordConfig.getSpecialWord());

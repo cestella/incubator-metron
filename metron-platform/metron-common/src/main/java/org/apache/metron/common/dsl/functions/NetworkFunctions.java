@@ -66,6 +66,49 @@ public class NetworkFunctions {
     }
   }
 
+  @Stellar(name="EXTRACT_SUBDOMAINS"
+          ,namespace = "DOMAIN"
+          ,description = "Removes the subdomains from a domain."
+          , params = {
+                      "domain - Fully qualified domain name"
+                     }
+          , returns = "The subdomains of the domain.  " +
+                      "(for example, DOMAIN_EXTRACT_SUBDOMAINS('mail.yahoo.com') yields 'mail')"
+          )
+  public static class ExtractSubdomains extends BaseStellarFunction {
+
+    @Override
+    public Object apply(List<Object> objects) {
+      Object dnObj = objects.get(0);
+      InternetDomainName idn = toDomainName(dnObj);
+      if(idn != null) {
+        String dn = dnObj.toString();
+        String tld = idn.publicSuffix().toString();
+        String suffix = Iterables.getFirst(Splitter.on(tld).split(dn), null);
+        if(suffix != null)
+        {
+          String ret = "";
+          String lastSegment = "";
+          for(int i = 0; i < suffix.length() - 1;++i) {
+            char c = suffix.charAt(i);
+            if(c == '.') {
+              ret = ret.length() == 0?lastSegment:(ret + '.' + lastSegment);
+            }
+            else {
+              lastSegment += c;
+            }
+          }
+          return ret;
+        }
+        else {
+          return null;
+        }
+      }
+      return null;
+
+    }
+  }
+
   @Stellar(name="REMOVE_SUBDOMAINS"
           ,namespace = "DOMAIN"
           ,description = "Removes the subdomains from a domain."

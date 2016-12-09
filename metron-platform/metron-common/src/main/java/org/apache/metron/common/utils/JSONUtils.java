@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
+import java.util.List;
 
 public enum JSONUtils {
   INSTANCE;
@@ -93,4 +94,22 @@ public enum JSONUtils {
   public byte[] toJSON(Object config) throws JsonProcessingException {
     return _mapper.get().writeValueAsBytes(config);
   }
+
+  public String stringFromPossiblyMultiline(Object o) {
+    if(o == null) {
+      return null;
+    }
+    if(o instanceof String) {
+      return (String)o;
+    }
+    String ret = "";
+    if(o instanceof List) {
+      List<Object> strings = (List<Object>)o;
+      for(Object string : strings) {
+        ret += string.toString();
+      }
+    }
+    return ret;
+  }
+
 }

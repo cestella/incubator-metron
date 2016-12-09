@@ -20,6 +20,8 @@
 
 package org.apache.metron.sc.preprocessing;
 
+import org.apache.metron.common.utils.JSONUtils;
+
 import java.io.Serializable;
 
 public class State implements Serializable {
@@ -30,15 +32,15 @@ public class State implements Serializable {
     return stateProjection;
   }
 
-  public void setStateProjection(String stateProjection) {
-    this.stateProjection = stateProjection;
+  public void setStateProjection(Object stateProjection) {
+    this.stateProjection = JSONUtils.INSTANCE.stringFromPossiblyMultiline(stateProjection);
   }
 
   public String getStateUpdate() {
     return stateUpdate;
   }
 
-  public void setStateUpdate(String stateUpdate) {
-    this.stateUpdate = stateUpdate;
+  public void setStateUpdate(Object stateUpdate) {
+    this.stateUpdate = JSONUtils.INSTANCE.stringFromPossiblyMultiline(stateUpdate);
   }
 }

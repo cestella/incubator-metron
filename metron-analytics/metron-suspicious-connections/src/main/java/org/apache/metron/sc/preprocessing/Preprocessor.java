@@ -21,14 +21,13 @@
 package org.apache.metron.sc.preprocessing;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.ImmutableList;
 import org.apache.metron.common.dsl.Context;
-import org.apache.metron.common.dsl.FunctionResolverSingleton;
 import org.apache.metron.common.dsl.MapVariableResolver;
+import org.apache.metron.common.dsl.functions.resolver.SingletonFunctionResolver;
 import org.apache.metron.common.stellar.StellarProcessor;
 import org.apache.metron.common.utils.JSONUtils;
 import org.apache.metron.sc.training.TrainingConfig;
-import org.apache.metron.sc.word.WordTransformer;
+import org.apache.metron.sc.WordTransformer;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
@@ -76,7 +75,7 @@ public class Preprocessor {
       MapVariableResolver resolver = new MapVariableResolver(message);
       StellarProcessor processor = new StellarProcessor();
       for(Map.Entry<String, State> kv : config.entrySet()) {
-        Object o = processor.parse(kv.getValue().getStateProjection(), resolver, FunctionResolverSingleton.getInstance(), Context.EMPTY_CONTEXT());
+        Object o = processor.parse(kv.getValue().getStateProjection(), resolver, SingletonFunctionResolver.getInstance(), Context.EMPTY_CONTEXT());
         ret.add(new Tuple2<>(kv.getKey(), new KeyedState(kv.getKey(), o)));
       }
       return ret.iterator();
@@ -117,7 +116,7 @@ public class Preprocessor {
         if(stellarStatement == null) {
           return nullRet;
         }
-        Object o = processor.parse(stellarStatement, resolver, FunctionResolverSingleton.getInstance(), Context.EMPTY_CONTEXT());
+        Object o = processor.parse(stellarStatement, resolver, SingletonFunctionResolver.getInstance(), Context.EMPTY_CONTEXT());
         return new KeyedState(leftState.key, o);
       }
     }

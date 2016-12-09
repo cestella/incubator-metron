@@ -23,6 +23,7 @@ package org.apache.metron.sc.integration;
 import com.tdunning.math.stats.AVLTreeDigest;
 import org.adrianwalker.multilinestring.Multiline;
 import org.apache.metron.common.utils.JSONUtils;
+import org.apache.metron.sc.ClusterModel;
 import org.apache.metron.sc.preprocessing.Preprocessor;
 import org.apache.metron.sc.preprocessing.WordConfig;
 import org.apache.metron.statistics.OnlineStatisticsProvider;
@@ -71,10 +72,7 @@ public class PreprocessingIntegrationTest implements Serializable {
             "ip_src_addr"
            ,"ip_dst_addr"
            ,"STATS_BIN(size_state, size)"
-              ],
-    "vocabSize" : 100,
-    "k" : 0.1,
-    "maxIter" : 100
+              ]
    }
    */
   @Multiline
@@ -149,7 +147,7 @@ public class PreprocessingIntegrationTest implements Serializable {
     JavaRDD<Map<String, Object>> messagesRdd = sc.parallelize(messages);
     Preprocessor preprocessor = new Preprocessor(sc);
     Map<String, Object> state = preprocessor.gatherState(wordConfigObj.getState(), messagesRdd);
-    String s = preprocessor.computeSpecialWord(wordConfigObj, state, messages.get(0));
+    String s = ClusterModel.computeSpecialWord( state, messages.get(0), wordConfigObj);
     Assert.assertEquals(messages.get(0).get("ip_src_addr") + ":" + messages.get(0).get("ip_dst_addr"), s);
   }
 }

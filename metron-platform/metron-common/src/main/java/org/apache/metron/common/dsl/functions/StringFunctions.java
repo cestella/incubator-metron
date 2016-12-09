@@ -21,11 +21,14 @@ package org.apache.metron.common.dsl.functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.metron.common.dsl.BaseStellarFunction;
 import org.apache.metron.common.dsl.Stellar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class StringFunctions {
@@ -96,6 +99,34 @@ public class StringFunctions {
         return false;
       }
       return str.startsWith(prefix);
+    }
+  }
+
+  @Stellar( namespace="STRING"
+          , name="ENTROPY"
+          , description = "Computes the shannon entropy of a string"
+          , params = { "input - String" }
+          , returns = "The shannon entropy of the string"
+          )
+  public static class Entropy extends BaseStellarFunction {
+    @Override
+    public Object apply(List<Object> strings) {
+      Map<Character, Integer> frequency = new HashMap<>();
+      String input = (String)strings.get(0);
+      if(StringUtils.isEmpty(input)) {
+        return Double.NaN;
+      }
+      for(int i = 0;i < input.length();++i) {
+        char c = input.charAt(i);
+        frequency.put(c, frequency.getOrDefault(c, 0) + 1);
+      }
+      double ret = 0.0;
+      double log2 = Math.log(2);
+      for(int i = 0;i < input.length();++i ) {
+        double p = ((double)frequency.get(input.charAt(i)))/input.length();
+        ret -= p * Math.log(p) / log2;
+      }
+      return ret;
     }
   }
 

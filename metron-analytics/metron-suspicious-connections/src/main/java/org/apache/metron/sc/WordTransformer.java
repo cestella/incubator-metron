@@ -18,12 +18,12 @@
  *
  */
 
-package org.apache.metron.sc.word;
+package org.apache.metron.sc;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.metron.common.dsl.Context;
-import org.apache.metron.common.dsl.FunctionResolverSingleton;
 import org.apache.metron.common.dsl.MapVariableResolver;
+import org.apache.metron.common.dsl.functions.resolver.SingletonFunctionResolver;
 import org.apache.metron.common.stellar.StellarProcessor;
 
 import java.io.Serializable;
@@ -42,7 +42,7 @@ public class WordTransformer implements Serializable {
     StellarProcessor processor = new StellarProcessor();
     List<String> ret = new ArrayList<>();
     for(String stellarTransforms : wordTransformers) {
-      Object o = processor.parse(stellarTransforms, resolver, FunctionResolverSingleton.getInstance(), context);
+      Object o = processor.parse(stellarTransforms, resolver, SingletonFunctionResolver.getInstance(), context);
       if(o == null) {
         continue;
       }

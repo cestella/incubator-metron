@@ -383,6 +383,13 @@ public class StellarTest {
   }
 
   @Test
+  public void testSubdomainExtraction() {
+    String query = "DOMAIN_EXTRACT_SUBDOMAINS(foo)";
+    Assert.assertEquals("www", run(query, ImmutableMap.of("foo", "www.google.co.uk")));
+    Assert.assertEquals("www", run(query, ImmutableMap.of("foo", "www.google.com")));
+    Assert.assertEquals("", run(query, ImmutableMap.of("foo", "google.com")));
+  }
+  @Test
   public void testURLToHost() {
     String query = "URL_TO_HOST(foo)";
     Assert.assertEquals("www.google.co.uk", run(query, ImmutableMap.of("foo", "http://www.google.co.uk/my/path")));

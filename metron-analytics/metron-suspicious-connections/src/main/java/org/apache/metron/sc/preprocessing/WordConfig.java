@@ -20,6 +20,9 @@
 
 package org.apache.metron.sc.preprocessing;
 
+import org.apache.metron.common.utils.JSONUtils;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +36,8 @@ public class WordConfig {
     return specialWord;
   }
 
-  public void setSpecialWord(String specialWord) {
-    this.specialWord = specialWord;
+  public void setSpecialWord(Object specialWord) {
+    this.specialWord = JSONUtils.INSTANCE.stringFromPossiblyMultiline(specialWord);
   }
 
 
@@ -50,8 +53,11 @@ public class WordConfig {
     return words;
   }
 
-  public void setWords(List<String> words) {
-    this.words = words;
+  public void setWords(List<Object> words) {
+    this.words = new ArrayList<>();
+    for(Object word : words) {
+      this.words.add(JSONUtils.INSTANCE.stringFromPossiblyMultiline(word));
+    }
   }
 
 
