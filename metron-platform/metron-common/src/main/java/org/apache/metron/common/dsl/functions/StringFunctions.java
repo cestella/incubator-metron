@@ -114,7 +114,7 @@ public class StringFunctions {
       Map<Character, Integer> frequency = new HashMap<>();
       String input = (String)strings.get(0);
       if(StringUtils.isEmpty(input)) {
-        return Double.NaN;
+        return 0.0;
       }
       for(int i = 0;i < input.length();++i) {
         char c = input.charAt(i);

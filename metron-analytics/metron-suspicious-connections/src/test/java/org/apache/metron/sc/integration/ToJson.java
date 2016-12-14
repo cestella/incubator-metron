@@ -18,9 +18,10 @@ public class ToJson {
     CSVParser parser = new CSVParserBuilder().build();
     BufferedReader br = new BufferedReader(new FileReader(inFile));
     List<Map<String, Object>> messages = new ArrayList<>();
+    int rank = 0;
     for(String line = null;(line = br.readLine()) != null;) {
       String[] tokens = parser.parseLine(line);
-      Map<String, Object> msg = toMsg(tokens);
+      Map<String, Object> msg = toMsg(rank++, tokens);
       messages.add(msg);
     }
     Collections.sort(messages, new Comparator<Map<String, Object>>() {
@@ -43,18 +44,16 @@ public class ToJson {
     }
     pw.close();
   }
-  public static final Map<String, Object> toMsg(String[] tokens) throws ParseException {
+  public static final Map<String, Object> toMsg(int rank, String[] tokens) throws ParseException {
     Map<String, Object> msg = new HashMap<>();
-    int offset = 0;
-    msg.put("timestamp", TS_FORMAT.parse(tokens[offset++]).getTime());
-    msg.put("frame_len", Integer.parseInt(tokens[offset++]));
-    msg.put("ip_dst", tokens[offset++]);
-    msg.put("ip_src", tokens[offset++]);
-    msg.put("dns_qry_name", tokens[offset++]);
-    msg.put("dns_qry_class_name", tokens[offset++]);
-    msg.put("dns_qry_type_name", tokens[offset++]);
-    msg.put("dns_qry_rcode_name", tokens[offset++]);
-    msg.put("dns_a", tokens[offset++]);
+    msg.put("timestamp", Long.parseLong(tokens[1]));
+    msg.put("frame_len", Integer.parseInt(tokens[2]));
+    msg.put("ip_dst", tokens[3]);
+    msg.put("dns_qry_name", tokens[4]);
+    msg.put("dns_qry_type_name", tokens[6]);
+    msg.put("dns_qry_rcode_name", tokens[7]);
+    msg.put("special_word", tokens[14]);
+    msg.put("rank", rank);
     return msg;
   }
 }

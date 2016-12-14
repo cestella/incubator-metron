@@ -43,11 +43,12 @@ import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.*;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Preprocessor {
-  JavaSparkContext sc;
-  SQLContext sqlContext;
+public class Preprocessor implements Serializable {
+  transient JavaSparkContext sc;
+  transient SQLContext sqlContext;
   public Preprocessor(JavaSparkContext sc) {
     this.sc = sc;
     sqlContext = new SQLContext(sc);
@@ -137,7 +138,7 @@ public class Preprocessor {
     public static Row tokenize(Map<String, Object> state, Map<String, Object> message, WordTransformer transformer) {
       HashMap<String, Object> adjustedState= new HashMap<>();
       for(Map.Entry<String, Object> kv : state.entrySet()) {
-        adjustedState.put(kv.getKey() + "_state", kv.getValue());
+        adjustedState.put(kv.getKey(), kv.getValue());
       }
       List<String> words = transformer.transform(adjustedState, message, Context.EMPTY_CONTEXT());
       String[] row = new String[words.size()];
@@ -179,10 +180,15 @@ public class Preprocessor {
   }
 
   public CountVectorizerModel createVectorizer(TrainingConfig wordConfig, Dataset<Row> df) {
-    CountVectorizer countVectorizer = new CountVectorizer()
-            .setVocabSize(wordConfig.getVocabSize())
-            .setInputCol("tokens")
-            .setOutputCol(WordConfig.FEATURES_COL);
+    CountVectorizer countVectorizer = new CountVectorizer();
+    if(wordConfig.getVocabSize() != null) {
+      countVectorizer = countVectorizer.setVocabSize(wordConfig.getVocabSize());
+    }
+    countVectorizer = countVectorizer.setInputCol("tokens")
+                   .setOutputCol(WordConfig.FEATURES_COL)
+                   .setMinDF(0.0)
+                   .setMinTF(0.0)
+                   ;
     CountVectorizerModel vectorizerModel = countVectorizer.fit(df);
     return vectorizerModel;
   }

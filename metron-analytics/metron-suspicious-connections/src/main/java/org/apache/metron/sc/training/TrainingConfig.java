@@ -3,25 +3,25 @@ package org.apache.metron.sc.training;
 import java.util.List;
 
 public class TrainingConfig {
-  private int k;
-  private int maxIter;
+  private Integer k;
+  private Integer maxIter;
   private List<String> inputDocs;
   private String outputPath;
-  private int vocabSize;
+  private Integer vocabSize;
 
-  public int getK() {
+  public Integer getK() {
     return k;
   }
 
-  public void setK(int k) {
+  public void setK(Integer k) {
     this.k = k;
   }
 
-  public int getMaxIter() {
+  public Integer getMaxIter() {
     return maxIter;
   }
 
-  public void setMaxIter(int maxIter) {
+  public void setMaxIter(Integer maxIter) {
     this.maxIter = maxIter;
   }
 
@@ -41,7 +41,7 @@ public class TrainingConfig {
     this.outputPath = outputPath;
   }
 
-  public int getVocabSize() {
+  public Integer getVocabSize() {
     return vocabSize;
   }
 

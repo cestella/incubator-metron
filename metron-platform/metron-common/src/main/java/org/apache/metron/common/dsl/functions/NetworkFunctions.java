@@ -83,7 +83,14 @@ public class NetworkFunctions {
       InternetDomainName idn = toDomainName(dnObj);
       if(idn != null) {
         String dn = dnObj.toString();
-        String tld = idn.publicSuffix().toString();
+        InternetDomainName suffixIdn= idn.publicSuffix();
+        String tld = null;
+        if(suffixIdn != null) {
+          tld = suffixIdn.toString();
+        }
+        else {
+          tld = Iterables.getLast(Splitter.on(".").split(dn));
+        }
         String suffix = Iterables.getFirst(Splitter.on(tld).split(dn), null);
         if(suffix != null)
         {
@@ -129,7 +136,13 @@ public class NetworkFunctions {
       InternetDomainName idn = toDomainName(dnObj);
       if(idn != null) {
         String dn = dnObj.toString();
-        String tld = Joiner.on(".").join(idn.publicSuffix().parts());
+        String tld = null;
+        if(idn.publicSuffix() != null) {
+          tld = Joiner.on(".").join(idn.publicSuffix().parts());
+        }
+        else {
+          tld = Iterables.getLast(Splitter.on(".").split(dn));
+        }
         String suffix = dn.substring(0, dn.length() - tld.length());
         String hostnameWithoutTLD = suffix.substring(0, suffix.length() - 1);
         String hostnameWithoutSubsAndTLD = Iterables.getLast(Splitter.on(".").split(hostnameWithoutTLD), null);
@@ -155,12 +168,21 @@ public class NetworkFunctions {
   public static class RemoveTLD extends BaseStellarFunction {
     @Override
     public Object apply(List<Object> objects) {
+      if(objects.isEmpty()) {
+        return null;
+      }
       Object dnObj = objects.get(0);
       InternetDomainName idn = toDomainName(dnObj);
       if(idn != null) {
         String dn = dnObj.toString();
-        String tld = idn.publicSuffix().toString();
-        String suffix = Iterables.getFirst(Splitter.on(tld).split(dn), null);
+        String tld = null;
+        if(idn.publicSuffix() != null) {
+          tld = idn.publicSuffix().toString();
+        }
+        else {
+          tld = Iterables.getLast(Splitter.on(".").split(dn));
+        }
+        String suffix = dn.substring(0, dn.length() - tld.length());
         if(suffix != null)
         {
           return suffix.substring(0, suffix.length() - 1);

@@ -80,10 +80,17 @@ public class ClusterModel implements Serializable {
   public double score(String specialWord, String ip) {
     Vector wordProbabilities = getTopicProbabilities(specialWord);
     Vector ipProbabilities = getTopicProbabilities(ip);
+    /*double sumWord = 0;
+    double sumIp = 0;
+    for(int i = 0;i < wordProbabilities.size();++i) {
+      sumWord += wordProbabilities.apply(i);
+      sumIp += ipProbabilities.apply(i);
+    }*/
     //inner product between the two vectors
     double ret = 0.0;
     for(int i = 0;i < wordProbabilities.size();++i) {
-      ret += wordProbabilities.apply(i) * ipProbabilities.apply(i);
+      //ret += wordProbabilities.apply(i)/sumWord * ipProbabilities.apply(i)/sumIp;
+      ret += wordProbabilities.apply(i)* ipProbabilities.apply(i);
     }
     return ret;
   }

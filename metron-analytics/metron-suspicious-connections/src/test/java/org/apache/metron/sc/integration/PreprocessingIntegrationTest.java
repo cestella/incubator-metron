@@ -62,7 +62,7 @@ public class PreprocessingIntegrationTest implements Serializable {
   /**
    {
     "state" : {
-          "size" : {
+          "size_state" : {
             "stateProjection" : "STATS_ADD(STATS_INIT(), size)",
             "stateUpdate" : "STATS_MERGE([left, right])"
                    }
@@ -119,8 +119,8 @@ public class PreprocessingIntegrationTest implements Serializable {
     JavaRDD<Map<String, Object>> messagesRdd = sc.parallelize(getMessages());
     Preprocessor preprocessor = new Preprocessor(sc);
     Map<String, Object> state = preprocessor.gatherState(wordConfigObj.getState(), messagesRdd);
-    Assert.assertTrue(state.containsKey("size"));
-    OnlineStatisticsProvider stats = (OnlineStatisticsProvider) state.get("size");
+    Assert.assertTrue(state.containsKey("size_state"));
+    OnlineStatisticsProvider stats = (OnlineStatisticsProvider) state.get("size_state");
     Assert.assertFalse(Double.isNaN(stats.getPercentile(.5)));
   }
 

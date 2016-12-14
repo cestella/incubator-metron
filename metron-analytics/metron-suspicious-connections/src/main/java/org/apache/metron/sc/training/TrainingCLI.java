@@ -70,10 +70,19 @@ public class TrainingCLI {
   }
 
   public static LDAModel trainModel(TrainingConfig config, Dataset<Row> vectorizedData) {
-    LDA lda = new LDA().setFeaturesCol(WordConfig.FEATURES_COL)
-                       .setK(config.getK())
-                       .setMaxIter(config.getMaxIter())
-                       ;
+    LDA lda = new LDA().setFeaturesCol(WordConfig.FEATURES_COL);
+    if(config.getK() != null) {
+      lda =  lda.setK(config.getK());
+    }
+    if(config.getMaxIter() != null) {
+      lda = lda.setMaxIter(config.getMaxIter());
+    }
+    lda = lda.setCheckpointInterval(5);
+    lda = lda.setOptimizer("em");
+    lda = lda.setSeed(0);
+
+    vectorizedData.cache();
+    //vectorizedData.rdd().checkpoint();
     return lda.fit(vectorizedData);
   }
 
