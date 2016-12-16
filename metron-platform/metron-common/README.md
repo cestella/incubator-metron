@@ -58,6 +58,8 @@ Using parens such as: "foo" : "\<ok\>" requires escaping; "foo": "\'\<ok\>\'"
 | [ `ENDS_WITH`](#ends_with)|
 | [ `ENRICHMENT_EXISTS`](#enrichment_exists)|
 | [ `ENRICHMENT_GET`](#enrichment_get)|
+| [ `FILL_LEFT`](#fill_left)|
+| [ `FILL_RIGHT`](#fill_right)|
 | [ `GET`](#get)|
 | [ `GET_FIRST`](#get_first)|
 | [ `GET_LAST`](#get_last)|
@@ -106,6 +108,7 @@ Using parens such as: "foo" : "\<ok\>" requires escaping; "foo": "\'\<ok\>\'"
 | [ `SYSTEM_PROPERTY_GET`](#system_property_get)|
 | [ `TO_DOUBLE`](#to_double)|
 | [ `TO_EPOCH_TIMESTAMP`](#to_epoch_timestamp)|
+| [ `TO_FLOAT`](#to_float)|
 | [ `TO_INTEGER`](#to_integer)|
 | [ `TO_LONG`](#to_long)|
 | [ `TO_LOWER`](#to_lower)|
@@ -225,6 +228,22 @@ Using parens such as: "foo" : "\<ok\>" requires escaping; "foo": "\'\<ok\>\'"
   * Description: Returns the last element of the list
   * Input:
     * input - List
+  * Returns: Last element of the list
+
+### `FILL_LEFT`
+  * Description: Fills or pads a given string with a given character, to a given length on the left
+  * Input:
+    * input - string
+    * fill - the fill character
+    * len - the required length
+  * Returns: the filled string
+
+### `FILL_RIGHT`
+  * Description: Fills or pads a given string with a given character, to a given length on the right
+  * Input:
+    * input - string
+    * fill - the fill character string
+    * len - the required length
   * Returns: Last element of the list
 
 ### `IN_SUBNET`
@@ -418,6 +437,12 @@ MAP_GET`
     * format - DateTime format as a String
     * timezone - Optional timezone in String format
   * Returns: Epoch timestamp
+  
+### `TO_FOAT`
+  * Description: Transforms the first argument to a float
+  * Input:
+    * input - Object of string or numeric type
+  * Returns: Float version of the first argument
 
 ### `TO_INTEGER`
   * Description: Transforms the first argument to an integer
@@ -625,7 +650,7 @@ JOIN, LENGTH, MAAS_GET_ENDPOINT, MAAS_MODEL_APPLY, MAP_EXISTS, MAP_GET, MONTH, P
 REGEXP_MATCH, SPLIT, STARTS_WITH, STATS_ADD, STATS_COUNT, STATS_GEOMETRIC_MEAN, STATS_INIT, 
 STATS_KURTOSIS, STATS_MAX, STATS_MEAN, STATS_MERGE, STATS_MIN, STATS_PERCENTILE, 
 STATS_POPULATION_VARIANCE, STATS_QUADRATIC_MEAN, STATS_SD, STATS_SKEWNESS, STATS_SUM, 
-STATS_SUM_LOGS, STATS_SUM_SQUARES, STATS_VARIANCE, TO_DOUBLE, TO_EPOCH_TIMESTAMP, 
+STATS_SUM_LOGS, STATS_SUM_SQUARES, STATS_VARIANCE, TO_DOUBLE, TO_EPOCH_TIMESTAMP, TO_FLOAT, 
 TO_INTEGER, TO_LOWER, TO_STRING, TO_UPPER, TRIM, URL_TO_HOST, URL_TO_PATH, URL_TO_PORT, 
 URL_TO_PROTOCOL, WEEK_OF_MONTH, WEEK_OF_YEAR, YEAR
 [Stellar]>>> 
