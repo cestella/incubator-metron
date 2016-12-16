@@ -131,7 +131,7 @@ public class DNSIntegrationTest {
   @Multiline
   static String trainingConfig;
 
-  List<String> getMessages() throws IOException {
+  public static List<String> getMessages() throws IOException {
     File dnsJson = new File("src/test/resources/dns_data.json");
     List<String> ret = new ArrayList<>();
     try(BufferedReader br = new BufferedReader(new FileReader(dnsJson))) {
@@ -142,7 +142,7 @@ public class DNSIntegrationTest {
     }
   }
 
-  public Map<String, Map<String, Object>> createIndex(List<String> messages) throws IOException {
+  public static Map<String, Map<String, Object>> createIndex(List<String> messages) throws IOException {
     Map<String, Map<String, Object>> ret = new HashMap<>();
     for (String line : messages) {
       Map<String, Object> message = JSONUtils.INSTANCE.load(line, new TypeReference<Map<String, Object>>() { });
@@ -151,7 +151,7 @@ public class DNSIntegrationTest {
     return ret;
   }
 
-  public String getKey(Map<String, Object> message) {
+  public static String getKey(Map<String, Object> message) {
 
     return message.get("ip_dst") + "_" + message.get("dns_qry_name");
   }

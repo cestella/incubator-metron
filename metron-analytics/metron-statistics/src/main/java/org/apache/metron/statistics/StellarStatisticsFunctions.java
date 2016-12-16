@@ -405,7 +405,7 @@ public class StellarStatisticsFunctions {
           , description = "Computes the p'th percentile of the accumulated values (or in the window if a window is used)."
           , params = {
           "stats - The Stellar statistics object"
-          , "p - a double where 0 <= p < 1 representing the percentile"
+          , "p - a double where 0 <= p < 100 representing the percentile"
 
   }
           , returns = "The p'th percentile of the data or NaN if the statistics object is null"
@@ -438,12 +438,12 @@ public class StellarStatisticsFunctions {
           , returns = "Which bin the value falls in"
   )
   public static class Bin extends BaseStellarFunction {
-    private enum BinSplits {
-      QUARTILE(ImmutableList.of(0.25, 0.50, 0.75)),
-      QUINTILE(ImmutableList.of(0.2, 0.4, 0.6, 0.8)),
-      DECILE(ImmutableList.of(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9))
+    public enum BinSplits {
+      QUARTILE(ImmutableList.of(25.0, 50.0, 75.0)),
+      QUINTILE(ImmutableList.of(20.0, 40.0, 60.0, 80.0)),
+      DECILE(ImmutableList.of(10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0))
       ;
-      List<Double> split;
+      public final List<Double> split;
       BinSplits(List<Double> split) {
         this.split = split;
       }
