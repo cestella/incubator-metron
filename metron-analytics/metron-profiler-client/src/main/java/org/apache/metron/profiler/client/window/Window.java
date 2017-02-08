@@ -1,16 +1,15 @@
 package org.apache.metron.profiler.client.window;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Window {
   private long startMillis;
-  private Optional<Long> endMillis;
-  private List<Predicate> includes;
-  private List<Predicate> excludes;
-  private long binWidth;
-  private long skipDistance;
+  private Long endMillis;
+  private List<Predicate<Long>> includes;
+  private List<Predicate<Long>> excludes;
+  private int binWidth;
+  private int skipDistance;
 
   public long getStartMillis() {
     return startMillis;
@@ -20,27 +19,27 @@ public class Window {
     this.startMillis = startMillis;
   }
 
-  public Optional<Long> getEndMillis() {
+  public Long getEndMillis() {
     return endMillis;
   }
 
-  void setEndMillis(Optional<Long> endMillis) {
+  void setEndMillis(Long endMillis) {
     this.endMillis = endMillis;
   }
 
-  public List<Predicate> getIncludes() {
+  public List<Predicate<Long>> getIncludes() {
     return includes;
   }
 
-  void setIncludes(List<Predicate> includes) {
+  void setIncludes(List<Predicate<Long>> includes) {
     this.includes = includes;
   }
 
-  public List<Predicate> getExcludes() {
+  public List<Predicate<Long>> getExcludes() {
     return excludes;
   }
 
-  void setExcludes(List<Predicate> excludes) {
+  void setExcludes(List<Predicate<Long>> excludes) {
     this.excludes = excludes;
   }
 
@@ -48,7 +47,7 @@ public class Window {
     return binWidth;
   }
 
-  void setBinWidth(long binWidth) {
+  void setBinWidth(int binWidth) {
     this.binWidth = binWidth;
   }
 
@@ -56,7 +55,7 @@ public class Window {
     return skipDistance;
   }
 
-  void setSkipDistance(long skipDistance) {
+  void setSkipDistance(int skipDistance) {
     this.skipDistance = skipDistance;
   }
 }

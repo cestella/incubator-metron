@@ -169,15 +169,27 @@ public interface WindowListener extends ParseTreeListener {
 	 */
 	void exitTimeInterval(WindowParser.TimeIntervalContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code TimeIntervalNow}
-	 * labeled alternative in {@link WindowParser#time_interval}.
+	 * Enter a parse tree produced by the {@code TimeAmount}
+	 * labeled alternative in {@link WindowParser#time_amount}.
 	 * @param ctx the parse tree
 	 */
-	void enterTimeIntervalNow(WindowParser.TimeIntervalNowContext ctx);
+	void enterTimeAmount(WindowParser.TimeAmountContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code TimeIntervalNow}
-	 * labeled alternative in {@link WindowParser#time_interval}.
+	 * Exit a parse tree produced by the {@code TimeAmount}
+	 * labeled alternative in {@link WindowParser#time_amount}.
 	 * @param ctx the parse tree
 	 */
-	void exitTimeIntervalNow(WindowParser.TimeIntervalNowContext ctx);
+	void exitTimeAmount(WindowParser.TimeAmountContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code TimeUnit}
+	 * labeled alternative in {@link WindowParser#time_unit}.
+	 * @param ctx the parse tree
+	 */
+	void enterTimeUnit(WindowParser.TimeUnitContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code TimeUnit}
+	 * labeled alternative in {@link WindowParser#time_unit}.
+	 * @param ctx the parse tree
+	 */
+	void exitTimeUnit(WindowParser.TimeUnitContext ctx);
 }

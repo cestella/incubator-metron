@@ -60,12 +60,11 @@ DAY_SPECIFIER : MONDAY | TUESDAY | WEDNESDAY | THURSDAY
                        | WEEKEND | WEEKDAY
                        ;
 
-TIME_UNIT : SECOND_UNIT | HOUR_UNIT | DAY_UNIT | MONTH_UNIT;
+TIME_UNIT : SECOND_UNIT | HOUR_UNIT | DAY_UNIT ;
 
 fragment SECOND_UNIT : 'SECOND' | 'second' | 'seconds' | 'SECONDS';
 fragment HOUR_UNIT : 'HOUR' | 'hour' | 'hours' | 'HOURS';
 fragment DAY_UNIT : 'DAY' | 'day' | 'days' | 'DAYS';
-fragment MONTH_UNIT : 'MONTH' | 'month' | 'months' | 'MONTHS';
 fragment MONDAY : 'MONDAY' | 'monday';
 fragment TUESDAY : 'TUESDAY' | 'tuesday';
 fragment WEDNESDAY : 'WEDNESDAY' | 'wednesday';
@@ -98,7 +97,7 @@ specifier_list : specifier
                | specifier_list COMMA specifier
                ;
 
-duration : FROM time_interval TO time_interval AGO? #FromToDuration
+duration : FROM time_interval AGO? TO time_interval AGO? #FromToDuration
          | TO time_interval AGO? #ToDuration
          ;
 
@@ -108,6 +107,11 @@ skip_distance : EVERY time_interval #SkipDistance
 bin_width : time_interval BIN #BinWidth
           ;
 
-time_interval : NUMBER TIME_UNIT #TimeInterval
-              | NOW #TimeIntervalNow
+time_interval : time_amount time_unit #TimeInterval
               ;
+
+time_amount : NUMBER #TimeAmount
+            ;
+
+time_unit : TIME_UNIT #TimeUnit
+            ;

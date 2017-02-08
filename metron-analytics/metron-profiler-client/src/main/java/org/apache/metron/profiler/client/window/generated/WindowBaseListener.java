@@ -181,13 +181,25 @@ public class WindowBaseListener implements WindowListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTimeIntervalNow(WindowParser.TimeIntervalNowContext ctx) { }
+	@Override public void enterTimeAmount(WindowParser.TimeAmountContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTimeIntervalNow(WindowParser.TimeIntervalNowContext ctx) { }
+	@Override public void exitTimeAmount(WindowParser.TimeAmountContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTimeUnit(WindowParser.TimeUnitContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTimeUnit(WindowParser.TimeUnitContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

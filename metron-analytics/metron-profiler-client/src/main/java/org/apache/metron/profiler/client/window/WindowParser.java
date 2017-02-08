@@ -1,21 +1,27 @@
 package org.apache.metron.profiler.client.window;
 
 import org.apache.metron.common.dsl.Token;
+import org.apache.metron.common.utils.ConversionUtils;
 import org.apache.metron.profiler.client.window.generated.WindowBaseListener;
+import org.apache.metron.profiler.client.window.predicates.DayPredicates;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public class WindowParser extends WindowBaseListener {
   private final Date now;
   private Stack<Token<?>> stack;
   private static final Token<Object> LIST_MARKER = new Token<>(null, Object.class);
+  private Window window;
 
   public WindowParser(Date now) {
     this.now = now;
+    this.window = new Window();
   }
 
   public WindowParser() {
@@ -26,8 +32,8 @@ public class WindowParser extends WindowBaseListener {
     stack.push(LIST_MARKER);
   }
 
-  private List<Predicate> getPredicates() {
-    LinkedList<Predicate> predicates = new LinkedList<>();
+  private List<Predicate<Long>> getPredicates() {
+    LinkedList<Predicate<Long>> predicates = new LinkedList<>();
     while (true) {
       Token<?> token = stack.pop();
       if (token == LIST_MARKER) {
@@ -47,7 +53,25 @@ public class WindowParser extends WindowBaseListener {
    * @param ctx
    */
   @Override
+  public void exitDaySpecifier(org.apache.metron.profiler.client.window.generated.WindowParser.DaySpecifierContext ctx) {
+    String specifier = ctx.getText().toUpperCase();
+    if(specifier.endsWith("s") || specifier.endsWith("S")) {
+      specifier = specifier.substring(0, specifier.length() - 1);
+    }
+    Predicate<Long> predicate = DayPredicates.valueOf(specifier);
+    stack.push(new Token<>(predicate, Predicate.class));
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <p>The default implementation does nothing.</p>
+   *
+   * @param ctx
+   */
+  @Override
   public void enterExcluding(org.apache.metron.profiler.client.window.generated.WindowParser.ExcludingContext ctx) {
+    enterList();
   }
 
   /**
@@ -59,7 +83,9 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitExcluding(org.apache.metron.profiler.client.window.generated.WindowParser.ExcludingContext ctx) {
-    super.exitExcluding(ctx);
+    List<Predicate<Long>> exclusionList= getPredicates();
+    window.setExcludes(exclusionList);
+
   }
 
   /**
@@ -71,7 +97,7 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void enterIncluding(org.apache.metron.profiler.client.window.generated.WindowParser.IncludingContext ctx) {
-    super.enterIncluding(ctx);
+    enterList();
   }
 
   /**
@@ -83,20 +109,10 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitIncluding(org.apache.metron.profiler.client.window.generated.WindowParser.IncludingContext ctx) {
-    super.exitIncluding(ctx);
+    List<Predicate<Long>> inclusionList= getPredicates();
+    window.setIncludes(inclusionList);
   }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * <p>The default implementation does nothing.</p>
-   *
-   * @param ctx
-   */
-  @Override
-  public void exitSpecifier_list(org.apache.metron.profiler.client.window.generated.WindowParser.Specifier_listContext ctx) {
-    super.exitSpecifier_list(ctx);
-  }
 
   /**
    * {@inheritDoc}
@@ -107,7 +123,12 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitFromToDuration(org.apache.metron.profiler.client.window.generated.WindowParser.FromToDurationContext ctx) {
-    super.exitFromToDuration(ctx);
+    Token<?> toInterval = stack.pop();
+    Token<?> fromInterval = stack.pop();
+    Integer to = (Integer)toInterval.getValue();
+    Integer from = (Integer)fromInterval.getValue();
+    window.setEndMillis(now.getTime() - from);
+    window.setStartMillis(now.getTime() - from - to);
   }
 
   /**
@@ -119,7 +140,10 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitToDuration(org.apache.metron.profiler.client.window.generated.WindowParser.ToDurationContext ctx) {
-    super.exitToDuration(ctx);
+    Token<?> timeInterval = stack.pop();
+    Integer width = (Integer)timeInterval.getValue();
+    window.setEndMillis(now.getTime());
+    window.setStartMillis(now.getTime() - width);
   }
 
   /**
@@ -131,7 +155,9 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitSkipDistance(org.apache.metron.profiler.client.window.generated.WindowParser.SkipDistanceContext ctx) {
-    super.exitSkipDistance(ctx);
+    Token<?> timeInterval = stack.pop();
+    Integer width = (Integer)timeInterval.getValue();
+    window.setSkipDistance(width);
   }
 
   /**
@@ -143,7 +169,9 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitBinWidth(org.apache.metron.profiler.client.window.generated.WindowParser.BinWidthContext ctx) {
-    super.exitBinWidth(ctx);
+    Token<?> timeInterval = stack.pop();
+    Integer width = (Integer)timeInterval.getValue();
+    window.setBinWidth(width);
   }
 
   /**
@@ -155,7 +183,11 @@ public class WindowParser extends WindowBaseListener {
    */
   @Override
   public void exitTimeInterval(org.apache.metron.profiler.client.window.generated.WindowParser.TimeIntervalContext ctx) {
-    super.exitTimeInterval(ctx);
+    Token<?> timeUnit = stack.pop();
+    Token<?> timeDuration = stack.pop();
+    int duration = ConversionUtils.convert(timeDuration.getValue(), Integer.class);
+    TimeUnit unit = (TimeUnit) timeUnit.getValue();
+    stack.push(new Token<>(unit.toMillis(duration), Long.class));
   }
 
   /**
@@ -166,7 +198,33 @@ public class WindowParser extends WindowBaseListener {
    * @param ctx
    */
   @Override
-  public void exitTimeIntervalNow(org.apache.metron.profiler.client.window.generated.WindowParser.TimeIntervalNowContext ctx) {
-    super.exitTimeIntervalNow(ctx);
+  public void exitTimeAmount(org.apache.metron.profiler.client.window.generated.WindowParser.TimeAmountContext ctx) {
+    int duration = Integer.parseInt(ctx.getText());
+    stack.push(new Token<>(duration, Integer.class));
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * <p>The default implementation does nothing.</p>
+   *
+   * @param ctx
+   */
+  @Override
+  public void exitTimeUnit(org.apache.metron.profiler.client.window.generated.WindowParser.TimeUnitContext ctx) {
+    switch(ctx.getText().toUpperCase()) {
+      case "DAY":
+      case "DAYS":
+        stack.push(new Token<>(TimeUnit.DAYS, TimeUnit.class));
+        break;
+      case "MINUTE":
+      case "MINUTES":
+        stack.push(new Token<>(TimeUnit.MINUTES, TimeUnit.class));
+        break;
+      case "SECOND":
+      case "SECONDS":
+        stack.push(new Token<>(TimeUnit.SECONDS, TimeUnit.class));
+        break;
+    }
   }
 }
