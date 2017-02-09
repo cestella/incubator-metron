@@ -1,4 +1,4 @@
-package org.apache.metron.profiler.client;
+package org.apache.metron.profiler.client.window;
 
 import org.apache.metron.profiler.client.window.Window;
 import org.apache.metron.profiler.client.window.WindowProcessor;
