@@ -22,7 +22,8 @@ public enum DayPredicates {
     int dow = toCalendar(ts).get(Calendar.DAY_OF_WEEK);
     return dow == 1 || dow == 7;
   })),
-  HOLIDAY(x -> new HolidaysPredicate(x))
+  HOLIDAY(x -> new HolidaysPredicate(x)),
+  DATE( x -> new DateSpecifierPredicate(x))
   ;
   Function<List<String>, Predicate<Long>> predicateCreator;
   DayPredicates(Function<List<String>, Predicate<Long>> predicate) {

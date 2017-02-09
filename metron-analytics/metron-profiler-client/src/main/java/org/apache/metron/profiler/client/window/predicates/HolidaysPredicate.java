@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class HolidaysPredicate implements Predicate<Long> {
@@ -22,20 +23,26 @@ public class HolidaysPredicate implements Predicate<Long> {
     else {
       String code = args.get(0);
       this.args = args.size() == 1 ? new String[]{} : new String[args.size() - 1];
-      this.manager = HolidayManager.getInstance(ManagerParameters.create(getCalendar(code), null));
+      Optional<HolidayCalendar> calendar = getCalendar(code);
+      if(calendar.isPresent()) {
+        this.manager = HolidayManager.getInstance(ManagerParameters.create(calendar.get()));
+      }
+      else {
+        this.manager = HolidayManager.getInstance(ManagerParameters.create(code));
+      }
       for (int i = 1; i < args.size(); ++i) {
         this.args[i - 1] = args.get(i);
       }
     }
   }
 
-  private static HolidayCalendar getCalendar(String code) {
+  private static Optional<HolidayCalendar> getCalendar(String code) {
     for(HolidayCalendar cal : HolidayCalendar.values()) {
       if(cal.getId().equalsIgnoreCase(code) || cal.name().equalsIgnoreCase(code)) {
-        return cal;
+        return Optional.of(cal);
       }
     }
-    throw new IllegalStateException("Unable to find holiday calendar called: " + code);
+    return Optional.empty();
   }
 
   @Override

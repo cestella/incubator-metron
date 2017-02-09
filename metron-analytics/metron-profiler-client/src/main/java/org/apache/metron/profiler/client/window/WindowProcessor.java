@@ -1,9 +1,10 @@
 package org.apache.metron.profiler.client.window;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.metron.common.dsl.ErrorListener;
+import org.apache.metron.common.dsl.GrammarUtils;
+import org.apache.metron.common.dsl.ParseException;
 import org.apache.metron.common.dsl.Token;
 import org.apache.metron.common.utils.ConversionUtils;
 import org.apache.metron.profiler.client.window.generated.WindowBaseListener;
@@ -22,6 +23,7 @@ import java.util.function.Predicate;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class WindowProcessor extends WindowBaseListener {
+  private Throwable throwable;
   private Stack<Token<?>> stack;
   private static final Token<Object> LIST_MARKER = new Token<>(null, Object.class);
   private static final Token<Object> DAY_SPECIFIER_MARKER = new Token<>(null, Object.class);
@@ -63,7 +65,10 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitIdentifier(WindowParser.IdentifierContext ctx) {
-    stack.push(new Token<>(ctx.getText(), String.class));
+    if(checkForException(ctx)) {
+      return;
+    }
+    stack.push(new Token<>(ctx.getText().substring(1), String.class));
   }
 
   /**
@@ -75,6 +80,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void enterSpecifier(WindowParser.SpecifierContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     stack.push(DAY_SPECIFIER_MARKER);
   }
 
@@ -88,6 +96,7 @@ public class WindowProcessor extends WindowBaseListener {
   @Override
   public void exitSpecifier(WindowParser.SpecifierContext ctx) {
     LinkedList<String> args = new LinkedList<>();
+
     while (true) {
       Token<?> token = stack.pop();
       if (token == DAY_SPECIFIER_MARKER) {
@@ -99,14 +108,18 @@ public class WindowProcessor extends WindowBaseListener {
     String specifier = args.removeFirst();
     List<String> arg = args.size() > 0?args:new ArrayList<>();
     Function<Long, Predicate<Long>> predicate = null;
-    if(specifier.equals("THIS DAY OF THE WEEK")) {
-      predicate = now -> DayPredicates.dayOfWeekPredicate(DayPredicates.getDayOfWeek(now));
+    try {
+      if (specifier.equals("THIS DAY OF THE WEEK") || specifier.equals("THIS DAY OF WEEK")) {
+        predicate = now -> DayPredicates.dayOfWeekPredicate(DayPredicates.getDayOfWeek(now));
+      } else {
+        final Predicate<Long> dayOfWeekPredicate = DayPredicates.create(specifier, arg);
+        predicate = now -> dayOfWeekPredicate;
+      }
+      stack.push(new Token<>(predicate, Function.class));
     }
-    else {
-      final Predicate<Long> dayOfWeekPredicate = DayPredicates.create(specifier, arg);
-      predicate = now -> dayOfWeekPredicate;
+    catch(Throwable t) {
+      throwable = t;
     }
-    stack.push(new Token<>(predicate, Function.class));
   }
 
   /**
@@ -118,7 +131,15 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitDay_specifier(WindowParser.Day_specifierContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     String specifier = ctx.getText().toUpperCase();
+    if(specifier.length() == 0 && ctx.exception != null){
+      IllegalStateException ise = new IllegalStateException("Invalid day specifier: " + ctx.getStart().getText(), ctx.exception);
+      throwable = ise;
+      throw ise;
+    }
     if(specifier.endsWith("S")) {
       specifier = specifier.substring(0, specifier.length() - 1);
     }
@@ -134,6 +155,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void enterExcluding_specifier(WindowParser.Excluding_specifierContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     enterList();
   }
 
@@ -146,6 +170,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitExcluding_specifier(WindowParser.Excluding_specifierContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     window.setExcludes(getPredicates());
   }
 
@@ -158,6 +185,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void enterIncluding_specifier(WindowParser.Including_specifierContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     enterList();
   }
 
@@ -170,12 +200,15 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitIncluding_specifier(WindowParser.Including_specifierContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     window.setIncludes(getPredicates());
   }
 
   private void setFromTo(int from, int to) {
-    window.setEndMillis(now -> now - to);
-    window.setStartMillis(now -> now - from);
+    window.setEndMillis(now -> now - Math.min(to, from));
+    window.setStartMillis(now -> now - Math.max(from, to));
   }
 
 
@@ -188,6 +221,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitFromToDuration(org.apache.metron.profiler.client.window.generated.WindowParser.FromToDurationContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     Token<?> toInterval = stack.pop();
     Token<?> fromInterval = stack.pop();
     Integer to = (Integer)toInterval.getValue();
@@ -204,6 +240,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitFromDuration(org.apache.metron.profiler.client.window.generated.WindowParser.FromDurationContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     Token<?> timeInterval = stack.pop();
     Integer from = (Integer)timeInterval.getValue();
     setFromTo(from, 0);
@@ -218,6 +257,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitSkipDistance(org.apache.metron.profiler.client.window.generated.WindowParser.SkipDistanceContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     Token<?> timeInterval = stack.pop();
     Integer width = (Integer)timeInterval.getValue();
     window.setSkipDistance(width);
@@ -231,7 +273,10 @@ public class WindowProcessor extends WindowBaseListener {
    * @param ctx
    */
   @Override
-  public void exitBinWidth(org.apache.metron.profiler.client.window.generated.WindowParser.BinWidthContext ctx) {
+  public void exitWindowWidth(org.apache.metron.profiler.client.window.generated.WindowParser.WindowWidthContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     Token<?> timeInterval = stack.pop();
     Integer width = (Integer)timeInterval.getValue();
     window.setBinWidth(width);
@@ -248,6 +293,9 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitTimeInterval(org.apache.metron.profiler.client.window.generated.WindowParser.TimeIntervalContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
     Token<?> timeUnit = stack.pop();
     Token<?> timeDuration = stack.pop();
     int duration = ConversionUtils.convert(timeDuration.getValue(), Integer.class);
@@ -264,6 +312,13 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitTimeAmount(org.apache.metron.profiler.client.window.generated.WindowParser.TimeAmountContext ctx) {
+    if(checkForException(ctx)) {
+      return;
+    }
+    if(ctx.getText().length() == 0) {
+      throwable = new IllegalStateException("Unable to parse empty string.");
+      return;
+    }
     int duration = Integer.parseInt(ctx.getText());
     stack.push(new Token<>(duration, Integer.class));
   }
@@ -277,43 +332,80 @@ public class WindowProcessor extends WindowBaseListener {
    */
   @Override
   public void exitTimeUnit(org.apache.metron.profiler.client.window.generated.WindowParser.TimeUnitContext ctx) {
-    switch(ctx.getText().toUpperCase()) {
+    checkForException(ctx);
+    switch(normalizeTimeUnit(ctx.getText())) {
       case "DAY":
-      case "DAYS":
         stack.push(new Token<>(TimeUnit.DAYS, TimeUnit.class));
         break;
       case "HOUR":
-      case "HOURS":
         stack.push(new Token<>(TimeUnit.HOURS, TimeUnit.class));
         break;
       case "MINUTE":
-      case "MINUTES":
         stack.push(new Token<>(TimeUnit.MINUTES, TimeUnit.class));
         break;
       case "SECOND":
-      case "SECONDS":
         stack.push(new Token<>(TimeUnit.SECONDS, TimeUnit.class));
         break;
+      default:
+        throw new IllegalStateException("Unsupported time unit: " + ctx.getText()
+                + ".  Supported units are limited to: day, hour, minute, second "
+                + "with any pluralization or capitalization.");
     }
   }
 
-  public static Window parse(String statement) {
+  private boolean checkForException(ParserRuleContext ctx) {
+    if(throwable != null)  {
+      //throw new ParseException(throwable.getMessage(), throwable);
+      return true;
+    }
+    else if(ctx.exception != null) {
+      return true;
+      //throw new ParseException(ctx.exception.getMessage(), ctx.exception);
+    }
+    return false;
+  }
+
+  private static String normalizeTimeUnit(String s) {
+    String ret = s.toUpperCase().replaceAll("[^A-Z]", "");
+    if(ret.endsWith("S")) {
+      return ret.substring(0, ret.length() - 1);
+    }
+    return ret;
+  }
+
+  public static Window parse(String statement) throws ParseException {
     if (statement == null || isEmpty(statement.trim())) {
       return null;
     }
-
+    statement = statement.trim();
     ANTLRInputStream input = new ANTLRInputStream(statement);
     WindowLexer lexer = new WindowLexer(input);
     lexer.removeErrorListeners();
     lexer.addErrorListener(new ErrorListener());
     TokenStream tokens = new CommonTokenStream(lexer);
     WindowParser parser = new WindowParser(tokens);
-
     WindowProcessor treeBuilder = new WindowProcessor();
     parser.addParseListener(treeBuilder);
     parser.removeErrorListeners();
     parser.addErrorListener(new ErrorListener());
     parser.window();
     return treeBuilder.getWindow();
+  }
+
+  public static String syntaxTree(String statement) {
+    if (statement == null || isEmpty(statement.trim())) {
+      return null;
+    }
+    statement = statement.trim();
+    ANTLRInputStream input = new ANTLRInputStream(statement);
+    WindowLexer lexer = new WindowLexer(input);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(new ErrorListener());
+    TokenStream tokens = new CommonTokenStream(lexer);
+    WindowParser parser = new WindowParser(tokens);
+    parser.removeErrorListeners();
+    parser.addErrorListener(new ErrorListener());
+    ParseTree tree = parser.window();
+    return GrammarUtils.toSyntaxTree(tree) ;
   }
 }

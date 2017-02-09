@@ -73,6 +73,18 @@ public class WindowBaseListener implements WindowListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDenseWindow(WindowParser.DenseWindowContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDenseWindow(WindowParser.DenseWindowContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExcluding_specifier(WindowParser.Excluding_specifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -193,13 +205,13 @@ public class WindowBaseListener implements WindowListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBinWidth(WindowParser.BinWidthContext ctx) { }
+	@Override public void enterWindowWidth(WindowParser.WindowWidthContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBinWidth(WindowParser.BinWidthContext ctx) { }
+	@Override public void exitWindowWidth(WindowParser.WindowWidthContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

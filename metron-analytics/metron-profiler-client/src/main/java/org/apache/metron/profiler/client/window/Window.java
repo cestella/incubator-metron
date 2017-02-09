@@ -5,6 +5,7 @@ import org.joda.time.Interval;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -14,8 +15,8 @@ public class Window {
   private Function<Long, Long> endMillis;
   private List<Function<Long, Predicate<Long>>> includes = new ArrayList<>();
   private List<Function<Long, Predicate<Long>>> excludes = new ArrayList<>();
-  private int binWidth;
-  private int skipDistance = Integer.MAX_VALUE;
+  private Optional<Integer> binWidth = Optional.empty();
+  private Optional<Integer> skipDistance = Optional.empty();
 
   public long getStartMillis(long now) {
     return startMillis.apply(now);
@@ -49,20 +50,20 @@ public class Window {
     this.excludes = excludes;
   }
 
-  public long getBinWidth() {
+  public Optional<Integer> getBinWidth() {
     return binWidth;
   }
 
   void setBinWidth(int binWidth) {
-    this.binWidth = binWidth;
+    this.binWidth = Optional.of(binWidth);
   }
 
-  public long getSkipDistance() {
+  public Optional<Integer> getSkipDistance() {
     return skipDistance;
   }
 
   void setSkipDistance(int skipDistance) {
-    this.skipDistance = skipDistance;
+    this.skipDistance = Optional.of(skipDistance);
   }
 
   public List<Interval> toIntervals(long now) {
@@ -71,6 +72,11 @@ public class Window {
     long endMillis = getEndMillis(now);
     Iterable<Predicate<Long>> includes = getIncludes(now);
     Iterable<Predicate<Long>> excludes = getExcludes(now);
+    //if we don't have a skip distance, then we just skip past everything to make the window dense
+    int skipDistance = getSkipDistance().orElse(Integer.MAX_VALUE);
+    //if we don't have a window width, then we want the window to be completely dense.
+    long binWidth = getBinWidth().isPresent()?getBinWidth().get():endMillis-startMillis;
+
     for(long left = startMillis;left + binWidth <= endMillis;left += skipDistance) {
       Interval interval = new Interval(left, left + binWidth);
       boolean include = includes.iterator().hasNext()?false:true;

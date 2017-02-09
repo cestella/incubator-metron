@@ -54,21 +54,23 @@ TO : 'TO' | 'to' | 'until' | 'UNTIL';
 AGO : 'AGO' | 'ago';
 
 NUMBER : FIRST_DIGIT DIGIT*;
+IDENTIFIER : [:][a-zA-Z0-9][a-zA-Z0-9_\.\-/]*;
+
 DAY_SPECIFIER : MONDAY | TUESDAY | WEDNESDAY | THURSDAY
                        | FRIDAY | SATURDAY | SUNDAY
                        | CURRENT_DAY_OF_WEEK
                        | WEEKEND | WEEKDAY | HOLIDAYS
+                       | DATE
                        ;
 
 TIME_UNIT : SECOND_UNIT | MINUTE_UNIT | HOUR_UNIT | DAY_UNIT ;
-IDENTIFIER : [a-zA-Z_][a-zA-Z_\.0-9]*;
 
 WS : [ \r\t\u000C\n]+ -> skip;
 
-fragment SECOND_UNIT : 'SECOND' | 'second' | 'seconds' | 'SECONDS';
-fragment MINUTE_UNIT : 'MINUTE' | 'minute' | 'minutes' | 'MINUTES';
-fragment HOUR_UNIT : 'HOUR' | 'hour' | 'hours' | 'HOURS';
-fragment DAY_UNIT : 'DAY' | 'day' | 'days' | 'DAYS';
+fragment SECOND_UNIT : 'SECOND' | 'second' | 'seconds' | 'SECONDS' | 'second(s)' | 'SECOND(S)';
+fragment MINUTE_UNIT : 'MINUTE' | 'minute' | 'minutes' | 'MINUTES' | 'minute(s)' | 'MINUTE(S)';
+fragment HOUR_UNIT : 'HOUR' | 'hour' | 'hours' | 'HOURS' | 'hour(s)' | 'HOUR(S)';
+fragment DAY_UNIT : 'DAY' | 'day' | 'days' | 'DAYS' | 'day(s)' | 'DAY(S)';
 fragment MONDAY : 'MONDAY' | 'monday' | 'MONDAYS' | 'mondays';
 fragment TUESDAY : 'TUESDAY' | 'tuesday' | 'TUESDAYS' | 'tuesdays';
 fragment WEDNESDAY : 'WEDNESDAY' | 'wednesday' | 'WEDNESDAYS' | 'wednesdays';
@@ -80,14 +82,16 @@ fragment CURRENT_DAY_OF_WEEK: 'this day of week' | 'THIS DAY OF WEEK' | 'this da
 fragment WEEKEND : 'weekend' | 'WEEKEND' | 'weekends' | 'WEEKENDS';
 fragment WEEKDAY: 'weekday' | 'WEEKDAY' | 'weekdays' | 'WEEKDAYS';
 fragment HOLIDAYS: 'holiday' | 'HOLIDAY' | 'holidays' | 'HOLIDAYS';
+fragment DATE: 'date' | 'DATE';
 
 fragment DIGIT : '0'..'9';
 fragment FIRST_DIGIT : '1'..'9';
 
 window : window_expression EOF;
 
-window_expression : bin_width including_specifier? excluding_specifier? #NonRepeatingWindow
-                  | bin_width skip_distance duration including_specifier? excluding_specifier? #RepeatingWindow
+window_expression : window_width including_specifier? excluding_specifier? #NonRepeatingWindow
+                  | window_width skip_distance duration including_specifier? excluding_specifier? #RepeatingWindow
+                  | duration #DenseWindow
                   ;
 
 excluding_specifier : EXCLUDE specifier_list
@@ -95,16 +99,17 @@ excluding_specifier : EXCLUDE specifier_list
 including_specifier : INCLUDE specifier_list
                     ;
 
-specifier : day_specifier (COLON specifier_arg_list)?
+specifier : day_specifier
+          | day_specifier specifier_arg_list
           ;
 
 specifier_arg_list : identifier
-                   | identifier COLON specifier_arg_list
+                   | identifier specifier_arg_list
                     ;
 
 day_specifier : DAY_SPECIFIER ;
 
-identifier : IDENTIFIER
+identifier : NUMBER | IDENTIFIER
           ;
 
 specifier_list : specifier
@@ -118,7 +123,7 @@ duration : FROM time_interval AGO? TO time_interval AGO? #FromToDuration
 skip_distance : EVERY time_interval #SkipDistance
               ;
 
-bin_width : time_interval WINDOW? #BinWidth
+window_width : time_interval WINDOW? #WindowWidth
           ;
 
 time_interval : time_amount time_unit #TimeInterval

@@ -63,6 +63,18 @@ public interface WindowListener extends ParseTreeListener {
 	 */
 	void exitRepeatingWindow(WindowParser.RepeatingWindowContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code DenseWindow}
+	 * labeled alternative in {@link WindowParser#window_expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterDenseWindow(WindowParser.DenseWindowContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DenseWindow}
+	 * labeled alternative in {@link WindowParser#window_expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitDenseWindow(WindowParser.DenseWindowContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link WindowParser#excluding_specifier}.
 	 * @param ctx the parse tree
 	 */
@@ -169,17 +181,17 @@ public interface WindowListener extends ParseTreeListener {
 	 */
 	void exitSkipDistance(WindowParser.SkipDistanceContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code BinWidth}
-	 * labeled alternative in {@link WindowParser#bin_width}.
+	 * Enter a parse tree produced by the {@code WindowWidth}
+	 * labeled alternative in {@link WindowParser#window_width}.
 	 * @param ctx the parse tree
 	 */
-	void enterBinWidth(WindowParser.BinWidthContext ctx);
+	void enterWindowWidth(WindowParser.WindowWidthContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code BinWidth}
-	 * labeled alternative in {@link WindowParser#bin_width}.
+	 * Exit a parse tree produced by the {@code WindowWidth}
+	 * labeled alternative in {@link WindowParser#window_width}.
 	 * @param ctx the parse tree
 	 */
-	void exitBinWidth(WindowParser.BinWidthContext ctx);
+	void exitWindowWidth(WindowParser.WindowWidthContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code TimeInterval}
 	 * labeled alternative in {@link WindowParser#time_interval}.
