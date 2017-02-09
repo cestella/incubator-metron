@@ -48,7 +48,7 @@ EXCLUDE : 'exclude' | 'EXCLUDE' | 'excludes' | 'EXCLUDES' | 'excluding' | 'EXCLU
 
 NOW : 'NOW' | 'now';
 
-FROM : 'FROM' | 'from';
+FROM : 'FROM' | 'from' | 'STARTING FROM' | 'starting from';
 EVERY : 'EVERY' | 'every';
 TO : 'TO' | 'to' | 'until' | 'UNTIL';
 AGO : 'AGO' | 'ago';
