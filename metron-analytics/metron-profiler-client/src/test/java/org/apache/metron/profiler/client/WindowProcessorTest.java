@@ -26,20 +26,27 @@ public class WindowProcessorTest {
 
   @Test
   public void testRepeat() {
-    Window w = WindowProcessor.parse("30 minute window every 1 hour from 2 hours ago to 30 minutes ago");
+    for(String text : new String[] {
+      "30 minute window every 1 hour from 2 hours ago to 30 minutes ago",
+      "30 minute window every 1 hour starting from 2 hours ago to 30 minutes ago",
+      "30 minute window every 1 hour starting from 2 hours ago until 30 minutes ago",
+    })
+    {
+      Window w = WindowProcessor.parse(text);
     /*
     A window size of 30 minutes
     Starting 2 hour ago and continuing until 30 minutes ago
     window 1: ( now - 2 hour, now - 2 hour + 30 minutes)
     window 2: (now - 1 hour, now - 1 hour + 30 minutes)
      */
-    Date now = new Date();
-    List<Interval> intervals = w.toIntervals(now.getTime());
-    Assert.assertEquals(2, intervals.size());
-    assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(2), intervals.get(0).getStartMillis());
-    assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(2) + TimeUnit.MINUTES.toMillis(30), intervals.get(0).getEndMillis());
-    assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(1), intervals.get(1).getStartMillis());
-    assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(1) + TimeUnit.MINUTES.toMillis(30), intervals.get(1).getEndMillis());
+      Date now = new Date();
+      List<Interval> intervals = w.toIntervals(now.getTime());
+      Assert.assertEquals(2, intervals.size());
+      assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(2), intervals.get(0).getStartMillis());
+      assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(2) + TimeUnit.MINUTES.toMillis(30), intervals.get(0).getEndMillis());
+      assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(1), intervals.get(1).getStartMillis());
+      assertEquals(now.getTime() - TimeUnit.HOURS.toMillis(1) + TimeUnit.MINUTES.toMillis(30), intervals.get(1).getEndMillis());
+    }
   }
 
 
@@ -106,6 +113,18 @@ public class WindowProcessorTest {
 
 
   @Test
+  public void testRepeatWithConflictingExclusionInclusion() throws ParseException {
+    {
+      Window w = WindowProcessor.parse("30 minute window every 24 hours from 7 days ago including saturdays excluding weekends");
+
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+      Date now = sdf.parse("2017/12/26 12:00");
+      List<Interval> intervals = w.toIntervals(now.getTime());
+      Assert.assertEquals(0, intervals.size());
+    }
+  }
+
+  @Test
   public void testRepeatWithWeekendExclusion() throws ParseException {
     {
       Window w = WindowProcessor.parse("30 minute window every 24 hours from 7 days ago excluding weekends");
@@ -114,6 +133,18 @@ public class WindowProcessorTest {
       Date now = sdf.parse("2017/12/26 12:00");
       List<Interval> intervals = w.toIntervals(now.getTime());
       Assert.assertEquals(5, intervals.size());
+    }
+  }
+
+  @Test
+  public void testRepeatWithInclusionExclusion() throws ParseException {
+    {
+      Window w = WindowProcessor.parse("30 minute window every 24 hours from 7 days ago including holidays:us excluding weekends");
+
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+      Date now = sdf.parse("2017/12/26 12:00");
+      List<Interval> intervals = w.toIntervals(now.getTime());
+      Assert.assertEquals(1, intervals.size());
     }
   }
 
