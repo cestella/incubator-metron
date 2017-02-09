@@ -37,25 +37,29 @@ public class WindowParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		COMMA=1, BIN=2, INCLUDE=3, EXCLUDE=4, NOW=5, FROM=6, EVERY=7, TO=8, AGO=9, 
-		NUMBER=10, WS=11, DAY_SPECIFIER=12, TIME_UNIT=13;
+		COMMA=1, COLON=2, WINDOW=3, INCLUDE=4, EXCLUDE=5, NOW=6, FROM=7, EVERY=8, 
+		TO=9, AGO=10, NUMBER=11, DAY_SPECIFIER=12, TIME_UNIT=13, IDENTIFIER=14, 
+		WS=15;
 	public static final int
 		RULE_window = 0, RULE_window_expression = 1, RULE_excluding_specifier = 2, 
-		RULE_including_specifier = 3, RULE_specifier = 4, RULE_specifier_list = 5, 
-		RULE_duration = 6, RULE_skip_distance = 7, RULE_bin_width = 8, RULE_time_interval = 9, 
-		RULE_time_amount = 10, RULE_time_unit = 11;
+		RULE_including_specifier = 3, RULE_specifier = 4, RULE_specifier_arg_list = 5, 
+		RULE_day_specifier = 6, RULE_identifier = 7, RULE_specifier_list = 8, 
+		RULE_duration = 9, RULE_skip_distance = 10, RULE_bin_width = 11, RULE_time_interval = 12, 
+		RULE_time_amount = 13, RULE_time_unit = 14;
 	public static final String[] ruleNames = {
 		"window", "window_expression", "excluding_specifier", "including_specifier", 
-		"specifier", "specifier_list", "duration", "skip_distance", "bin_width", 
-		"time_interval", "time_amount", "time_unit"
+		"specifier", "specifier_arg_list", "day_specifier", "identifier", "specifier_list", 
+		"duration", "skip_distance", "bin_width", "time_interval", "time_amount", 
+		"time_unit"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "','"
+		null, "','", "':'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, "COMMA", "BIN", "INCLUDE", "EXCLUDE", "NOW", "FROM", "EVERY", "TO", 
-		"AGO", "NUMBER", "WS", "DAY_SPECIFIER", "TIME_UNIT"
+		null, "COMMA", "COLON", "WINDOW", "INCLUDE", "EXCLUDE", "NOW", "FROM", 
+		"EVERY", "TO", "AGO", "NUMBER", "DAY_SPECIFIER", "TIME_UNIT", "IDENTIFIER", 
+		"WS"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -131,9 +135,9 @@ public class WindowParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(24);
+			setState(30);
 			window_expression();
-			setState(25);
+			setState(31);
 			match(EOF);
 			}
 		}
@@ -211,28 +215,28 @@ public class WindowParser extends Parser {
 		enterRule(_localctx, 2, RULE_window_expression);
 		int _la;
 		try {
-			setState(43);
+			setState(49);
 			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
 			case 1:
 				_localctx = new NonRepeatingWindowContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(27);
+				setState(33);
 				bin_width();
-				setState(29);
-				switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
-				case 1:
+				setState(35);
+				_la = _input.LA(1);
+				if (_la==INCLUDE) {
 					{
-					setState(28);
+					setState(34);
 					including_specifier();
 					}
-					break;
 				}
-				setState(32);
+
+				setState(38);
 				_la = _input.LA(1);
-				if (_la==DAY_SPECIFIER) {
+				if (_la==EXCLUDE) {
 					{
-					setState(31);
+					setState(37);
 					excluding_specifier();
 					}
 				}
@@ -243,26 +247,26 @@ public class WindowParser extends Parser {
 				_localctx = new RepeatingWindowContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(34);
+				setState(40);
 				bin_width();
-				setState(35);
+				setState(41);
 				skip_distance();
-				setState(36);
+				setState(42);
 				duration();
-				setState(38);
-				switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
-				case 1:
+				setState(44);
+				_la = _input.LA(1);
+				if (_la==INCLUDE) {
 					{
-					setState(37);
+					setState(43);
 					including_specifier();
 					}
-					break;
 				}
-				setState(41);
+
+				setState(47);
 				_la = _input.LA(1);
-				if (_la==DAY_SPECIFIER) {
+				if (_la==EXCLUDE) {
 					{
-					setState(40);
+					setState(46);
 					excluding_specifier();
 					}
 				}
@@ -283,28 +287,21 @@ public class WindowParser extends Parser {
 	}
 
 	public static class Excluding_specifierContext extends ParserRuleContext {
+		public TerminalNode EXCLUDE() { return getToken(WindowParser.EXCLUDE, 0); }
+		public Specifier_listContext specifier_list() {
+			return getRuleContext(Specifier_listContext.class,0);
+		}
 		public Excluding_specifierContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_excluding_specifier; }
-	 
-		public Excluding_specifierContext() { }
-		public void copyFrom(Excluding_specifierContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class ExcludingContext extends Excluding_specifierContext {
-		public Specifier_listContext specifier_list() {
-			return getRuleContext(Specifier_listContext.class,0);
-		}
-		public ExcludingContext(Excluding_specifierContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterExcluding(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterExcluding_specifier(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitExcluding(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitExcluding_specifier(this);
 		}
 	}
 
@@ -312,10 +309,11 @@ public class WindowParser extends Parser {
 		Excluding_specifierContext _localctx = new Excluding_specifierContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_excluding_specifier);
 		try {
-			_localctx = new ExcludingContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(45);
+			setState(51);
+			match(EXCLUDE);
+			setState(52);
 			specifier_list(0);
 			}
 		}
@@ -331,28 +329,21 @@ public class WindowParser extends Parser {
 	}
 
 	public static class Including_specifierContext extends ParserRuleContext {
+		public TerminalNode INCLUDE() { return getToken(WindowParser.INCLUDE, 0); }
+		public Specifier_listContext specifier_list() {
+			return getRuleContext(Specifier_listContext.class,0);
+		}
 		public Including_specifierContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_including_specifier; }
-	 
-		public Including_specifierContext() { }
-		public void copyFrom(Including_specifierContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class IncludingContext extends Including_specifierContext {
-		public Specifier_listContext specifier_list() {
-			return getRuleContext(Specifier_listContext.class,0);
-		}
-		public IncludingContext(Including_specifierContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterIncluding(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterIncluding_specifier(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitIncluding(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitIncluding_specifier(this);
 		}
 	}
 
@@ -360,10 +351,11 @@ public class WindowParser extends Parser {
 		Including_specifierContext _localctx = new Including_specifierContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_including_specifier);
 		try {
-			_localctx = new IncludingContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(47);
+			setState(54);
+			match(INCLUDE);
+			setState(55);
 			specifier_list(0);
 			}
 		}
@@ -379,26 +371,24 @@ public class WindowParser extends Parser {
 	}
 
 	public static class SpecifierContext extends ParserRuleContext {
+		public Day_specifierContext day_specifier() {
+			return getRuleContext(Day_specifierContext.class,0);
+		}
+		public TerminalNode COLON() { return getToken(WindowParser.COLON, 0); }
+		public Specifier_arg_listContext specifier_arg_list() {
+			return getRuleContext(Specifier_arg_listContext.class,0);
+		}
 		public SpecifierContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_specifier; }
-	 
-		public SpecifierContext() { }
-		public void copyFrom(SpecifierContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class DaySpecifierContext extends SpecifierContext {
-		public TerminalNode DAY_SPECIFIER() { return getToken(WindowParser.DAY_SPECIFIER, 0); }
-		public DaySpecifierContext(SpecifierContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterDaySpecifier(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterSpecifier(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitDaySpecifier(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitSpecifier(this);
 		}
 	}
 
@@ -406,11 +396,154 @@ public class WindowParser extends Parser {
 		SpecifierContext _localctx = new SpecifierContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_specifier);
 		try {
-			_localctx = new DaySpecifierContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(49);
+			setState(57);
+			day_specifier();
+			setState(60);
+			switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
+			case 1:
+				{
+				setState(58);
+				match(COLON);
+				setState(59);
+				specifier_arg_list();
+				}
+				break;
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Specifier_arg_listContext extends ParserRuleContext {
+		public IdentifierContext identifier() {
+			return getRuleContext(IdentifierContext.class,0);
+		}
+		public TerminalNode COLON() { return getToken(WindowParser.COLON, 0); }
+		public Specifier_arg_listContext specifier_arg_list() {
+			return getRuleContext(Specifier_arg_listContext.class,0);
+		}
+		public Specifier_arg_listContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_specifier_arg_list; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterSpecifier_arg_list(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitSpecifier_arg_list(this);
+		}
+	}
+
+	public final Specifier_arg_listContext specifier_arg_list() throws RecognitionException {
+		Specifier_arg_listContext _localctx = new Specifier_arg_listContext(_ctx, getState());
+		enterRule(_localctx, 10, RULE_specifier_arg_list);
+		try {
+			setState(67);
+			switch ( getInterpreter().adaptivePredict(_input,6,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(62);
+				identifier();
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(63);
+				identifier();
+				setState(64);
+				match(COLON);
+				setState(65);
+				specifier_arg_list();
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Day_specifierContext extends ParserRuleContext {
+		public TerminalNode DAY_SPECIFIER() { return getToken(WindowParser.DAY_SPECIFIER, 0); }
+		public Day_specifierContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_day_specifier; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterDay_specifier(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitDay_specifier(this);
+		}
+	}
+
+	public final Day_specifierContext day_specifier() throws RecognitionException {
+		Day_specifierContext _localctx = new Day_specifierContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_day_specifier);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(69);
 			match(DAY_SPECIFIER);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class IdentifierContext extends ParserRuleContext {
+		public TerminalNode IDENTIFIER() { return getToken(WindowParser.IDENTIFIER, 0); }
+		public IdentifierContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_identifier; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterIdentifier(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitIdentifier(this);
+		}
+	}
+
+	public final IdentifierContext identifier() throws RecognitionException {
+		IdentifierContext _localctx = new IdentifierContext(_ctx, getState());
+		enterRule(_localctx, 14, RULE_identifier);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(71);
+			match(IDENTIFIER);
 			}
 		}
 		catch (RecognitionException re) {
@@ -455,20 +588,20 @@ public class WindowParser extends Parser {
 		int _parentState = getState();
 		Specifier_listContext _localctx = new Specifier_listContext(_ctx, _parentState);
 		Specifier_listContext _prevctx = _localctx;
-		int _startState = 10;
-		enterRecursionRule(_localctx, 10, RULE_specifier_list, _p);
+		int _startState = 16;
+		enterRecursionRule(_localctx, 16, RULE_specifier_list, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			{
-			setState(52);
+			setState(74);
 			specifier();
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(59);
+			setState(81);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,5,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
@@ -477,18 +610,18 @@ public class WindowParser extends Parser {
 					{
 					_localctx = new Specifier_listContext(_parentctx, _parentState);
 					pushNewRecursionContext(_localctx, _startState, RULE_specifier_list);
-					setState(54);
+					setState(76);
 					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-					setState(55);
+					setState(77);
 					match(COMMA);
-					setState(56);
+					setState(78);
 					specifier();
 					}
 					} 
 				}
-				setState(61);
+				setState(83);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,5,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 			}
 			}
 		}
@@ -537,83 +670,81 @@ public class WindowParser extends Parser {
 			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitFromToDuration(this);
 		}
 	}
-	public static class ToDurationContext extends DurationContext {
-		public TerminalNode TO() { return getToken(WindowParser.TO, 0); }
+	public static class FromDurationContext extends DurationContext {
+		public TerminalNode FROM() { return getToken(WindowParser.FROM, 0); }
 		public Time_intervalContext time_interval() {
 			return getRuleContext(Time_intervalContext.class,0);
 		}
 		public TerminalNode AGO() { return getToken(WindowParser.AGO, 0); }
-		public ToDurationContext(DurationContext ctx) { copyFrom(ctx); }
+		public FromDurationContext(DurationContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterToDuration(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).enterFromDuration(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitToDuration(this);
+			if ( listener instanceof WindowListener ) ((WindowListener)listener).exitFromDuration(this);
 		}
 	}
 
 	public final DurationContext duration() throws RecognitionException {
 		DurationContext _localctx = new DurationContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_duration);
+		enterRule(_localctx, 18, RULE_duration);
 		int _la;
 		try {
-			setState(77);
-			switch (_input.LA(1)) {
-			case FROM:
+			setState(99);
+			switch ( getInterpreter().adaptivePredict(_input,11,_ctx) ) {
+			case 1:
 				_localctx = new FromToDurationContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(62);
+				setState(84);
 				match(FROM);
-				setState(63);
+				setState(85);
 				time_interval();
-				setState(65);
+				setState(87);
 				_la = _input.LA(1);
 				if (_la==AGO) {
 					{
-					setState(64);
+					setState(86);
 					match(AGO);
 					}
 				}
 
-				setState(67);
+				setState(89);
 				match(TO);
-				setState(68);
+				setState(90);
 				time_interval();
-				setState(70);
+				setState(92);
 				_la = _input.LA(1);
 				if (_la==AGO) {
 					{
-					setState(69);
+					setState(91);
 					match(AGO);
 					}
 				}
 
 				}
 				break;
-			case TO:
-				_localctx = new ToDurationContext(_localctx);
+			case 2:
+				_localctx = new FromDurationContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(72);
-				match(TO);
-				setState(73);
+				setState(94);
+				match(FROM);
+				setState(95);
 				time_interval();
-				setState(75);
+				setState(97);
 				_la = _input.LA(1);
 				if (_la==AGO) {
 					{
-					setState(74);
+					setState(96);
 					match(AGO);
 					}
 				}
 
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -656,14 +787,14 @@ public class WindowParser extends Parser {
 
 	public final Skip_distanceContext skip_distance() throws RecognitionException {
 		Skip_distanceContext _localctx = new Skip_distanceContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_skip_distance);
+		enterRule(_localctx, 20, RULE_skip_distance);
 		try {
 			_localctx = new SkipDistanceContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(79);
+			setState(101);
 			match(EVERY);
-			setState(80);
+			setState(102);
 			time_interval();
 			}
 		}
@@ -693,7 +824,7 @@ public class WindowParser extends Parser {
 		public Time_intervalContext time_interval() {
 			return getRuleContext(Time_intervalContext.class,0);
 		}
-		public TerminalNode BIN() { return getToken(WindowParser.BIN, 0); }
+		public TerminalNode WINDOW() { return getToken(WindowParser.WINDOW, 0); }
 		public BinWidthContext(Bin_widthContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -707,15 +838,23 @@ public class WindowParser extends Parser {
 
 	public final Bin_widthContext bin_width() throws RecognitionException {
 		Bin_widthContext _localctx = new Bin_widthContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_bin_width);
+		enterRule(_localctx, 22, RULE_bin_width);
+		int _la;
 		try {
 			_localctx = new BinWidthContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(82);
+			setState(104);
 			time_interval();
-			setState(83);
-			match(BIN);
+			setState(106);
+			_la = _input.LA(1);
+			if (_la==WINDOW) {
+				{
+				setState(105);
+				match(WINDOW);
+				}
+			}
+
 			}
 		}
 		catch (RecognitionException re) {
@@ -760,14 +899,14 @@ public class WindowParser extends Parser {
 
 	public final Time_intervalContext time_interval() throws RecognitionException {
 		Time_intervalContext _localctx = new Time_intervalContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_time_interval);
+		enterRule(_localctx, 24, RULE_time_interval);
 		try {
 			_localctx = new TimeIntervalContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(85);
+			setState(108);
 			time_amount();
-			setState(86);
+			setState(109);
 			time_unit();
 			}
 		}
@@ -808,12 +947,12 @@ public class WindowParser extends Parser {
 
 	public final Time_amountContext time_amount() throws RecognitionException {
 		Time_amountContext _localctx = new Time_amountContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_time_amount);
+		enterRule(_localctx, 26, RULE_time_amount);
 		try {
 			_localctx = new TimeAmountContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(88);
+			setState(111);
 			match(NUMBER);
 			}
 		}
@@ -854,12 +993,12 @@ public class WindowParser extends Parser {
 
 	public final Time_unitContext time_unit() throws RecognitionException {
 		Time_unitContext _localctx = new Time_unitContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_time_unit);
+		enterRule(_localctx, 28, RULE_time_unit);
 		try {
 			_localctx = new TimeUnitContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(90);
+			setState(113);
 			match(TIME_UNIT);
 			}
 		}
@@ -876,7 +1015,7 @@ public class WindowParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 5:
+		case 8:
 			return specifier_list_sempred((Specifier_listContext)_localctx, predIndex);
 		}
 		return true;
@@ -890,28 +1029,34 @@ public class WindowParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\17_\4\2\t\2\4\3\t"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\21v\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4"+
-		"\f\t\f\4\r\t\r\3\2\3\2\3\2\3\3\3\3\5\3 \n\3\3\3\5\3#\n\3\3\3\3\3\3\3\3"+
-		"\3\5\3)\n\3\3\3\5\3,\n\3\5\3.\n\3\3\4\3\4\3\5\3\5\3\6\3\6\3\7\3\7\3\7"+
-		"\3\7\3\7\3\7\7\7<\n\7\f\7\16\7?\13\7\3\b\3\b\3\b\5\bD\n\b\3\b\3\b\3\b"+
-		"\5\bI\n\b\3\b\3\b\3\b\5\bN\n\b\5\bP\n\b\3\t\3\t\3\t\3\n\3\n\3\n\3\13\3"+
-		"\13\3\13\3\f\3\f\3\r\3\r\3\r\2\3\f\16\2\4\6\b\n\f\16\20\22\24\26\30\2"+
-		"\2\\\2\32\3\2\2\2\4-\3\2\2\2\6/\3\2\2\2\b\61\3\2\2\2\n\63\3\2\2\2\f\65"+
-		"\3\2\2\2\16O\3\2\2\2\20Q\3\2\2\2\22T\3\2\2\2\24W\3\2\2\2\26Z\3\2\2\2\30"+
-		"\\\3\2\2\2\32\33\5\4\3\2\33\34\7\2\2\3\34\3\3\2\2\2\35\37\5\22\n\2\36"+
-		" \5\b\5\2\37\36\3\2\2\2\37 \3\2\2\2 \"\3\2\2\2!#\5\6\4\2\"!\3\2\2\2\""+
-		"#\3\2\2\2#.\3\2\2\2$%\5\22\n\2%&\5\20\t\2&(\5\16\b\2\')\5\b\5\2(\'\3\2"+
-		"\2\2()\3\2\2\2)+\3\2\2\2*,\5\6\4\2+*\3\2\2\2+,\3\2\2\2,.\3\2\2\2-\35\3"+
-		"\2\2\2-$\3\2\2\2.\5\3\2\2\2/\60\5\f\7\2\60\7\3\2\2\2\61\62\5\f\7\2\62"+
-		"\t\3\2\2\2\63\64\7\16\2\2\64\13\3\2\2\2\65\66\b\7\1\2\66\67\5\n\6\2\67"+
-		"=\3\2\2\289\f\3\2\29:\7\3\2\2:<\5\n\6\2;8\3\2\2\2<?\3\2\2\2=;\3\2\2\2"+
-		"=>\3\2\2\2>\r\3\2\2\2?=\3\2\2\2@A\7\b\2\2AC\5\24\13\2BD\7\13\2\2CB\3\2"+
-		"\2\2CD\3\2\2\2DE\3\2\2\2EF\7\n\2\2FH\5\24\13\2GI\7\13\2\2HG\3\2\2\2HI"+
-		"\3\2\2\2IP\3\2\2\2JK\7\n\2\2KM\5\24\13\2LN\7\13\2\2ML\3\2\2\2MN\3\2\2"+
-		"\2NP\3\2\2\2O@\3\2\2\2OJ\3\2\2\2P\17\3\2\2\2QR\7\t\2\2RS\5\24\13\2S\21"+
-		"\3\2\2\2TU\5\24\13\2UV\7\4\2\2V\23\3\2\2\2WX\5\26\f\2XY\5\30\r\2Y\25\3"+
-		"\2\2\2Z[\7\f\2\2[\27\3\2\2\2\\]\7\17\2\2]\31\3\2\2\2\f\37\"(+-=CHMO";
+		"\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\3\2\3\3\3\3\5\3&"+
+		"\n\3\3\3\5\3)\n\3\3\3\3\3\3\3\3\3\5\3/\n\3\3\3\5\3\62\n\3\5\3\64\n\3\3"+
+		"\4\3\4\3\4\3\5\3\5\3\5\3\6\3\6\3\6\5\6?\n\6\3\7\3\7\3\7\3\7\3\7\5\7F\n"+
+		"\7\3\b\3\b\3\t\3\t\3\n\3\n\3\n\3\n\3\n\3\n\7\nR\n\n\f\n\16\nU\13\n\3\13"+
+		"\3\13\3\13\5\13Z\n\13\3\13\3\13\3\13\5\13_\n\13\3\13\3\13\3\13\5\13d\n"+
+		"\13\5\13f\n\13\3\f\3\f\3\f\3\r\3\r\5\rm\n\r\3\16\3\16\3\16\3\17\3\17\3"+
+		"\20\3\20\3\20\2\3\22\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\2s\2"+
+		" \3\2\2\2\4\63\3\2\2\2\6\65\3\2\2\2\b8\3\2\2\2\n;\3\2\2\2\fE\3\2\2\2\16"+
+		"G\3\2\2\2\20I\3\2\2\2\22K\3\2\2\2\24e\3\2\2\2\26g\3\2\2\2\30j\3\2\2\2"+
+		"\32n\3\2\2\2\34q\3\2\2\2\36s\3\2\2\2 !\5\4\3\2!\"\7\2\2\3\"\3\3\2\2\2"+
+		"#%\5\30\r\2$&\5\b\5\2%$\3\2\2\2%&\3\2\2\2&(\3\2\2\2\')\5\6\4\2(\'\3\2"+
+		"\2\2()\3\2\2\2)\64\3\2\2\2*+\5\30\r\2+,\5\26\f\2,.\5\24\13\2-/\5\b\5\2"+
+		".-\3\2\2\2./\3\2\2\2/\61\3\2\2\2\60\62\5\6\4\2\61\60\3\2\2\2\61\62\3\2"+
+		"\2\2\62\64\3\2\2\2\63#\3\2\2\2\63*\3\2\2\2\64\5\3\2\2\2\65\66\7\7\2\2"+
+		"\66\67\5\22\n\2\67\7\3\2\2\289\7\6\2\29:\5\22\n\2:\t\3\2\2\2;>\5\16\b"+
+		"\2<=\7\4\2\2=?\5\f\7\2><\3\2\2\2>?\3\2\2\2?\13\3\2\2\2@F\5\20\t\2AB\5"+
+		"\20\t\2BC\7\4\2\2CD\5\f\7\2DF\3\2\2\2E@\3\2\2\2EA\3\2\2\2F\r\3\2\2\2G"+
+		"H\7\16\2\2H\17\3\2\2\2IJ\7\20\2\2J\21\3\2\2\2KL\b\n\1\2LM\5\n\6\2MS\3"+
+		"\2\2\2NO\f\3\2\2OP\7\3\2\2PR\5\n\6\2QN\3\2\2\2RU\3\2\2\2SQ\3\2\2\2ST\3"+
+		"\2\2\2T\23\3\2\2\2US\3\2\2\2VW\7\t\2\2WY\5\32\16\2XZ\7\f\2\2YX\3\2\2\2"+
+		"YZ\3\2\2\2Z[\3\2\2\2[\\\7\13\2\2\\^\5\32\16\2]_\7\f\2\2^]\3\2\2\2^_\3"+
+		"\2\2\2_f\3\2\2\2`a\7\t\2\2ac\5\32\16\2bd\7\f\2\2cb\3\2\2\2cd\3\2\2\2d"+
+		"f\3\2\2\2eV\3\2\2\2e`\3\2\2\2f\25\3\2\2\2gh\7\n\2\2hi\5\32\16\2i\27\3"+
+		"\2\2\2jl\5\32\16\2km\7\5\2\2lk\3\2\2\2lm\3\2\2\2m\31\3\2\2\2no\5\34\17"+
+		"\2op\5\36\20\2p\33\3\2\2\2qr\7\r\2\2r\35\3\2\2\2st\7\17\2\2t\37\3\2\2"+
+		"\2\17%(.\61\63>ESY^cel";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

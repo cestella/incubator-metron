@@ -73,37 +73,73 @@ public class WindowBaseListener implements WindowListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExcluding(WindowParser.ExcludingContext ctx) { }
+	@Override public void enterExcluding_specifier(WindowParser.Excluding_specifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExcluding(WindowParser.ExcludingContext ctx) { }
+	@Override public void exitExcluding_specifier(WindowParser.Excluding_specifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIncluding(WindowParser.IncludingContext ctx) { }
+	@Override public void enterIncluding_specifier(WindowParser.Including_specifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIncluding(WindowParser.IncludingContext ctx) { }
+	@Override public void exitIncluding_specifier(WindowParser.Including_specifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDaySpecifier(WindowParser.DaySpecifierContext ctx) { }
+	@Override public void enterSpecifier(WindowParser.SpecifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDaySpecifier(WindowParser.DaySpecifierContext ctx) { }
+	@Override public void exitSpecifier(WindowParser.SpecifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecifier_arg_list(WindowParser.Specifier_arg_listContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecifier_arg_list(WindowParser.Specifier_arg_listContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDay_specifier(WindowParser.Day_specifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDay_specifier(WindowParser.Day_specifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIdentifier(WindowParser.IdentifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIdentifier(WindowParser.IdentifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -133,13 +169,13 @@ public class WindowBaseListener implements WindowListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterToDuration(WindowParser.ToDurationContext ctx) { }
+	@Override public void enterFromDuration(WindowParser.FromDurationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitToDuration(WindowParser.ToDurationContext ctx) { }
+	@Override public void exitFromDuration(WindowParser.FromDurationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

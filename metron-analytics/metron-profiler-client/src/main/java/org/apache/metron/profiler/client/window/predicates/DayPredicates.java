@@ -2,28 +2,31 @@ package org.apache.metron.profiler.client.window.predicates;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-public enum DayPredicates implements Predicate<Long> {
-  SUNDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 1),
-  MONDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 2),
-  TUESDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 3),
-  WEDNESDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 4),
-  THURSDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 5),
-  FRIDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 6),
-  SATURDAY( ts -> toCalendar(ts).get(Calendar.DAY_OF_WEEK) == 7),
-  WEEKDAY( ts -> {
+public enum DayPredicates {
+  SUNDAY( x -> dayOfWeekPredicate(1)),
+  MONDAY( x -> dayOfWeekPredicate(2)),
+  TUESDAY( x -> dayOfWeekPredicate(3)),
+  WEDNESDAY( x -> dayOfWeekPredicate(4)),
+  THURSDAY( x -> dayOfWeekPredicate(5)),
+  FRIDAY( x -> dayOfWeekPredicate(6)),
+  SATURDAY( x -> dayOfWeekPredicate(7)),
+  WEEKDAY( x -> (ts -> {
     int dow = toCalendar(ts).get(Calendar.DAY_OF_WEEK);
     return dow > 1 && dow < 7;
-  }),
-  WEEKEND( ts -> {
+  })),
+  WEEKEND( x -> (ts -> {
     int dow = toCalendar(ts).get(Calendar.DAY_OF_WEEK);
     return dow == 1 || dow == 7;
-  })
+  })),
+  HOLIDAY(x -> new HolidaysPredicate(x))
   ;
-  Predicate<Long> predicate;
-  DayPredicates(Predicate<Long> predicate) {
-    this.predicate = predicate;
+  Function<List<String>, Predicate<Long>> predicateCreator;
+  DayPredicates(Function<List<String>, Predicate<Long>> predicate) {
+    this.predicateCreator = predicate;
   }
 
   private static Calendar toCalendar(Long ts) {
@@ -32,9 +35,16 @@ public enum DayPredicates implements Predicate<Long> {
     return c;
   }
 
-  @Override
-  public boolean test(Long ts) {
-    return predicate.test(ts);
+  public static int getDayOfWeek(Long ts) {
+    return toCalendar(ts).get(Calendar.DAY_OF_WEEK);
+  }
+
+  public static Predicate<Long> dayOfWeekPredicate(int dayOfWeek) {
+    return ts -> getDayOfWeek(ts) == dayOfWeek;
+  }
+
+  public static Predicate<Long> create(String name, List<String> arg) {
+    return DayPredicates.valueOf(name).predicateCreator.apply(arg);
   }
 
 }

@@ -63,41 +63,65 @@ public interface WindowListener extends ParseTreeListener {
 	 */
 	void exitRepeatingWindow(WindowParser.RepeatingWindowContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Excluding}
-	 * labeled alternative in {@link WindowParser#excluding_specifier}.
+	 * Enter a parse tree produced by {@link WindowParser#excluding_specifier}.
 	 * @param ctx the parse tree
 	 */
-	void enterExcluding(WindowParser.ExcludingContext ctx);
+	void enterExcluding_specifier(WindowParser.Excluding_specifierContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Excluding}
-	 * labeled alternative in {@link WindowParser#excluding_specifier}.
+	 * Exit a parse tree produced by {@link WindowParser#excluding_specifier}.
 	 * @param ctx the parse tree
 	 */
-	void exitExcluding(WindowParser.ExcludingContext ctx);
+	void exitExcluding_specifier(WindowParser.Excluding_specifierContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Including}
-	 * labeled alternative in {@link WindowParser#including_specifier}.
+	 * Enter a parse tree produced by {@link WindowParser#including_specifier}.
 	 * @param ctx the parse tree
 	 */
-	void enterIncluding(WindowParser.IncludingContext ctx);
+	void enterIncluding_specifier(WindowParser.Including_specifierContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Including}
-	 * labeled alternative in {@link WindowParser#including_specifier}.
+	 * Exit a parse tree produced by {@link WindowParser#including_specifier}.
 	 * @param ctx the parse tree
 	 */
-	void exitIncluding(WindowParser.IncludingContext ctx);
+	void exitIncluding_specifier(WindowParser.Including_specifierContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code DaySpecifier}
-	 * labeled alternative in {@link WindowParser#specifier}.
+	 * Enter a parse tree produced by {@link WindowParser#specifier}.
 	 * @param ctx the parse tree
 	 */
-	void enterDaySpecifier(WindowParser.DaySpecifierContext ctx);
+	void enterSpecifier(WindowParser.SpecifierContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code DaySpecifier}
-	 * labeled alternative in {@link WindowParser#specifier}.
+	 * Exit a parse tree produced by {@link WindowParser#specifier}.
 	 * @param ctx the parse tree
 	 */
-	void exitDaySpecifier(WindowParser.DaySpecifierContext ctx);
+	void exitSpecifier(WindowParser.SpecifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WindowParser#specifier_arg_list}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecifier_arg_list(WindowParser.Specifier_arg_listContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WindowParser#specifier_arg_list}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecifier_arg_list(WindowParser.Specifier_arg_listContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WindowParser#day_specifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterDay_specifier(WindowParser.Day_specifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WindowParser#day_specifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitDay_specifier(WindowParser.Day_specifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WindowParser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterIdentifier(WindowParser.IdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WindowParser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitIdentifier(WindowParser.IdentifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link WindowParser#specifier_list}.
 	 * @param ctx the parse tree
@@ -121,17 +145,17 @@ public interface WindowListener extends ParseTreeListener {
 	 */
 	void exitFromToDuration(WindowParser.FromToDurationContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ToDuration}
+	 * Enter a parse tree produced by the {@code FromDuration}
 	 * labeled alternative in {@link WindowParser#duration}.
 	 * @param ctx the parse tree
 	 */
-	void enterToDuration(WindowParser.ToDurationContext ctx);
+	void enterFromDuration(WindowParser.FromDurationContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ToDuration}
+	 * Exit a parse tree produced by the {@code FromDuration}
 	 * labeled alternative in {@link WindowParser#duration}.
 	 * @param ctx the parse tree
 	 */
-	void exitToDuration(WindowParser.ToDurationContext ctx);
+	void exitFromDuration(WindowParser.FromDurationContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code SkipDistance}
 	 * labeled alternative in {@link WindowParser#skip_distance}.

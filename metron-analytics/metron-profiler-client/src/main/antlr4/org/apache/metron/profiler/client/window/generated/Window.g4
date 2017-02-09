@@ -39,11 +39,12 @@ grammar Window;
  */
 }
 COMMA : ',';
+COLON : ':';
 
-BIN : 'bin' | 'BIN' | 'bins' | 'BINS';
+WINDOW : 'window' | 'windows';
 
-INCLUDE : 'include' | 'INCLUDE' | 'includes' | 'INCLUDES';
-EXCLUDE : 'exclude' | 'EXCLUDE' | 'excludes' | 'EXCLUDES';
+INCLUDE : 'include' | 'INCLUDE' | 'includes' | 'INCLUDES' | 'including' | 'INCLUDING';
+EXCLUDE : 'exclude' | 'EXCLUDE' | 'excludes' | 'EXCLUDES' | 'excluding' | 'EXCLUDING';
 
 NOW : 'NOW' | 'now';
 
@@ -53,28 +54,32 @@ TO : 'TO' | 'to' | 'until' | 'UNTIL';
 AGO : 'AGO' | 'ago';
 
 NUMBER : FIRST_DIGIT DIGIT*;
-WS : [ \r\t\u000C\n]+ -> skip;
 DAY_SPECIFIER : MONDAY | TUESDAY | WEDNESDAY | THURSDAY
                        | FRIDAY | SATURDAY | SUNDAY
                        | CURRENT_DAY_OF_WEEK
-                       | WEEKEND | WEEKDAY
+                       | WEEKEND | WEEKDAY | HOLIDAYS
                        ;
 
-TIME_UNIT : SECOND_UNIT | HOUR_UNIT | DAY_UNIT ;
+TIME_UNIT : SECOND_UNIT | MINUTE_UNIT | HOUR_UNIT | DAY_UNIT ;
+IDENTIFIER : [a-zA-Z_][a-zA-Z_\.0-9]*;
+
+WS : [ \r\t\u000C\n]+ -> skip;
 
 fragment SECOND_UNIT : 'SECOND' | 'second' | 'seconds' | 'SECONDS';
+fragment MINUTE_UNIT : 'MINUTE' | 'minute' | 'minutes' | 'MINUTES';
 fragment HOUR_UNIT : 'HOUR' | 'hour' | 'hours' | 'HOURS';
 fragment DAY_UNIT : 'DAY' | 'day' | 'days' | 'DAYS';
-fragment MONDAY : 'MONDAY' | 'monday';
-fragment TUESDAY : 'TUESDAY' | 'tuesday';
-fragment WEDNESDAY : 'WEDNESDAY' | 'wednesday';
-fragment THURSDAY : 'THURSDAY' | 'thursday';
-fragment FRIDAY : 'FRIDAY' | 'friday';
-fragment SATURDAY: 'SATURDAY' | 'saturday';
-fragment SUNDAY : 'SUNDAY' | 'sunday';
-fragment CURRENT_DAY_OF_WEEK: 'this day of week' | 'THIS DAY OF WEEK';
+fragment MONDAY : 'MONDAY' | 'monday' | 'MONDAYS' | 'mondays';
+fragment TUESDAY : 'TUESDAY' | 'tuesday' | 'TUESDAYS' | 'tuesdays';
+fragment WEDNESDAY : 'WEDNESDAY' | 'wednesday' | 'WEDNESDAYS' | 'wednesdays';
+fragment THURSDAY : 'THURSDAY' | 'thursday' | 'THURSDAYS' | 'thursdays';
+fragment FRIDAY : 'FRIDAY' | 'friday' | 'FRIDAYS' | 'fridays';
+fragment SATURDAY: 'SATURDAY' | 'saturday' | 'SATURDAYS' | 'saturdays';
+fragment SUNDAY : 'SUNDAY' | 'sunday' | 'SUNDAYS' | 'sundays';
+fragment CURRENT_DAY_OF_WEEK: 'this day of week' | 'THIS DAY OF WEEK' | 'this day of the week' | 'THIS DAY OF THE WEEK';
 fragment WEEKEND : 'weekend' | 'WEEKEND' | 'weekends' | 'WEEKENDS';
 fragment WEEKDAY: 'weekday' | 'WEEKDAY' | 'weekdays' | 'WEEKDAYS';
+fragment HOLIDAYS: 'holiday' | 'HOLIDAY' | 'holidays' | 'HOLIDAYS';
 
 fragment DIGIT : '0'..'9';
 fragment FIRST_DIGIT : '1'..'9';
@@ -85,12 +90,21 @@ window_expression : bin_width including_specifier? excluding_specifier? #NonRepe
                   | bin_width skip_distance duration including_specifier? excluding_specifier? #RepeatingWindow
                   ;
 
-excluding_specifier : specifier_list #Excluding
+excluding_specifier : EXCLUDE specifier_list
                     ;
-including_specifier : specifier_list #Including
+including_specifier : INCLUDE specifier_list
                     ;
 
-specifier : DAY_SPECIFIER #DaySpecifier
+specifier : day_specifier (COLON specifier_arg_list)?
+          ;
+
+specifier_arg_list : identifier
+                   | identifier COLON specifier_arg_list
+                    ;
+
+day_specifier : DAY_SPECIFIER ;
+
+identifier : IDENTIFIER
           ;
 
 specifier_list : specifier
@@ -98,13 +112,13 @@ specifier_list : specifier
                ;
 
 duration : FROM time_interval AGO? TO time_interval AGO? #FromToDuration
-         | TO time_interval AGO? #ToDuration
+         | FROM time_interval AGO? #FromDuration
          ;
 
 skip_distance : EVERY time_interval #SkipDistance
               ;
 
-bin_width : time_interval BIN #BinWidth
+bin_width : time_interval WINDOW? #BinWidth
           ;
 
 time_interval : time_amount time_unit #TimeInterval
