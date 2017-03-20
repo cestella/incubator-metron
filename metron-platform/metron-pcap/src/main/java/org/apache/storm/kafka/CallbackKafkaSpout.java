@@ -17,6 +17,9 @@
  */
 package org.apache.storm.kafka;
 
+
+import org.apache.storm.kafka.spout.KafkaSpout;
+import org.apache.storm.kafka.spout.KafkaSpoutConfig;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 
@@ -24,69 +27,71 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class CallbackKafkaSpout extends KafkaSpout {
-    static final long serialVersionUID = 0xDEADBEEFL;
-    Class<? extends Callback> callbackClazz;
-    Callback _callback;
-    EmitContext _context;
-    public CallbackKafkaSpout(SpoutConfig spoutConfig, String callbackClass) {
-        this(spoutConfig, toCallbackClass(callbackClass));
-    }
+  static final long serialVersionUID = 0xDEADBEEFL;
+  Class<? extends Callback> callbackClazz;
+  Callback _callback;
+  EmitContext _context;
+  KafkaSpoutConfig _spoutConfig;
+  public CallbackKafkaSpout(KafkaSpoutConfig spoutConfig, String callbackClass) {
+    this(spoutConfig, toCallbackClass(callbackClass));
+  }
 
-    public CallbackKafkaSpout(SpoutConfig spoutConf, Class<? extends Callback> callback) {
-        super(spoutConf);
-        callbackClazz = callback;
-    }
+  public CallbackKafkaSpout(KafkaSpoutConfig spoutConf, Class<? extends Callback> callback) {
+    super(spoutConf);
+    _spoutConfig = spoutConf;
+    callbackClazz = callback;
+  }
 
-    public void initialize(TopologyContext context) {
-        _callback = createCallback(callbackClazz);
-        _context = new EmitContext().with(EmitContext.Type.SPOUT_CONFIG, _spoutConfig)
-                                    .with(EmitContext.Type.UUID, context.getStormId())
-                                    .with(EmitContext.Type.TOPIC, _spoutConfig.topic);
-        _callback.initialize(_context);
-    }
+  public void initialize(TopologyContext context) {
+    _callback = createCallback(callbackClazz);
+    _context = new EmitContext().with(EmitContext.Type.SPOUT_CONFIG, _spoutConfig)
+            .with(EmitContext.Type.UUID, context.getStormId())
+            .with(EmitContext.Type.TOPIC, _spoutConfig.getKafkaSpoutStreams().getTopics());
+    _callback.initialize(_context);
+  }
 
 
-    private static Class<? extends Callback> toCallbackClass(String callbackClass)  {
-        try{
-            return (Class<? extends Callback>) Callback.class.forName(callbackClass);
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeException(callbackClass + " not found", e);
-        }
+  private static Class<? extends Callback> toCallbackClass(String callbackClass)  {
+    try{
+      return (Class<? extends Callback>) Callback.class.forName(callbackClass);
     }
+    catch (ClassNotFoundException e) {
+      throw new RuntimeException(callbackClass + " not found", e);
+    }
+  }
 
-    protected Callback createCallback(Class<? extends Callback> callbackClass)  {
-        try {
-            return callbackClass.getConstructor().newInstance();
-        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException("Unable to instantiate callback", e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Illegal access", e);
-        }
+  protected Callback createCallback(Class<? extends Callback> callbackClass)  {
+    try {
+      return callbackClass.getConstructor().newInstance();
+    } catch (InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+      throw new RuntimeException("Unable to instantiate callback", e);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException("Illegal access", e);
     }
+  }
 
-    @Override
-    public void open(Map conf, final TopologyContext context, final SpoutOutputCollector collector) {
-        if(_callback == null) {
-            initialize(context);
-        }
-        super.open( conf, context
-                  , new CallbackCollector(_callback, collector
-                                         ,_context.cloneContext().with(EmitContext.Type.OPEN_CONFIG, conf)
-                                                                 .with(EmitContext.Type.TOPOLOGY_CONTEXT, context)
-                                         )
-                  );
+  @Override
+  public void open(Map conf, final TopologyContext context, final SpoutOutputCollector collector) {
+    if(_callback == null) {
+      initialize(context);
     }
+    super.open( conf, context
+            , new CallbackCollector(_callback, collector
+                    ,_context.cloneContext().with(EmitContext.Type.OPEN_CONFIG, conf)
+                    .with(EmitContext.Type.TOPOLOGY_CONTEXT, context)
+            )
+    );
+  }
 
-    @Override
-    public void close() {
-        super.close();
-        if(_callback != null) {
-            try {
-                _callback.close();
-            } catch (Exception e) {
-                throw new IllegalStateException("Unable to close callback", e);
-            }
-        }
+  @Override
+  public void close() {
+    super.close();
+    if(_callback != null) {
+      try {
+        _callback.close();
+      } catch (Exception e) {
+        throw new IllegalStateException("Unable to close callback", e);
+      }
     }
+  }
 }

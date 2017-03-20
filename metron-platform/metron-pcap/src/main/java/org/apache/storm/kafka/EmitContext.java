@@ -17,6 +17,7 @@
  */
 package org.apache.storm.kafka;
 
+import org.apache.metron.common.spout.kafka.SpoutConfig;
 import org.apache.storm.task.TopologyContext;
 
 import java.io.Serializable;

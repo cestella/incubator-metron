@@ -20,11 +20,12 @@ package org.apache.metron.spout.pcap;
 
 import org.apache.storm.kafka.Callback;
 import org.apache.storm.kafka.CallbackKafkaSpout;
+import org.apache.storm.kafka.spout.KafkaSpoutConfig;
 
 public class KafkaToHDFSSpout extends CallbackKafkaSpout {
   static final long serialVersionUID = 0xDEADBEEFL;
   HDFSWriterConfig config = null;
-  public KafkaToHDFSSpout(SpoutConfig spoutConfig, HDFSWriterConfig config) {
+  public KafkaToHDFSSpout(KafkaSpoutConfig spoutConfig, HDFSWriterConfig config) {
     super(spoutConfig, HDFSWriterCallback.class);
     this.config = config;
   }

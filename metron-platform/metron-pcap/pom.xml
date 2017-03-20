@@ -117,6 +117,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.storm</groupId>
+            <artifactId>storm-kafka-client</artifactId>
+            <version>${global_storm_version}</version>
+        </dependency>
+        <!--dependency>
+            <groupId>org.apache.storm</groupId>
             <artifactId>storm-kafka</artifactId>
             <version>${global_storm_version}</version>
             <exclusions>
@@ -125,11 +130,18 @@
                     <groupId>curator-client</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.apache.metron</groupId>
             <artifactId>metron-common</artifactId>
             <version>${project.parent.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.storm</groupId>
+                    <artifactId>storm-kafka</artifactId>
+                </exclusion>
+            </exclusions>
+
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>

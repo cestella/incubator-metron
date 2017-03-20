@@ -133,7 +133,13 @@ public class HDFSWriterCallback implements Callback {
     @Override
     public void initialize(EmitContext context) {
         this.context = context;
-        this.topic = context.get(EmitContext.Type.TOPIC);
+        Object topics = context.get(EmitContext.Type.TOPIC);
+        if(topics instanceof List) {
+            this.topic = Joiner.on(",").join((List<String>)topics);
+        }
+        else {
+            this.topic = "" + topics;
+        }
     }
 
     /**
