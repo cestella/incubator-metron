@@ -17,6 +17,7 @@
  */
 package org.apache.metron.parsers.integration.components;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
@@ -24,6 +25,13 @@ import org.apache.metron.integration.InMemoryComponent;
 import org.apache.metron.integration.UnableToStartException;
 import org.apache.metron.parsers.topology.ParserTopologyBuilder;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -91,6 +99,15 @@ public class ParserTopologyComponent implements InMemoryComponent {
   public void stop() {
     if(stormCluster != null) {
       stormCluster.shutdown();
+      if(new File("logs/workers-artifacts").exists()) {
+        Path rootPath = Paths.get("logs");
+        Path destPath = Paths.get("target/logs");
+        try {
+          Files.move(rootPath, destPath);
+        } catch (IOException e) {
+          throw new IllegalStateException(e.getMessage(), e);
+        }
+      }
     }
   }
 }

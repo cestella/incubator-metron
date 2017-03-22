@@ -42,6 +42,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -72,6 +75,7 @@ public class FluxTopologyComponent implements InMemoryComponent {
 
     public Builder withTopologyProperties(Properties properties) {
       this.topologyProperties = properties;
+      this.topologyProperties.put("storm.home", "target");
       return this;
     }
 
@@ -135,6 +139,15 @@ public class FluxTopologyComponent implements InMemoryComponent {
     if (stormCluster != null) {
       try {
         stormCluster.shutdown();
+        if(new File("logs/workers-artifacts").exists()) {
+          Path rootPath = Paths.get("logs");
+          Path destPath = Paths.get("target/logs");
+          try {
+            Files.move(rootPath, destPath);
+          } catch (IOException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+          }
+        }
       }
       catch(Throwable t) {
         LOG.error(t.getMessage(), t);
