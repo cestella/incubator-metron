@@ -22,7 +22,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils$;
-import kafka.admin.RackAwareMode;
 import kafka.utils.ZkUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -242,7 +241,7 @@ public class KafkaServiceImplTest {
 
     kafkaService.createTopic(VALID_KAFKA_TOPIC);
 
-    verify(adminUtils).createTopic(eq(zkUtils), eq("t"), eq(1), eq(2), eq(new Properties()), eq(RackAwareMode.Disabled$.MODULE$));
+    verify(adminUtils).createTopic(eq(zkUtils), eq("t"), eq(1), eq(2), eq(new Properties()));
     verify(kafkaConsumer).listTopics();
     verifyZeroInteractions(zkUtils);
   }
@@ -256,7 +255,7 @@ public class KafkaServiceImplTest {
 
     when(kafkaConsumer.listTopics()).thenReturn(topics);
 
-    doThrow(AdminOperationException.class).when(adminUtils).createTopic(eq(zkUtils), eq("t"), eq(1), eq(2), eq(new Properties()), eq(RackAwareMode.Disabled$.MODULE$));
+    doThrow(AdminOperationException.class).when(adminUtils).createTopic(eq(zkUtils), eq("t"), eq(1), eq(2), eq(new Properties()));
 
     kafkaService.createTopic(VALID_KAFKA_TOPIC);
   }

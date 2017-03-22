@@ -133,7 +133,12 @@ public class FluxTopologyComponent implements InMemoryComponent {
   @Override
   public void stop() {
     if (stormCluster != null) {
-      stormCluster.shutdown();
+      try {
+        stormCluster.shutdown();
+      }
+      catch(Throwable t) {
+        LOG.error(t.getMessage(), t);
+      }
     }
   }
 

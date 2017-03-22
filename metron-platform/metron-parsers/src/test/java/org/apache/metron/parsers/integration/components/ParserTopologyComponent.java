@@ -20,7 +20,6 @@ package org.apache.metron.parsers.integration.components;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
-import org.apache.metron.common.spout.kafka.SpoutConfig;
 import org.apache.metron.integration.InMemoryComponent;
 import org.apache.metron.integration.UnableToStartException;
 import org.apache.metron.parsers.topology.ParserTopologyBuilder;
@@ -34,7 +33,6 @@ public class ParserTopologyComponent implements InMemoryComponent {
   private Properties topologyProperties;
   private String brokerUrl;
   private String sensorType;
-  private SpoutConfig.Offset offset = SpoutConfig.Offset.BEGINNING;
   private LocalCluster stormCluster;
 
   public static class Builder {
@@ -65,9 +63,6 @@ public class ParserTopologyComponent implements InMemoryComponent {
     this.sensorType = sensorType;
   }
 
-  public void setOffset(SpoutConfig.Offset offset) {
-    this.offset = offset;
-  }
 
   @Override
   public void start() throws UnableToStartException {
@@ -75,7 +70,6 @@ public class ParserTopologyComponent implements InMemoryComponent {
       TopologyBuilder topologyBuilder = ParserTopologyBuilder.build(topologyProperties.getProperty("kafka.zk")
                                                                    , brokerUrl
                                                                    , sensorType
-                                                                   , offset
                                                                    , 1
                                                                    , 1
                                                                    , 1
