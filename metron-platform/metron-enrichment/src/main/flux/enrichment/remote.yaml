@@ -176,44 +176,44 @@ components:
                     - "${kafka.zk}"
 
 #kafka/zookeeper
-  # Any kafka props for the producer go here.
-  - id: "kafkaProps"
-    className: "java.util.HashMap"
-    configMethods:
-      -   name: "put"
-          args:
-            - "value.deserializer"
-            - "org.apache.kafka.common.serialization.ByteArrayDeserializer"
-      -   name: "put"
-          args:
-            - "key.deserializer"
-            - "org.apache.kafka.common.serialization.ByteArrayDeserializer"
-      -   name: "put"
-          args:
-            - "group.id"
-            - "enrichments"
+    # Any kafka props for the producer go here.
+    -   id: "kafkaProps"
+        className: "java.util.HashMap"
+        configMethods:
+          -   name: "put"
+              args:
+                  - "value.deserializer"
+                  - "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+          -   name: "put"
+              args:
+                  - "key.deserializer"
+                  - "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+          -   name: "put"
+              args:
+                  - "group.id"
+                  - "enrichments"
 
   # The fields to pull out of the kafka messages
-  - id: "fields"
-    className: "java.util.ArrayList"
-    configMethods:
-      -   name: "add"
-          args:
-            - "value"
+    -   id: "fields"
+        className: "java.util.ArrayList"
+        configMethods:
+          -   name: "add"
+              args:
+                  - "value"
 
-  - id: "kafkaConfig"
-    className: "org.apache.metron.storm.kafka.flux.SimpleStormKafkaBuilder"
-    constructorArgs:
-      # zookeeper hosts
-      - ref: "kafkaProps"
-      # topic name
-      - "enrichments"
-      - "${kafka.zk}"
-      - ref: "fields"
-    configMethods:
-      -   name: "setFirstPollOffsetStrategy"
-          args:
-            - "UNCOMMITTED_EARLIEST"
+    -   id: "kafkaConfig"
+        className: "org.apache.metron.storm.kafka.flux.SimpleStormKafkaBuilder"
+        constructorArgs:
+          # zookeeper hosts
+          - ref: "kafkaProps"
+          # topic name
+          - "enrichments"
+          - "${kafka.zk}"
+          - ref: "fields"
+        configMethods:
+            -   name: "setFirstPollOffsetStrategy"
+                args:
+                    - "UNCOMMITTED_EARLIEST"
 
 
 spouts:
