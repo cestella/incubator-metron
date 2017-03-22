@@ -45,6 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -144,6 +145,10 @@ public class FluxTopologyComponent implements InMemoryComponent {
           Path destPath = Paths.get("target/logs");
           try {
             Files.move(rootPath, destPath);
+            Files.walk(destPath)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
           } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
           }

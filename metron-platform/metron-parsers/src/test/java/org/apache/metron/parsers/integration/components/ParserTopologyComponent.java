@@ -104,6 +104,10 @@ public class ParserTopologyComponent implements InMemoryComponent {
         Path destPath = Paths.get("target/logs");
         try {
           Files.move(rootPath, destPath);
+          Files.walk(destPath)
+               .sorted(Comparator.reverseOrder())
+               .map(Path::toFile)
+               .forEach(File::delete);
         } catch (IOException e) {
           throw new IllegalStateException(e.getMessage(), e);
         }
