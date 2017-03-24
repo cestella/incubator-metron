@@ -30,6 +30,15 @@ components:
                 args:
                     - "ENRICHMENT"
 
+    # Any kafka props for the producer go here.
+    -   id: "kafkaWriterProps"
+        className: "java.util.HashMap"
+        configMethods:
+          -   name: "put"
+              args:
+                  - "security.protocol"
+                  - "${kafka.security.protocol}"
+
     -   id: "stellarEnrichment"
         className: "org.apache.metron.enrichment.configuration.Enrichment"
         constructorArgs:
@@ -103,7 +112,9 @@ components:
                 args:
                     - "${kafka.zk}"
             -   name: "withProducerConfigs"
-                args: [ref: "kafkaWriterProps"]
+                args: 
+                    - ref: "kafkaWriterProps"
+
 # Threat Intel
     -   id: "stellarThreatIntelAdapter"
         className: "org.apache.metron.enrichment.adapters.stellar.StellarAdapter"
@@ -167,7 +178,8 @@ components:
                 args:
                     - "${kafka.zk}"
             -   name: "withProducerConfigs"
-                args: [ref: "kafkaWriterProps"]
+                args: 
+                    - ref: "kafkaWriterProps"
 #indexing
     -   id: "kafkaWriter"
         className: "org.apache.metron.writer.kafka.KafkaWriter"
@@ -179,7 +191,9 @@ components:
                 args:
                     - "${kafka.zk}"
             -   name: "withProducerConfigs"
-                args: [ref: "kafkaWriterProps"]
+                args: 
+                    - ref: "kafkaWriterProps"
+
 #kafka/zookeeper
     # Any kafka props for the consumer go here.
     -   id: "kafkaProps"
@@ -202,14 +216,6 @@ components:
                   - "security.protocol"
                   - "${kafka.security.protocol}"
 
-    # Any kafka props for the producer go here.
-    -   id: "kafkaWriterProps"
-        className: "java.util.HashMap"
-        configMethods:
-            -   name: "put"
-                args:
-                    - "security.protocol"
-                    - "${kafka.security.protocol}"
 
   # The fields to pull out of the kafka messages
     -   id: "fields"
