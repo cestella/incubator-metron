@@ -36,9 +36,7 @@ import org.apache.metron.parsers.topology.config.ConfigHandlers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 public class ParserTopologyCLI {
@@ -315,8 +313,17 @@ public class ParserTopologyCLI {
       );
       Config stormConf = ParserOptions.getConfig(cmd);
       if(securityProtocol.isPresent()) {
+        List<String> autoCredentials = new ArrayList<>();
+        if(stormConf.containsKey(Config.TOPOLOGY_AUTO_CREDENTIALS)) {
+          autoCredentials.addAll((Collection<? extends String>) stormConf.get(Config.TOPOLOGY_AUTO_CREDENTIALS));
+        }
+        for(String credential : ImmutableList.of(AutoHDFS.class.getName(), AutoHBase.class.getName())) {
+          if(!autoCredentials.contains(credential)) {
+            autoCredentials.add(credential);
+          }
+        }
         stormConf.put( Config.TOPOLOGY_AUTO_CREDENTIALS
-                     , ImmutableList.of(AutoHDFS.class.getName(), AutoHBase.class.getName())
+                     , autoCredentials
                      );
       }
       if (ParserOptions.TEST.has(cmd)) {
