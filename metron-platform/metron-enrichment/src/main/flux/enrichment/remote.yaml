@@ -21,6 +21,7 @@ config:
     topology.auto-credentials: ${storm.auto.credentials}
 
 components:
+
 # Enrichment
     -   id: "stellarEnrichmentAdapter"
         className: "org.apache.metron.enrichment.adapters.stellar.StellarAdapter"

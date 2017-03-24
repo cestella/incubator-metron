@@ -36,7 +36,6 @@ import org.apache.metron.parsers.topology.config.ConfigHandlers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -317,9 +316,7 @@ public class ParserTopologyCLI {
       Config stormConf = ParserOptions.getConfig(cmd);
       if(securityProtocol.isPresent()) {
         stormConf.put( Config.TOPOLOGY_AUTO_CREDENTIALS
-                     , ImmutableList.of( AutoHDFS.class.getName()
-                                       , AutoHBase.class.getName()
-                                       )
+                     , ImmutableList.of(AutoHDFS.class.getName(), AutoHBase.class.getName())
                      );
       }
       if (ParserOptions.TEST.has(cmd)) {

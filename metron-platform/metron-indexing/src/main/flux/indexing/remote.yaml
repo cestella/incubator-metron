@@ -15,6 +15,7 @@
 # limitations under the License.
 
 name: "indexing"
+
 config:
     topology.workers: ${indexing.workers}
     topology.acker.executors: ${indexing.executors}

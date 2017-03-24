@@ -122,8 +122,8 @@
             <version>${global_storm_version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty-sslengine</artifactId>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-server</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
