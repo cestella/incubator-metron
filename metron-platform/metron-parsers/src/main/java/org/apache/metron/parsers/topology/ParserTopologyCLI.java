@@ -17,13 +17,10 @@
  */
 package org.apache.metron.parsers.topology;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.metron.storm.kafka.flux.SpoutConfiguration;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
-import org.apache.storm.hbase.security.AutoHBase;
-import org.apache.storm.hdfs.common.security.AutoHDFS;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -312,14 +309,6 @@ public class ParserTopologyCLI {
               securityProtocol
       );
       Config stormConf = ParserOptions.getConfig(cmd);
-      if(securityProtocol.isPresent() && !stormConf.containsKey(Config.TOPOLOGY_AUTO_CREDENTIALS)) {
-        //if I'm specifying it already, then I won't impose autohdfs and autohbase
-        List<String> autoCredentials = new ArrayList<>();
-        for (String credential : ImmutableList.of(AutoHDFS.class.getName(), AutoHBase.class.getName())) {
-          autoCredentials.add(credential);
-        }
-        stormConf.put( Config.TOPOLOGY_AUTO_CREDENTIALS , autoCredentials );
-      }
       if (ParserOptions.TEST.has(cmd)) {
         stormConf.put(Config.TOPOLOGY_DEBUG, true);
         LocalCluster cluster = new LocalCluster();
