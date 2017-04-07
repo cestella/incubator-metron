@@ -96,7 +96,9 @@ public class ThreatTriageProcessor implements Function<Map, ThreatScore> {
     Aggregators aggregators = threatTriageConfig.getAggregator();
     List<Number> allScores = threatScore.getRuleScores().stream().map(score -> score.getRule().getScore()).collect(Collectors.toList());
     Double aggregateScore = aggregators.aggregate(allScores, threatTriageConfig.getAggregationConfig());
-
+    if(aggregateScore == null) {
+      aggregateScore = Double.NaN;
+    }
     // return the overall threat score
     threatScore.setScore(aggregateScore);
     return threatScore;
