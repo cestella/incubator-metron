@@ -116,7 +116,7 @@ public class FixedPcapFilter implements PcapFilter {
       }
       else if(!doHeaderFiltering){
         //otherwise we aren't doing packet filtering either, so we aren't doing any filtering, then we should
-        //fail the test
+        //pass the test
         return true;
       }
       else {
