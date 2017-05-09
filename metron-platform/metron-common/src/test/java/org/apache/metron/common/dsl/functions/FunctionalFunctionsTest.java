@@ -232,4 +232,19 @@ public class FunctionalFunctionsTest {
       Assert.assertEquals("grok", result.get(2));
     }
   }
+
+  @Test
+  public void testReduce_TwoElements() {
+    for (String expr : ImmutableList.of("REDUCE([ 'foo', 'bar' ], (x, y) -> LIST_ADD(x, y), [] )"
+                                       )
+        )
+    {
+      Object o = run(expr, ImmutableMap.of("foo", 1, "bar", 2));
+      Assert.assertTrue(o instanceof List);
+      List<String> result = (List<String>) o;
+      Assert.assertEquals(2, result.size());
+      Assert.assertEquals("foo", result.get(0));
+      Assert.assertEquals("bar", result.get(1));
+    }
+  }
 }

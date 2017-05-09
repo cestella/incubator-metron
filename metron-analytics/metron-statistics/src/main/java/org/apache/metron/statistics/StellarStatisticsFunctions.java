@@ -477,7 +477,17 @@ public class StellarStatisticsFunctions {
       if (stats == null || value == null || bins.size() == 0) {
         return -1;
       }
-      return MathFunctions.Bin.getBin(value, bins.size(), bin -> stats.getPercentile(bins.get(bin).doubleValue()));
+      try {
+        return MathFunctions.Bin.getBin(value, bins.size(), bin -> stats.getPercentile(bins.get(bin).doubleValue()));
+      }
+      catch(IllegalStateException ise) {
+        if(ise.getMessage().equals("Your bins must be non-decreasing")) {
+          return -1;
+        }
+        else {
+          throw ise;
+        }
+      }
     }
   }
 

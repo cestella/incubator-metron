@@ -19,6 +19,9 @@
                       "foo": "1 + 1"
                       }
           ,"ALL_CAPS" : "TO_UPPER(source.type)"
+          ,"s" : [ "stats := STATS_INIT()"
+                 , "stats := null"
+                 ]
           ,"src_enrichment" : {
             "src_classification" : "ENRICHMENT_GET('playful_classification', ip_src_addr, 'enrichments', 'cf')"
           }

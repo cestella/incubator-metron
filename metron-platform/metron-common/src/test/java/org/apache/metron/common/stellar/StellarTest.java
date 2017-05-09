@@ -18,6 +18,7 @@
 
 package org.apache.metron.common.stellar;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
@@ -590,6 +591,23 @@ public class StellarTest {
     Assert.assertTrue(runPredicate("exists(foo)", v -> variableMap.get(v)));
     Assert.assertFalse(runPredicate("exists(bar)", v -> variableMap.get(v)));
     Assert.assertTrue(runPredicate("exists(bar) or true", v -> variableMap.get(v)));
+  }
+
+  @Test
+  public void testInFunction() throws Exception {
+    final Map<String, Object> variableMap = new HashMap<String, Object>() {{
+      put("foo", "casey");
+      put("bar", ImmutableList.of("casey", "blah"));
+      put("baz", new HashSet<String>(ImmutableList.of("casey", "blah")));
+      put("ip", "192.168.0.1");
+      put("empty", "");
+      put("spaced", "metron is great");
+      put("myMap", ImmutableMap.of("casey", "apple"));
+    }};
+    Assert.assertTrue(runPredicate("foo in bar", v -> variableMap.get(v)));
+    Assert.assertTrue(runPredicate("foo in baz", v -> variableMap.get(v)));
+    Assert.assertFalse(runPredicate("empty in bar", v -> variableMap.get(v)));
+    Assert.assertFalse(runPredicate("empty in baz", v -> variableMap.get(v)));
   }
 
   @Test

@@ -220,7 +220,14 @@ public class GenericEnrichmentBolt extends ConfiguredEnrichmentBolt {
               adapter.logAccess(cacheKey);
               prefix = adapter.getOutputPrefix(cacheKey);
               subGroup = adapter.getStreamSubGroup(enrichmentType, field);
+              long start = System.currentTimeMillis();
               enrichedField = cache.getUnchecked(cacheKey);
+              if(LOG.isDebugEnabled()) {
+                long duration = System.currentTimeMillis() - start;
+                if(duration > 1000) {
+                  LOG.debug("SLOW ENRICHMENT: " + key + " took " + duration + "ms");
+                }
+              }
               if (enrichedField == null)
                 throw new Exception("[Metron] Could not enrich string: "
                         + value);

@@ -18,9 +18,7 @@
 package org.apache.metron.enrichment.bolt;
 
 import com.google.common.base.Joiner;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.google.common.cache.*;
 import com.google.common.collect.Sets;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.bolt.ConfiguredEnrichmentBolt;
@@ -91,6 +89,19 @@ public abstract class JoinBolt<V> extends ConfiguredEnrichmentBolt {
     };
     cache = CacheBuilder.newBuilder().maximumSize(maxCacheSize)
             .expireAfterWrite(maxTimeRetain, TimeUnit.MINUTES)
+            .removalListener(new RemovalListener<String, Map<String, V>>() {
+              /**
+               * Notifies the listener that a removal occurred at some point in the past.
+               *
+               * @param notification
+               */
+              @Override
+              public void onRemoval(RemovalNotification<String, Map<String, V>> notification) {
+                if(LOG.isDebugEnabled()) {
+                  LOG.debug(getClass().getSimpleName() + ": Evicting " + notification.getKey() + " because " + notification.getCause().toString());
+                }
+              }
+            })
             .build(loader);
     prepare(map, topologyContext);
   }

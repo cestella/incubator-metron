@@ -103,10 +103,17 @@ public class BulkMessageWriterBolt extends ConfiguredIndexingBolt {
   @SuppressWarnings("unchecked")
   @Override
   public void execute(Tuple tuple) {
-    JSONObject message = (JSONObject) messageGetStrategy.get(tuple);
-    String sensorType = MessageUtils.getSensorType(message);
+    JSONObject message = null;
     try
     {
+      try {
+        message =  (JSONObject) messageGetStrategy.get(tuple);
+      }
+      catch(Exception ex) {
+        LOG.error(ex.getMessage(), ex);
+        return;
+      }
+      String sensorType = MessageUtils.getSensorType(message);
       WriterConfiguration writerConfiguration = configurationTransformation.apply(new IndexingWriterConfiguration(bulkMessageWriter.getName(), getConfigurations()));
       if(writerConfiguration.isDefault(sensorType)) {
         //want to warn, but not fail the tuple

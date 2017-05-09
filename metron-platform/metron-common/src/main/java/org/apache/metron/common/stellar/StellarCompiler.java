@@ -250,7 +250,8 @@ public class StellarCompiler extends StellarBaseListener {
   public void exitNotFunc(StellarParser.NotFuncContext ctx) {
     expression.tokenDeque.push(new Token<>( (tokenDeque, state) -> {
     Token<Boolean> arg = (Token<Boolean>) popDeque(tokenDeque);
-    tokenDeque.push(new Token<>(!arg.getValue(), Boolean.class));
+      Object val = arg.getValue();
+    tokenDeque.push(new Token<>(!(val == null?false:(boolean)val), Boolean.class));
     }, DeferredFunction.class));
   }
 

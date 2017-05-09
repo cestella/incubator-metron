@@ -17,6 +17,8 @@
  */
 package org.apache.metron.enrichment.adapters.stellar;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import org.apache.metron.common.configuration.enrichment.SensorEnrichmentConfig;
 import org.apache.metron.common.configuration.enrichment.handler.ConfigHandler;
 import org.apache.metron.common.dsl.Context;
@@ -31,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static org.apache.metron.enrichment.bolt.GenericEnrichmentBolt.STELLAR_CONTEXT_CONF;
@@ -87,12 +89,19 @@ public class StellarAdapter implements EnrichmentAdapter<CacheKey>,Serializable 
     Map<String, Object> message = value.getValue(Map.class);
     VariableResolver resolver = new MapVariableResolver(message, sensorConfig, globalConfig);
     StellarProcessor processor = new StellarProcessor();
-    Map<String, Object> stellarStatements = value.getField().length() == 0? handler.getConfig()
-                                                                          : (Map)handler.getConfig().get(value.getField());
+    Collection<Map.Entry<String, Object>> stellarStatements = getStatements(value.getField().length() == 0? handler.getConfig()
+                                                                          : handler.getConfig().get(value.getField()));
     if(stellarStatements != null) {
-      for (Map.Entry<String, Object> kv : stellarStatements.entrySet()) {
+      for (Map.Entry<String, Object> kv : stellarStatements) {
         if(kv.getValue() instanceof String) {
+          long startTime = System.currentTimeMillis();
           String stellarStatement = (String) kv.getValue();
+          if(_LOG.isDebugEnabled()) {
+            long duration = System.currentTimeMillis() - startTime;
+            if(duration > 1000) {
+              _LOG.debug("SLOW LOG: " + stellarStatement + " took" + duration + "ms");
+            }
+          }
           Object o = processor.parse(stellarStatement, resolver, StellarFunctions.FUNCTION_RESOLVER(), stellarContext);
           if(o != null && o instanceof Map) {
             for(Map.Entry<Object, Object> valueKv : ((Map<Object, Object>)o).entrySet()) {
@@ -109,6 +118,28 @@ public class StellarAdapter implements EnrichmentAdapter<CacheKey>,Serializable 
     JSONObject enriched = new JSONObject(message);
     _LOG.trace("Stellar Enrichment Success: " + enriched);
     return enriched;
+  }
+
+  Collection<Map.Entry<String, Object>> getStatements(Object o) {
+    if(o instanceof Map) {
+      return ((Map) o).entrySet();
+    }
+    else if(o instanceof List) {
+      List<Map.Entry<String, Object>> ret = new ArrayList<>();
+      List<String> entries = (List<String>)o;
+      for(String entry : entries) {
+        Iterable<String> parts = Splitter.on(":=").split(entry);
+        String var = Iterables.getFirst(parts, null);
+        String statement = Iterables.getLast(parts, null);
+        if(var != null && statement != null) {
+          ret.add(new AbstractMap.SimpleEntry<>(var.trim(), statement.trim()));
+        }
+      }
+      return ret;
+    }
+    else {
+      throw new IllegalStateException("Stellar statements must either be a map or a list.");
+    }
   }
 
   @Override

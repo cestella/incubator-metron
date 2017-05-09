@@ -17,7 +17,9 @@
  */
 package org.apache.metron.common.configuration.enrichment.handler;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import org.apache.metron.common.stellar.StellarProcessor;
 import org.json.simple.JSONObject;
 
@@ -34,7 +36,7 @@ public class StellarConfig implements Config {
       if(kv.getValue() instanceof String) {
         includeEmpty = true;
       }
-      else if(kv.getValue() instanceof Map) {
+      else if(kv.getValue() instanceof Map || kv.getValue() instanceof List) {
         ret.add(kv.getKey());
       }
     }
@@ -58,9 +60,14 @@ public class StellarConfig implements Config {
       if(kv.getValue() instanceof String) {
         defaultStellarStatementGroup.put(kv.getKey(), (String)kv.getValue());
       }
-      else if(kv.getValue() instanceof Map) {
+      else if(kv.getValue() instanceof Map ) {
         JSONObject ret = new JSONObject();
-        ret.put(kv.getKey(), getMessage(processor, (Map<String, String>) kv.getValue(), message));
+        ret.put(kv.getKey(), getMessage(processor, (Map)kv.getValue(), message));
+        messages.add(ret);
+      }
+      else if(kv.getValue() instanceof List) {
+        JSONObject ret = new JSONObject();
+        ret.put(kv.getKey(), getMessage(processor, (List)kv.getValue(), message));
         messages.add(ret);
       }
     }
@@ -71,6 +78,28 @@ public class StellarConfig implements Config {
       messages.add(ret);
     }
     return messages;
+  }
+
+  private Map<String, Object> getMessage( StellarProcessor processor
+                                        , List<String> stellarStatementGroup
+                                        , JSONObject message
+                                        )
+  {
+    Set<String> stellarFields = new HashSet<>();
+    for(String stellarStatementExpr: stellarStatementGroup) {
+      String stellarStatement = Iterables.getLast(Splitter.on(":=").split(stellarStatementExpr));
+      if(stellarStatement != null) {
+        Set<String> variables = processor.variablesUsed(stellarStatement.trim());
+        if (variables != null) {
+          stellarFields.addAll(variables);
+        }
+      }
+    }
+    Map<String, Object> messageSegment = new HashMap<>();
+    for(String variable : stellarFields) {
+      messageSegment.put(variable, message.get(variable));
+    }
+    return messageSegment;
   }
 
   private Map<String, Object> getMessage( StellarProcessor processor

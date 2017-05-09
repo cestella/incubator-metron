@@ -167,10 +167,22 @@ public enum LocalImporter implements Importer {
   public static class Progress {
     private int count = 0;
     private String anim= "|/-\\";
+    private PrintStream pw;
+    public Progress(PrintStream pw) {
+      this.pw = pw;
+    }
+
+    public Progress() {
+      this(System.out);
+    }
+
+    public synchronized void reset() {
+      count = 0;
+    }
 
     public synchronized void update() {
       int currentCount = count++;
-      System.out.print("\rProcessed " + currentCount + " - " + anim.charAt(currentCount % anim.length()));
+      pw.print("\rProcessed " + currentCount + " - " + anim.charAt(currentCount % anim.length()));
     }
   }
 
