@@ -250,7 +250,7 @@ public class StellarCompiler extends StellarBaseListener {
   public void exitNotFunc(StellarParser.NotFuncContext ctx) {
     expression.tokenDeque.push(new Token<>( (tokenDeque, state) -> {
     Token<Boolean> arg = (Token<Boolean>) popDeque(tokenDeque);
-      Object val = arg.getValue();
+    Object val = arg.getValue();
     tokenDeque.push(new Token<>(!(val == null?false:(boolean)val), Boolean.class));
     }, DeferredFunction.class));
   }
@@ -328,10 +328,7 @@ public class StellarCompiler extends StellarBaseListener {
   private boolean booleanOp(final Token<?> left, final Token<?> right, final BooleanOp op, final String opName) {
     Boolean l = ConversionUtils.convert(left.getValue(), Boolean.class);
     Boolean r = ConversionUtils.convert(right.getValue(), Boolean.class);
-    if (l == null || r == null) {
-      throw new ParseException("Unable to operate on " + left.getValue() + " " + opName + " " + right.getValue() + ", null value");
-    }
-    return op.op(l, r);
+    return op.op(l == null?false:l, r==null?false:r);
   }
 
 
