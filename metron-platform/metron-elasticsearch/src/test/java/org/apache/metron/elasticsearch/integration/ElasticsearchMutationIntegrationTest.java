@@ -115,16 +115,35 @@ public class ElasticsearchMutationIntegrationTest {
     }
     Assert.assertEquals(10, docs.size());
     //modify the first message and add a new field
-    Map<String, Object> message0 = new HashMap<String, Object>(inputData.get(0)) {{
-      put("new-field", "metron");
-    }};
-    String message0Json = JSONUtils.INSTANCE.toJSON(message0, true);
-    String uuid = "" + message0.get(Constants.GUID);
-    Mutation mutation = Mutation.of(MutationOperation.REPLACE, message0Json);
-    dao.update(uuid, SENSOR_NAME, mutation, Optional.empty(), configurations);
-    Assert.assertEquals(1, table.size());
-    Document doc = dao.getLatest(uuid, SENSOR_NAME);
-    Assert.assertEquals(message0Json, doc.getDocument());
+    {
+      Map<String, Object> message0 = new HashMap<String, Object>(inputData.get(0)) {{
+        put("new-field", "metron");
+      }};
+      String message0Json = JSONUtils.INSTANCE.toJSON(message0, true);
+      String uuid = "" + message0.get(Constants.GUID);
+      Mutation mutation = Mutation.of(MutationOperation.REPLACE, message0Json);
+      dao.update(uuid, SENSOR_NAME, mutation, Optional.empty(), configurations);
+      Assert.assertEquals(1, table.size());
+      Document doc = dao.getLatest(uuid, SENSOR_NAME);
+      Assert.assertEquals(message0Json, doc.getDocument());
+      //TODO: Validate that the hbase row has one column
+      //TODO: Validate that ES is up-to-date
+    }
+    //modify the same message and modify the new field
+    {
+      Map<String, Object> message0 = new HashMap<String, Object>(inputData.get(0)) {{
+        put("new-field", "metron2");
+      }};
+      String message0Json = JSONUtils.INSTANCE.toJSON(message0, true);
+      String uuid = "" + message0.get(Constants.GUID);
+      Mutation mutation = Mutation.of(MutationOperation.REPLACE, message0Json);
+      dao.update(uuid, SENSOR_NAME, mutation, Optional.empty(), configurations);
+      Assert.assertEquals(1, table.size());
+      Document doc = dao.getLatest(uuid, SENSOR_NAME);
+      Assert.assertEquals(message0Json, doc.getDocument());
+      //TODO: Validate that the hbase row has 2 columns
+      //TODO: Validate that ES is up-to-date
+    }
   }
 
 }
