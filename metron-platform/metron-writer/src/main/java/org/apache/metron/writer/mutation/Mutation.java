@@ -26,6 +26,15 @@ public class Mutation implements Serializable {
   MutationOperation mutator;
   String mutationArg;
 
+  public Mutation(MutationOperation mutator, String mutationArg) {
+    this.mutator = mutator;
+    this.mutationArg = mutationArg;
+  }
+
+  public static Mutation of(MutationOperation mutator, String mutationArg) {
+    return new Mutation(mutator, mutationArg);
+  }
+
   /**
    * Applies this function to the given argument.
    *

@@ -34,9 +34,7 @@ public class MutationTest {
 
   @Test
   public void testReplace() throws Exception {
-    Mutation m = new Mutation();
-    m.mutator = MutationOperation.REPLACE;
-    m.mutationArg = "{ \"a\" : 1 }";
+    Mutation m = Mutation.of(MutationOperation.REPLACE, "{ \"a\" : 1 }");
     String out = m.apply(
             () -> {
               try {
@@ -66,11 +64,7 @@ public class MutationTest {
     final Map<String, Object> orig = new HashMap<String, Object>() {{
       put("a", 1);
     }};
-    Map<String, Object> out = apply(new Mutation() {{
-      mutationArg = addElement;
-      mutator = MutationOperation.PATCH;
-    }}
-    , orig);
+    Map<String, Object> out = apply(Mutation.of(MutationOperation.PATCH, addElement), orig);
     mapEquals(out, new HashMap<String, Object>() {{
       putAll(orig);
       put("b", "metron");
@@ -97,11 +91,7 @@ public class MutationTest {
     final Map<String, Object> orig = new HashMap<String, Object>() {{
       put("a", 1);
     }};
-    Map<String, Object> out = apply(new Mutation() {{
-      mutationArg = addAndThenRemoveElement;
-      mutator = MutationOperation.PATCH;
-    }}
-    , orig);
+    Map<String, Object> out = apply(Mutation.of(MutationOperation.PATCH, addAndThenRemoveElement) , orig);
     mapEquals(out, new HashMap<String, Object>() {{
       put("b", "metron");
     }});
