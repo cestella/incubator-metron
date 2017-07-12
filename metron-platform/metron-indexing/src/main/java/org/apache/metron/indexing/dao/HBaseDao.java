@@ -1,6 +1,5 @@
-package org.apache.metron.writer.dao;
+package org.apache.metron.indexing.dao;
 
-import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
@@ -12,17 +11,17 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.NavigableMap;
 
-public class NoSqlDao extends IndexDao {
+public class HBaseDao extends IndexDao {
   private HTableInterface tableInterface;
   private byte[] cf;
 
-  public NoSqlDao(HTableInterface tableInterface, String cf, IndexUpdateCallback callback) {
+  public HBaseDao(HTableInterface tableInterface, String cf, IndexUpdateCallback callback) {
     super(callback);
     this.tableInterface = tableInterface;
     this.cf = cf.getBytes();
   }
 
-  public NoSqlDao(HTableInterface tableInterface, String cf) {
+  public HBaseDao(HTableInterface tableInterface, String cf) {
     this(tableInterface, cf, (x,y) -> {});
   }
 

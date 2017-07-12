@@ -1,10 +1,10 @@
-package org.apache.metron.writer.dao;
+package org.apache.metron.indexing.dao;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.utils.JSONUtils;
-import org.apache.metron.writer.mutation.Mutation;
-import org.apache.metron.writer.mutation.MutationException;
+import org.apache.metron.indexing.mutation.Mutation;
+import org.apache.metron.indexing.mutation.MutationException;
 
 import java.io.IOException;
 import java.util.Optional;

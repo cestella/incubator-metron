@@ -15,28 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.metron.writer.mutation;
+package org.apache.metron.indexing.mutation.mutators;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.metron.writer.mutation.mutators.Patch;
-import org.apache.metron.writer.mutation.mutators.Replace;
+import org.apache.metron.indexing.mutation.MutationException;
+import org.apache.metron.indexing.mutation.Mutator;
 
 import java.util.function.Supplier;
 
-public enum MutationOperation implements Mutator{
-  PATCH(new Patch()),
-  REPLACE(new Replace())
-  ;
-
-  Mutator mutator;
-
-  MutationOperation(Mutator mutator) {
-    this.mutator = mutator;
-  }
+public class Replace implements Mutator {
 
   @Override
-  public String mutate(Supplier<JsonNode> originalNode, String arg) throws MutationException {
-    return this.mutator.mutate(originalNode, arg);
+  public String mutate(Supplier<JsonNode> original, String arg) throws MutationException {
+    return arg;
   }
 }

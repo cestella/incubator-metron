@@ -15,13 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.writer.mutation.mutators;
+package org.apache.metron.indexing.mutation.mutators;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.flipkart.zjsonpatch.JsonPatch;
 import org.apache.metron.common.utils.JSONUtils;
-import org.apache.metron.writer.mutation.MutationException;
-import org.apache.metron.writer.mutation.Mutator;
+import org.apache.metron.indexing.mutation.MutationException;
+import org.apache.metron.indexing.mutation.Mutator;
 
 import java.util.function.Supplier;
 

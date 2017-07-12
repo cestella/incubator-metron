@@ -1,4 +1,4 @@
-package org.apache.metron.writer.dao;
+package org.apache.metron.indexing.dao;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.lang3.exception.ExceptionUtils;

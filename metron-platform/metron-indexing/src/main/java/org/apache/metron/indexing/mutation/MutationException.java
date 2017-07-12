@@ -15,9 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.writer.mutation;
-
-import java.io.IOException;
+package org.apache.metron.indexing.mutation;
 
 public class MutationException extends Exception {
   public MutationException(String s, Exception e) {

@@ -1,33 +1,29 @@
 package org.apache.metron.elasticsearch.integration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.metron.common.Constants;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.utils.JSONUtils;
+import org.apache.metron.elasticsearch.dao.ElasticsearchDao;
 import org.apache.metron.elasticsearch.integration.components.ElasticSearchComponent;
+import org.apache.metron.elasticsearch.utils.ElasticsearchUtils;
 import org.apache.metron.elasticsearch.writer.ElasticsearchWriter;
 import org.apache.metron.test.mock.MockHTable;
-import org.apache.metron.writer.dao.Document;
-import org.apache.metron.writer.dao.IndexDao;
-import org.apache.metron.writer.dao.MultiIndexDao;
-import org.apache.metron.writer.dao.NoSqlDao;
-import org.apache.metron.writer.mutation.Mutation;
-import org.apache.metron.writer.mutation.MutationOperation;
-import org.elasticsearch.action.bulk.BulkResponse;
+import org.apache.metron.indexing.dao.Document;
+import org.apache.metron.indexing.dao.IndexDao;
+import org.apache.metron.indexing.dao.MultiIndexDao;
+import org.apache.metron.indexing.dao.HBaseDao;
+import org.apache.metron.indexing.mutation.Mutation;
+import org.apache.metron.indexing.mutation.MutationOperation;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -66,19 +62,20 @@ public class ElasticsearchMutationIntegrationTest {
             .build();
     es.start();
 
-    hbaseDao = new NoSqlDao(table, CF);
-    esDao = new ElasticsearchWriter();
-    ((ElasticsearchWriter)esDao).init(new HashMap<String, Object>() {{
+    hbaseDao = new HBaseDao(table, CF);
+    Map<String, Object> globalConfig = new HashMap<String, Object>() {{
       put("es.clustername", "metron");
       put("es.port", "9300");
       put("es.ip", "localhost");
       put("es.date.format", dateFormat);
-                }}
-              );
+    }};
+
+    esDao = new ElasticsearchDao(ElasticsearchUtils.getClient(globalConfig ) );
 
     dao = new MultiIndexDao(hbaseDao, esDao);
     configurations = mock(WriterConfiguration.class);
     when(configurations.getIndex(any())).thenReturn(SENSOR_NAME);
+    when(configurations.getGlobalConfig()).thenReturn(globalConfig);
   }
 
   @AfterClass

@@ -1,4 +1,4 @@
-package org.apache.metron.writer.dao;
+package org.apache.metron.indexing.dao;
 
 public class Document {
   Long timestamp;

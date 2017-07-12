@@ -15,19 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.writer.mutation.mutators;
+
+package org.apache.metron.indexing.mutation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.metron.writer.mutation.MutationException;
-import org.apache.metron.writer.mutation.Mutator;
-import org.json.simple.JSONObject;
 
 import java.util.function.Supplier;
 
-public class Replace implements Mutator {
-
-  @Override
-  public String mutate(Supplier<JsonNode> original, String arg) throws MutationException {
-    return arg;
-  }
+public interface Mutator {
+  String mutate(Supplier<JsonNode> original, String arg) throws MutationException;
 }
