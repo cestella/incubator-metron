@@ -162,9 +162,6 @@ public class ElasticsearchMetaAlertIntegrationTest {
            "guid" : {
              "type" : "keyword"
            },
-           "ip_src_addr" : {
-             "type" : "keyword"
-           },
            "score" : {
              "type" : "integer"
            },
@@ -176,7 +173,24 @@ public class ElasticsearchMetaAlertIntegrationTest {
    }
    */
   @Multiline
-  public static String templates;
+  public static String metaAlertTemplate;
+
+  /**
+   {
+       "test_doc" : {
+         "properties" : {
+           "guid" : {
+             "type" : "keyword"
+           },
+           "ip_src_addr" : {
+             "type" : "keyword"
+           }
+         }
+       }
+   }
+   */
+  @Multiline
+  public static String indexTemplate;
 
   @BeforeClass
   public static void setupBefore() throws Exception {
@@ -208,7 +222,8 @@ public class ElasticsearchMetaAlertIntegrationTest {
   @Before
   public void setup() throws IOException {
     es.createIndexWithMapping(METAALERTS_INDEX, MetaAlertDao.METAALERT_DOC,
-        templates);
+        metaAlertTemplate);
+    es.createIndexWithMapping(INDEX, SENSOR_NAME + "_doc", indexTemplate);
   }
 
   @AfterClass
