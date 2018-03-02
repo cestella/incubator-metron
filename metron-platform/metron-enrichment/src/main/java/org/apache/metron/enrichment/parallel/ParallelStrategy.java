@@ -67,10 +67,6 @@ public abstract class ParallelStrategy implements Strategy {
         builder = builder.recordStats();
       }
       cache = builder.build();
-      if(logStats) {
-        builder = builder.recordStats();
-      }
-      cache = builder.build();*/
     }
   }
 
