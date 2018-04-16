@@ -41,6 +41,7 @@
     <modules>
         <module>metron-docker</module>
         <module>metron-performance</module>
+        <module>metron-webrequest</module>
     </modules>
     <dependencies>
         <dependency>
