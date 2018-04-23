@@ -27,9 +27,6 @@
   </parent>
   <description>webrequest classifier</description>
   <url>https://metron.apache.org/</url>
-  <properties>
-    <spark.version>1.6.3</spark.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -39,25 +36,25 @@
        <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.10</artifactId>
-      <version>${spark.version}</version>
+      <version>${global_spark_version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-mllib_2.10</artifactId>
-      <version>${spark.version}</version>
+      <version>${global_spark_version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_2.10</artifactId>
-      <version>${spark.version}</version>
+      <version>${global_spark_version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-hive_2.10</artifactId>
-      <version>${spark.version}</version>
+      <version>${global_spark_version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

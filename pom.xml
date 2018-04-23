@@ -95,6 +95,7 @@
         <global_flux_version>${base_flux_version}</global_flux_version>
         <global_pcap_version>1.7.1</global_pcap_version>
         <global_kafka_version>0.10.0.1</global_kafka_version>
+        <global_spark_version>1.6.3</global_spark_version>
         <global_hadoop_version>${base_hadoop_version}</global_hadoop_version>
         <global_hbase_version>${base_hbase_version}</global_hbase_version>
         <global_flume_version>${base_flume_version}</global_flume_version>
