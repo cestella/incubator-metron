@@ -29,11 +29,16 @@
   <url>https://metron.apache.org/</url>
   <dependencies>
     <dependency>
+      <groupId>org.apache.metron</groupId>
+      <artifactId>metron-statistics</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${global_guava_version}</version>
     </dependency>
-       <dependency>
+    <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.10</artifactId>
       <version>${global_spark_version}</version>
