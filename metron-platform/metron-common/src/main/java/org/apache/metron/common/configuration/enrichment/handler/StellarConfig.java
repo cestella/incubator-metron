@@ -19,6 +19,8 @@ package org.apache.metron.common.configuration.enrichment.handler;
 
 import org.apache.metron.stellar.common.StellarAssignment;
 import org.apache.metron.stellar.common.StellarProcessor;
+import org.apache.metron.stellar.dsl.MapVariableResolver;
+import org.apache.metron.stellar.dsl.VariableResolver;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,8 +144,13 @@ public class StellarConfig implements Config {
   {
 
     Map<String, Object> messageSegment = new HashMap<>();
-    for(String variable : stellarFields) {
-      messageSegment.put(variable, message.get(variable));
+    if(stellarFields.contains(VariableResolver.ALL_FIELDS)) {
+      messageSegment.putAll(message);
+    }
+    else {
+      for (String variable : stellarFields) {
+        messageSegment.put(variable, message.get(variable));
+      }
     }
     return messageSegment;
   }

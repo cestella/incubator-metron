@@ -18,6 +18,9 @@
 
 package org.apache.metron.stellar.common.utils;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.metron.stellar.dsl.Context;
 import org.apache.metron.stellar.dsl.DefaultVariableResolver;
 import org.apache.metron.stellar.dsl.MapVariableResolver;
@@ -56,13 +59,22 @@ public class StellarProcessorUtils {
      * @return ret
      */
     public static Object run(String rule, Map<String, Object> variables, Context context) {
-        StellarProcessor processor = new StellarProcessor();
-        Assert.assertTrue(rule + " not valid.", processor.validate(rule, context));
-        Object ret = processor.parse(rule, new DefaultVariableResolver(x -> variables.get(x),x-> variables.containsKey(x)), StellarFunctions.FUNCTION_RESOLVER(), context);
-        byte[] raw = SerDeUtils.toBytes(ret);
-        Object actual = SerDeUtils.fromBytes(raw, Object.class);
-        Assert.assertEquals(ret, actual);
-        return ret;
+      StellarProcessor processor = new StellarProcessor();
+      Assert.assertTrue(rule + " not valid.", processor.validate(rule, context));
+      Object ret = processor.parse( rule
+              , new DefaultVariableResolver(
+                      x -> {
+                        if(x.equals(MapVariableResolver.ALL_FIELDS)) {
+                          return variables;
+                        }
+                        return variables.get(x);
+                      }
+                      ,x-> x.equals(MapVariableResolver.ALL_FIELDS) || variables.containsKey(x)
+              ), StellarFunctions.FUNCTION_RESOLVER(), context);
+      byte[] raw = SerDeUtils.toBytes(ret);
+      Object actual = SerDeUtils.fromBytes(raw, Object.class);
+      Assert.assertTrue(ret + " != " + actual, ret.equals(actual) || EqualsBuilder.reflectionEquals(ret, actual));
+      return ret;
     }
 
   public static Object run(String rule, Map<String, Object> variables) {

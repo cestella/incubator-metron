@@ -48,7 +48,7 @@ public class BinFunctions {
       for(int bin = 0; bin < numBins;++bin) {
         double bound = boundFunc.apply(bin);
         if(lastBound > bound ) {
-          throw new IllegalStateException("Your bins must be non-decreasing");
+          throw new IllegalStateException("Your bins must be non-decreasing: " + lastBound + " > " + bound);
         }
         if(value <= bound) {
           return bin;

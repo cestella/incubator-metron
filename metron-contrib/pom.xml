@@ -42,6 +42,7 @@
         <module>metron-docker</module>
         <module>metron-performance</module>
         <module>metron-webrequest</module>
+        <module>metron-vectorizer</module>
     </modules>
     <dependencies>
         <dependency>

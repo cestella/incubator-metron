@@ -18,6 +18,7 @@
 package org.apache.metron.stellar.common.utils.hashing;
 
 import com.google.common.base.Joiner;
+import org.apache.metron.stellar.common.utils.hashing.semantic.SemanticHasher;
 import org.apache.metron.stellar.common.utils.hashing.tlsh.TLSHHasher;
 
 import java.util.*;
@@ -34,7 +35,8 @@ import java.util.function.Function;
  */
 public enum HashStrategy {
   TLSH(a -> new TLSHHasher(), TLSHHasher.supportedHashes()),
-  DEFAULT(a -> new DefaultHasher(a), DefaultHasher.supportedHashes())
+  DEFAULT(a -> new DefaultHasher(a), DefaultHasher.supportedHashes()),
+  SEMANTIC(a -> new SemanticHasher(), SemanticHasher.supportedHashes())
   ;
 
   /**

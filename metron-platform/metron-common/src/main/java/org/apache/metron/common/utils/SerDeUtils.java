@@ -47,6 +47,7 @@ import de.javakaffee.kryoserializers.guava.ImmutableSetSerializer;
 import de.javakaffee.kryoserializers.jodatime.JodaLocalDateSerializer;
 import de.javakaffee.kryoserializers.jodatime.JodaLocalDateTimeSerializer;
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -263,6 +264,28 @@ public class SerDeUtils {
     catch(Throwable t) {
       LOG.error("Unable to deserialize  because {}", t.getMessage(), t);
       throw t;
+    }
+  }
+
+  /**
+   * This is a serialization container for situations where we need to rely on
+   * objects which are not java serializable, but are kryo serializable.
+   * (I'm looking at you, Spark, and your context scrubbing ;)
+   * @param <T>
+   */
+  public static class SerializationContainer<T> implements Serializable {
+    private transient T val;
+    private byte[] serialized;
+    private Class<T> clazz;
+    public SerializationContainer(T val, Class<T> clazz) {
+      serialized = SerDeUtils.toBytes(val);
+      this.clazz = clazz;
+    }
+    public synchronized T get() {
+      if(val == null) {
+        val = SerDeUtils.fromBytes(serialized, clazz);
+      }
+      return val;
     }
   }
 }
