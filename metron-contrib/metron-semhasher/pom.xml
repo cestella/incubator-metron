@@ -16,22 +16,65 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>metron-webrequest</name>
+  <name>metron-vectorizer</name>
   <groupId>org.apache.metron</groupId>
-  <artifactId>metron-webrequest</artifactId>
+  <artifactId>metron-semhasher</artifactId>
   <packaging>jar</packaging>
   <parent>
     <groupId>org.apache.metron</groupId>
     <artifactId>metron-contrib</artifactId>
     <version>0.4.3</version>
   </parent>
-  <description>webrequest classifier</description>
+  <description>Metron Vectorizer</description>
   <url>https://metron.apache.org/</url>
+  <properties>
+    <spark_jackson>2.4.4</spark_jackson>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>info.debatty</groupId>
+      <artifactId>java-lsh</artifactId>
+      <version>0.11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.metron</groupId>
+      <artifactId>metron-parsers</artifactId>
+      <version>${project.parent.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${spark_jackson}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${spark_jackson}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${spark_jackson}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.metron</groupId>
       <artifactId>metron-statistics</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

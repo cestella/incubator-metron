@@ -43,7 +43,6 @@
 		<module>metron-maas-service</module>
 		<module>metron-maas-common</module>
 		<module>metron-statistics</module>
-		<module>metron-ml</module>
 		<module>metron-profiler</module>
 		<module>metron-profiler-client</module>
 		<module>metron-profiler-common</module>
