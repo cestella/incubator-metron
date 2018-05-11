@@ -58,6 +58,7 @@ Source11:       metron-management-%{full_version}-archive.tar.gz
 Source12:       metron-maas-service-%{full_version}-archive.tar.gz
 Source13:       metron-alerts-%{full_version}-archive.tar.gz
 Source14:       metron-performance-%{full_version}-archive.tar.gz
+Source15:       metron-semhash-loader-%{full_version}-archive.tar.gz
 
 %description
 Apache Metron provides a scalable advanced security analytics framework
@@ -95,6 +96,7 @@ tar -xzf %{SOURCE11} -C %{buildroot}%{metron_home}
 tar -xzf %{SOURCE12} -C %{buildroot}%{metron_home}
 tar -xzf %{SOURCE13} -C %{buildroot}%{metron_home}
 tar -xzf %{SOURCE14} -C %{buildroot}%{metron_home}
+tar -xzf %{SOURCE15} -C %{buildroot}%{metron_home}
 
 install %{buildroot}%{metron_home}/bin/metron-management-ui %{buildroot}/etc/init.d/
 install %{buildroot}%{metron_home}/bin/metron-alerts-ui %{buildroot}/etc/init.d/
@@ -203,6 +205,25 @@ This package installs performance tools useful for Metron
 %dir %{metron_home}/lib
 %{metron_home}/bin/load_tool.sh
 %attr(0644,root,root) %{metron_home}/lib/metron-performance-%{full_version}.jar
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%package        semhash-loader
+Summary:        Metron Semhashing Tools
+Group:          Applications/Internet
+Provides:       semhash-loader = %{version}
+
+%description    semhash-loader
+This package installs semhash-loader tools useful for Metron
+
+%files          semhash-loader
+%defattr(-,root,root,755)
+%dir %{metron_root}
+%dir %{metron_home}
+%dir %{metron_home}/bin
+%dir %{metron_home}/lib
+%{metron_home}/bin/semhash_loader.sh
+%attr(0644,root,root) %{metron_home}/lib/metron-semhash-loader-%{full_version}.jar
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

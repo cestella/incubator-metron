@@ -432,6 +432,9 @@
             <package>
               <name>metron-performance</name>
             </package>
+            <package>
+              <name>metron-semhash-loader</name>
+            </package>
 
           </packages>
         </osSpecific>
