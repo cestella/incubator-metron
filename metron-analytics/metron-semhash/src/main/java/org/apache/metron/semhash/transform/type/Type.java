@@ -17,8 +17,6 @@
  */
 package org.apache.metron.semhash.transform.type;
 
-import org.apache.metron.semhasher.context.TypeTransformer;
-
 import java.util.Map;
 import java.util.Optional;
 

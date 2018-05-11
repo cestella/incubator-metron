@@ -17,8 +17,6 @@
  */
 package org.apache.metron.semhash.transform.type;
 
-import org.apache.metron.semhasher.context.TypeTransformer;
-
 public class TextTypeTransformer implements TypeTransformer {
   @Override
   public Object typeSpecific(Object o) {

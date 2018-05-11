@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import org.apache.metron.statistics.BinFunctions;
 import org.apache.metron.statistics.OnlineStatisticsProvider;
 import org.apache.metron.stellar.common.utils.ConversionUtils;
-import org.apache.metron.semhasher.context.TypeTransformer;
 
 import java.util.List;
 import java.util.Map;

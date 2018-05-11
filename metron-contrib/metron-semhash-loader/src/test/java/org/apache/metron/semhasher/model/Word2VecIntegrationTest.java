@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.metron.common.utils.JSONUtils;
 import org.apache.metron.common.utils.SerDeUtils;
 import org.apache.metron.semhash.SemanticHasher;
+import org.apache.metron.semhasher.cli.CLI;
 import org.apache.metron.semhasher.config.Config;
 import org.apache.metron.semhasher.load.LoadUtil;
 import org.apache.spark.SparkConf;
@@ -245,7 +246,7 @@ public class Word2VecIntegrationTest {
     Config config = JSONUtils.INSTANCE.load(configJson, Config.class);
     config.initialize();
     JavaRDD<byte[]> trainingData = LoadUtil.INSTANCE.rawRead(sc, ImmutableList.of(flows), Optional.of(10));
-    SemanticHasher binner = SemanticHasher.create(trainingData, config);
+    SemanticHasher binner = CLI.create(trainingData, config);
     try(OutputStream os = new FileOutputStream(new File("/tmp/binner.ser"))) {
       IOUtils.write(SerDeUtils.toBytes(binner), os);
     }

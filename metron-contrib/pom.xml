@@ -41,7 +41,7 @@
     <modules>
         <module>metron-docker</module>
         <module>metron-performance</module>
-        <module>metron-semhasher</module>
+        <module>metron-semhash-loader</module>
     </modules>
     <dependencies>
         <dependency>
