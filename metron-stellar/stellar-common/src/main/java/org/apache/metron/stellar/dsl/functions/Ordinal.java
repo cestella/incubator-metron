@@ -20,7 +20,7 @@ package org.apache.metron.stellar.dsl.functions;
 /**
  * Interface that provides the statistical function get max and min from the implementing object.
  */
-public interface Ordinal extends Serializable{
+public interface Ordinal extends java.io.Serializable{
 
     /**
      * get the min value

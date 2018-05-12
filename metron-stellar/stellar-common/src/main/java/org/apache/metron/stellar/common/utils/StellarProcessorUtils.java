@@ -18,15 +18,12 @@
 
 package org.apache.metron.stellar.common.utils;
 
-<<<<<<< HEAD
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-=======
 import com.google.common.collect.ImmutableList;
 import org.apache.metron.stellar.common.StellarPredicateProcessor;
 import org.apache.metron.stellar.common.StellarProcessor;
->>>>>>> master
 import org.apache.metron.stellar.dsl.Context;
 import org.apache.metron.stellar.dsl.DefaultVariableResolver;
 import org.apache.metron.stellar.dsl.MapVariableResolver;
@@ -51,7 +48,6 @@ import java.util.stream.StreamSupport;
  */
 public class StellarProcessorUtils {
 
-<<<<<<< HEAD
     /**
      * This utility class is intended for use while unit testing Stellar operators.
      * It is included in the "main" code so third-party operators will not need
@@ -61,15 +57,17 @@ public class StellarProcessorUtils {
      * 1. Validate works on the expression
      * 2. The output can be serialized and deserialized properly
      *
-     * @param rule
+     * @param expression
      * @param variables
      * @param context
      * @return ret
      */
-    public static Object run(String rule, Map<String, Object> variables, Context context) {
+    public static Object run(String expression, Map<String, Object> variables, Context context) {
       StellarProcessor processor = new StellarProcessor();
-      Assert.assertTrue(rule + " not valid.", processor.validate(rule, context));
-      Object ret = processor.parse( rule
+      Assert.assertTrue("Invalid expression; expr=" + expression,
+            processor.validate(expression, context));
+
+      Object ret = processor.parse( expression 
               , new DefaultVariableResolver(
                       x -> {
                         if(x.equals(MapVariableResolver.ALL_FIELDS)) {
@@ -84,39 +82,6 @@ public class StellarProcessorUtils {
       Assert.assertTrue(ret + " != " + actual, ret.equals(actual) || EqualsBuilder.reflectionEquals(ret, actual));
       return ret;
     }
-=======
-  /**
-   * Execute and validate a Stellar expression.
-   *
-   * <p>This is intended for use while unit testing Stellar expressions.  This ensures that the expression
-   * validates successfully and produces a result that can be serialized correctly.
-   *
-   * @param expression The expression to execute.
-   * @param variables The variables to expose to the expression.
-   * @param context The execution context.
-   * @return The result of executing the expression.
-   */
-  public static Object run(String expression, Map<String, Object> variables, Context context) {
-
-    // validate the expression
-    StellarProcessor processor = new StellarProcessor();
-    Assert.assertTrue("Invalid expression; expr=" + expression,
-            processor.validate(expression, context));
-
-    // execute the expression
-    Object ret = processor.parse(
-            expression,
-            new DefaultVariableResolver(x -> variables.get(x), x -> variables.containsKey(x)),
-            StellarFunctions.FUNCTION_RESOLVER(),
-            context);
-
-    // ensure the result can be serialized/deserialized
-    byte[] raw = SerDeUtils.toBytes(ret);
-    Object actual = SerDeUtils.fromBytes(raw, Object.class);
-    Assert.assertEquals(ret, actual);
-
-    return ret;
-  }
 
   /**
    * Execute and validate a Stellar expression.
@@ -131,7 +96,6 @@ public class StellarProcessorUtils {
   public static Object run(String expression, Map<String, Object> variables) {
     return run(expression, variables, Context.EMPTY_CONTEXT());
   }
->>>>>>> master
 
   /**
    * Execute and validate a Stellar expression.
