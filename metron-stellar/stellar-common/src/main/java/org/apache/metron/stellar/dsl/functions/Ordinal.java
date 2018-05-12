@@ -15,32 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.metron.stellar.dsl.functions;
 
-package org.apache.metron.common.field.transformation;
+/**
+ * Interface that provides the statistical function get max and min from the implementing object.
+ */
+public interface Ordinal extends Serializable{
 
-import org.apache.metron.common.utils.ReflectionUtils;
+    /**
+     * get the min value
+     * @return min value
+     */
+    double getMin();
 
-public enum FieldTransformations {
-  IP_PROTOCOL(new IPProtocolTransformation())
-  ,REMOVE(new RemoveTransformation())
-  ,STELLAR(new StellarTransformation())
-  ,SELECT(new SelectTransformation())
-  ,RENAME(new RenameTransformation())
-  ;
-  FieldTransformation mapping;
-  FieldTransformations(FieldTransformation mapping) {
-    this.mapping = mapping;
-  }
-  public static FieldTransformation get(String mapping) {
-    try {
-      return FieldTransformations.valueOf(mapping).mapping;
-    }
-    catch(Exception ex) {
-      return ReflectionUtils.createInstance(mapping);
-    }
-  }
-
-  public Class<? extends FieldTransformation> getMappingClass() {
-    return mapping.getClass();
-  }
+    /**
+     * get the max value
+     * @return max value
+     */
+    double getMax();
 }
