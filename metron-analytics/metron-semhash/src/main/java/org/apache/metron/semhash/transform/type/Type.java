@@ -17,6 +17,10 @@
  */
 package org.apache.metron.semhash.transform.type;
 
+import org.apache.metron.semhash.transform.Context;
+import org.apache.metron.semhash.transform.FieldTransformation;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,18 +39,23 @@ public enum Type implements TypeTransformer {
   }
 
   @Override
-  public Optional<String> toWord(String field, Object o, Object context, Map<String, Object> wordConfig) {
-    return func.toWord(field, o, context, wordConfig);
+  public List<String> toWord(String field
+                                , Object o
+                                , Context context
+                                , Map<String, FieldTransformation> schema
+                                , Map<String, Object> message
+                                , Map<String, Object> config) {
+    return func.toWord(field, o, context, schema, message, config);
   }
 
   @Override
-  public Optional<Object> init() {
-    return func.init();
+  public Map<String, Object> map(String fieldName, Object datum, Map<String, FieldTransformation> schema, Map<String, Object> message) {
+    return func.map(fieldName, datum, schema, message);
   }
 
   @Override
-  public Object map(Object datum, Object context) {
-    return func.map(datum, context);
+  public boolean isCategorical() {
+    return func.isCategorical();
   }
 
   @Override

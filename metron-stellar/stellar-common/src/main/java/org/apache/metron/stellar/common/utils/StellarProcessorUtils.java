@@ -79,7 +79,9 @@ public class StellarProcessorUtils {
               ), StellarFunctions.FUNCTION_RESOLVER(), context);
       byte[] raw = SerDeUtils.toBytes(ret);
       Object actual = SerDeUtils.fromBytes(raw, Object.class);
-      Assert.assertTrue(ret + " != " + actual, ret.equals(actual) || EqualsBuilder.reflectionEquals(ret, actual));
+      if(!(ret == null || actual == null)) {
+        Assert.assertTrue(ret + " != " + actual, ret.equals(actual) || EqualsBuilder.reflectionEquals(ret, actual));
+      }
       return ret;
     }
 

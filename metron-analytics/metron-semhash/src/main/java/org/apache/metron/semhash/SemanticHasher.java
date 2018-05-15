@@ -42,14 +42,15 @@ public class SemanticHasher implements Function<Map<String, Object>, Map<String,
   }
 
   public Map<String, Object> apply(Map<String, Object> message) {
-    double[] vector = vectorizerModel.apply(message);
+    Map.Entry<double[], Double> vector = vectorizerModel.apply(message);
     if(vector == null) {
       return new HashMap<>();
     }
-    String bin = binningModel.bin(vector);
+    String bin = binningModel.bin(vector.getKey());
     Map<String, Object> ret = new HashMap<String, Object>();
-    ret.put(DelegatingSemanticHasher.VECTOR_KEY, vector);
+    ret.put(DelegatingSemanticHasher.VECTOR_KEY, vector.getKey());
     ret.put(DelegatingSemanticHasher.HASH_KEY, bin);
+    ret.put(DelegatingSemanticHasher.RANK_KEY, vector.getValue());
     return ret;
   }
 

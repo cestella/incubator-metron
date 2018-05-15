@@ -17,11 +17,13 @@
  */
 package org.apache.metron.semhash.bin;
 
+import com.google.common.base.Joiner;
 import info.debatty.java.lsh.LSHSuperBit;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.metron.stellar.common.utils.ConversionUtils;
 import org.apache.metron.semhash.vector.VectorizerModel;
+import org.apache.metron.stellar.common.utils.HexUtils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -38,9 +40,9 @@ public class LSHBinner implements BinningModel {
   public static final double DISTANCE_DEFAULT = 0.9;
   public static final String TARGET_ERROR_CONF = "error";
   public static final double TARGET_ERROR_DEFAULT = 0.04;
-  public static final String TARGET_FALSE_POSITIVE_CONF = "error";
+  public static final String TARGET_FALSE_POSITIVE_CONF = "falsePositives";
   public static final double TARGET_FALSE_POSITIVE_DEFAULT = 1e-6;
-  public static final int NUM_BUCKETS_IN_HASH_DEFAULT = 3;
+  public static final int NUM_BUCKETS_IN_HASH_DEFAULT = 1;
   public static final String NUM_BUCKETS_IN_HASH_CONF = "bucketsInHash";
 
   private LSHSuperBit lsh;
@@ -59,7 +61,7 @@ public class LSHBinner implements BinningModel {
     int[] hashes = lsh.hash(vector);
     String ret = "";
     for(int i = 0;i < numBucketsInHash;++i) {
-      ret += hashes[i];
+      ret += (i == 0?"":",") + hashes[i];
     }
     return ret;
   }

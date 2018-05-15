@@ -15,16 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.semhasher.model.vectorization;
 
-import org.apache.metron.semhash.vector.VectorizerModel;
-import org.apache.metron.semhasher.config.Config;
-import org.apache.metron.semhash.transform.Context;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+package org.apache.metron.stellar.common.utils;
 
-import java.util.Map;
+public enum HexUtils {
+  INSTANCE;
 
-public interface VectorizerTrainer {
-  VectorizerModel train(JavaSparkContext sc, Config config, Context context, JavaRDD<Map<String, Object>> messagesRdd);
+  final protected static char[] encoding = "0123456789ABCDEF".toCharArray();
+
+  /**
+   * Integer array specific implementation inspired by  https://stackoverflow.com/a/28611711
+   * @param arr
+   * @return
+   */
+  public String toHexString(int[] arr, int len) {
+    char[] encodedChars = new char[len * 4 * 2];
+    for (int i = 0; i < len; i++) {
+      int v = arr[i];
+      int idx = i * 4 * 2;
+      for (int j = 0; j < 8; j++) {
+        encodedChars[idx + j] = encoding[(v >>> ((7-j)*4)) & 0x0F];
+      }
+    }
+    return new String(encodedChars);
+  }
+
+  public String toHexString(int[] arr) {
+    return toHexString(arr, arr.length);
+
+  }
 }

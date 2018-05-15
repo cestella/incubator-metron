@@ -25,10 +25,17 @@ import org.apache.metron.semhash.transform.Context;
 import org.apache.metron.semhash.vector.word2vec.SentenceUtil;
 import org.apache.metron.stellar.common.utils.ConversionUtils;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.feature.Word2Vec;
+import org.apache.spark.mllib.linalg.DenseVector;
+import org.apache.spark.mllib.linalg.Matrix;
+import org.apache.spark.mllib.linalg.Vector;
+import org.apache.spark.mllib.linalg.distributed.RowMatrix;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +46,7 @@ public class Word2VecTrainer  implements VectorizerTrainer{
     SEED("seed", Optional.of(0)),
     LEARNING_RATE("learningRate", Optional.of(0.025d)),
     ITERATIONS("iterations", Optional.of(1)),
+    WINDOW_SIZE("windowSize", Optional.empty()),
     MIN_COUNT("minCount", Optional.of(5)),
     SAMPLE_SIZE("sampleSize", Optional.of(500)),
     ;
@@ -76,15 +84,20 @@ public class Word2VecTrainer  implements VectorizerTrainer{
   private Word2Vec configure(Map<String, Object> config) {
     Integer dimension = W2VParams.DIMENSION.get(config, Integer.class);
     Long seed = W2VParams.SEED.get(config, Long.class);
-    return new Word2Vec().setVectorSize(dimension)
+    Word2Vec ret = new Word2Vec().setVectorSize(dimension)
             .setSeed(seed)
             .setMinCount(W2VParams.MIN_COUNT.get(config, Integer.class))
             .setLearningRate(W2VParams.LEARNING_RATE.get(config, Double.class))
             .setNumIterations(W2VParams.ITERATIONS.get(config, Integer.class))
             ;
+    Integer window = W2VParams.WINDOW_SIZE.get(config, Integer.class);
+    if(window != null) {
+      return ret.setWindowSize(window);
+    }
+    return ret;
   }
   @Override
-  public VectorizerModel train(Config config, Context context, JavaRDD<Map<String, Object>> messagesRdd) {
+  public VectorizerModel train(JavaSparkContext sc, Config config, Context context, JavaRDD<Map<String, Object>> messagesRdd) {
     JavaRDD<Iterable<String>> rdd = messagesRdd.map(new ToSentenceMapper(context, config)).cache();
     int sampleSize = W2VParams.SAMPLE_SIZE.get(config.getVectorizerConfig(), Integer.class);
     List<Iterable<String>> s = rdd.takeSample(false, sampleSize);
@@ -92,17 +105,36 @@ public class Word2VecTrainer  implements VectorizerTrainer{
     int dimension = W2VParams.DIMENSION.get(config.getVectorizerConfig(), Integer.class);
 
     org.apache.spark.mllib.feature.Word2VecModel m = w2v.fit(rdd);
-    Map<String, float[]> model = new HashMap<>();
+    Map<String, Map.Entry<float[], Float>> model = new LinkedHashMap<>();
     scala.collection.immutable.Map<String, float[]> vecs = m.getVectors();
+    List<Vector> vecList = new ArrayList<>();
     for(scala.collection.Iterator<String> it = vecs.keysIterator(); it.hasNext();) {
       String word = it.next();
       float[] vec = vecs.get(word).get();
-      model.put(word, vec);
+      double[] tmpV = new double[vec.length];
+      for(int i = 0;i < vec.length;++i) {
+        tmpV[i] = vec[i];
+      }
+      vecList.add(new DenseVector(tmpV));
+    }
+    JavaRDD<Vector> vRdd = sc.parallelize(vecList);
+    RowMatrix mat = new RowMatrix(vRdd.rdd());
+    Matrix comp = mat.computePrincipalComponents(1);
+    RowMatrix projection = mat.multiply(comp);
+    Object projectionsO = projection.rows().collect();
+    Vector[] projections = (Vector[]) projectionsO;
+    int idx = 0;
+    for(scala.collection.Iterator<String> it = vecs.keysIterator(); it.hasNext();idx++) {
+      Vector v = projections[idx];
+      String word = it.next();
+      float[] vec = vecs.get(word).get();
+      float rank = (float)v.apply(0);
+      model.put(word, new AbstractMap.SimpleEntry<>(vec, rank));
     }
     Word2VecModel ret = new Word2VecModel(config.getSchema(), context, dimension, model);
     List<double[]> sample = new ArrayList<>();
     for(Iterable<String> sentence : s) {
-      sample.add(ret.apply(sentence));
+      sample.add(ret.apply(sentence).getKey());
     }
     ret.setSample(sample);
     return ret;

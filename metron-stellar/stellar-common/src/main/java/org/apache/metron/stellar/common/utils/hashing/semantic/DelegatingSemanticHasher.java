@@ -18,10 +18,12 @@
 
 package org.apache.metron.stellar.common.utils.hashing.semantic;
 
+import com.google.common.collect.Iterables;
 import org.apache.commons.codec.EncoderException;
 import org.apache.metron.stellar.common.utils.hashing.Hasher;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -31,11 +33,13 @@ import java.util.function.Function;
 public class DelegatingSemanticHasher implements Hasher {
   public static final String HASHER_CONF = "hasher";
   public static final String RETURN_CONF = "return";
+  public static final String IGNORE_CONF = "ignore";
   public static final String VECTOR_KEY = "vector";
   public static final String HASH_KEY = "hash";
+  public static final String RANK_KEY = "rank";
   public enum Return implements Function<Map<String, Object>, Object> {
-    VECTOR(m -> m.getOrDefault(VECTOR_KEY, null)),
-    HASH(m -> m.getOrDefault(HASH_KEY, null)),
+    VECTOR(m -> m == null?null:m.getOrDefault(VECTOR_KEY, null)),
+    HASH(m -> m == null?null:m.getOrDefault(HASH_KEY, null)),
     ALL(m -> m)
     ;
     Function<Map<String, Object>, Object> func;
@@ -60,6 +64,7 @@ public class DelegatingSemanticHasher implements Hasher {
   }
   private Function<Map<String, Object>, Map<String, Object>> hasher;
   private Return returnStrategy = Return.HASH;
+  private Set<String> ignoreFields;
 
   /**
    * Returns an encoded string representation of the hash value of the input. It is expected that
@@ -78,8 +83,21 @@ public class DelegatingSemanticHasher implements Hasher {
     if(toHash == null || !(toHash instanceof Map)) {
       throw new IllegalArgumentException("Invalid argument " + toHash + " expected a non-null map.");
     }
-    Map<String, Object> input = (Map<String, Object>) toHash;
+    Map<String, Object> input = getMap((Map<String, Object>) toHash);
     return returnStrategy.apply(hasher.apply(input));
+  }
+
+  private Map<String, Object> getMap(Map<String, Object> toHash) {
+    if(toHash == null || ignoreFields == null) {
+      return toHash;
+    }
+    HashMap<String, Object> ret = new HashMap<>();
+    for(Map.Entry<String, Object> kv : toHash.entrySet()) {
+      if(!ignoreFields.contains(kv.getKey())) {
+        ret.put(kv.getKey(), kv.getValue());
+      }
+    }
+    return ret;
   }
 
   /**
@@ -91,6 +109,13 @@ public class DelegatingSemanticHasher implements Hasher {
   public void configure(Optional<Map<String, Object>> config) {
     hasher = (Function<Map<String, Object>, Map<String, Object>>) config.get().get(HASHER_CONF);
     returnStrategy = Return.from((String)config.get().get(RETURN_CONF)).orElse(returnStrategy);
+    Object ignore = config.get().get(IGNORE_CONF);
+    if(ignore != null) {
+      ignoreFields = new HashSet<>();
+      for(String s : (Iterable<String>)ignore) {
+        ignoreFields.add(s);
+      }
+    }
   }
 
   public static final Set<String> supportedHashes() {

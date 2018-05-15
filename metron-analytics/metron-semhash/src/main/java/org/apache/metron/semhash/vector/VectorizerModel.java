@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface VectorizerModel extends Function<Map<String, Object>, double[]> , Serializable {
+public interface VectorizerModel extends Function<Map<String, Object>, Map.Entry<double[], Double>> , Serializable {
   int getDimension();
   List<double[]> getSample();
 }

@@ -15,16 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.metron.semhasher.model.vectorization;
 
-import org.apache.metron.semhash.vector.VectorizerModel;
-import org.apache.metron.semhasher.config.Config;
-import org.apache.metron.semhash.transform.Context;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+package org.apache.metron.stellar.common.utils;
 
-import java.util.Map;
+import org.junit.Test;
 
-public interface VectorizerTrainer {
-  VectorizerModel train(JavaSparkContext sc, Config config, Context context, JavaRDD<Map<String, Object>> messagesRdd);
+public class HexUtilsTest {
+  @Test
+  public void hexTest() {
+    System.out.println(HexUtils.INSTANCE.toHexString(new int[] { 30, 2, 3}, 2));
+  }
 }

@@ -18,30 +18,39 @@
 package org.apache.metron.semhash.transform.type;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.metron.semhash.transform.Context;
+import org.apache.metron.semhash.transform.FieldTransformation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface TypeTransformer {
   Object typeSpecific(Object o);
-
-  default Optional<String> toWord(String field, Object o, Object context, Map<String, Object> wordConfig) {
-    if(o == null) {
-      return Optional.empty();
+  default List<String> toWord(String field
+                                , Object o
+                                , Context context
+                                , Map<String, FieldTransformation> schema
+                                , Map<String, Object> message
+                                , Map<String, Object> config) {
+    List<String> words = new ArrayList<>();
+    if(o != null) {
+      String s = o.toString();
+      if(!StringUtils.isEmpty(s)) {
+        words.add(field + ":" + s);
+      }
     }
-    String s = o.toString();
-    return StringUtils.isEmpty(s)?Optional.empty():Optional.of(field + ":" + s);
+    return words;
   }
 
-  default Optional<Object> init() {
-    return Optional.empty();
-  }
-
-  default Object map(Object datum, Object context) {
+  default Map<String, Object> map(String fieldName, Object datum, Map<String, FieldTransformation> schema, Map<String, Object> message) {
     return null;
   }
 
   default Object reduce(Object left, Object right) {
     return null;
   }
+
+  boolean isCategorical();
 }

@@ -36,7 +36,6 @@ public enum SentenceUtil {
         continue;
       }
 
-      Object context = contexts.getContext().get(kv.getKey());
       FieldTransformation transformation = kv.getValue();
       if(normalize) {
         raw = transformation.getType().typeSpecific(raw);
@@ -44,9 +43,10 @@ public enum SentenceUtil {
           continue;
         }
       }
-      Optional<String> word = transformation.getType().toWord(kv.getKey(), raw, context, transformation.getTypeConfig());
-      if(word.isPresent()) {
-        ret.add(word.get());
+      List<String> phrase = transformation.getType()
+                                          .toWord(kv.getKey(), raw, contexts, schema, message,transformation.getTypeConfig());
+      if(!phrase.isEmpty()) {
+        ret.addAll(phrase);
       }
     }
     return ret;

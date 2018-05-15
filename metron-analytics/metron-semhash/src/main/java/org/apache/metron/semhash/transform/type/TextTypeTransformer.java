@@ -22,4 +22,9 @@ public class TextTypeTransformer implements TypeTransformer {
   public Object typeSpecific(Object o) {
     return o == null?null:o.toString();
   }
+
+  @Override
+  public boolean isCategorical() {
+    return true;
+  }
 }

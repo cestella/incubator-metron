@@ -17,22 +17,28 @@
  */
 package org.apache.metron.semhash.vector.word2vec;
 
+import com.google.common.base.Joiner;
 import org.apache.metron.semhash.transform.FieldTransformation;
 import org.apache.metron.semhash.transform.Context;
 import org.apache.metron.semhash.vector.VectorizerModel;
 
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
 public class Word2VecModel implements VectorizerModel {
 
-  private Map<String, float[]> model;
+  private Map<String, Map.Entry<float[], Float>> model;
   private Map<String, FieldTransformation> schema;
   private Context context;
   private int dimension;
   private List<double[]> sample;
 
-  public Word2VecModel(Map<String, FieldTransformation> schema, Context context, int dimension, Map<String, float[]> model) {
+  public Word2VecModel( Map<String, FieldTransformation> schema
+                      , Context context
+                      , int dimension
+                      , Map<String, Map.Entry<float[], Float>> model
+                      ) {
     this.model = model;
     this.dimension = dimension;
     this.schema = schema;
@@ -61,21 +67,34 @@ public class Word2VecModel implements VectorizerModel {
     this.sample = sample;
   }
 
-  public double[] apply(Iterable<String> sentence) {
+  public Map.Entry<double[], Double> apply(Iterable<String> sentence) {
+    //System.out.println(Joiner.on(" ").join(sentence));
     double[] v = null;
+    Double proj = null;
     int n = 0;
     for(String word : sentence) {
-      float[] wordV = model.get(word);
-      if(wordV == null) {
+      Map.Entry<float[], Float> o = model.get(word);
+      if(o == null ) {
         continue;
       }
+      float[] wordV = o.getKey();
+      if(wordV == null ) {
+        continue;
+      }
+      /*System.out.print(word + " => ");
+      for(int i = 0;i < wordV.length;++i) {
+        System.out.print(wordV[i] + " ");
+      }
+      System.out.println();*/
       if(v == null) {
+        proj = o.getValue() != null?o.getValue().doubleValue():null;
         v = new double[wordV.length];
         for(int i = 0;i < v.length;++i) {
           v[i] = wordV[i];
         }
       }
       else {
+        proj = (proj == null?0d:proj) + (o.getValue() != null?o.getValue().doubleValue():null);
         for(int i = 0;i < v.length;++i) {
           v[i] += wordV[i];
         }
@@ -85,14 +104,16 @@ public class Word2VecModel implements VectorizerModel {
     if(v == null) {
       return null;
     }
+
+    proj = proj == null?null:proj/n;
     for(int i = 0;i < v.length;++i) {
       v[i] /= n;
     }
-    return v;
+    return new AbstractMap.SimpleEntry<>(v, proj);
   }
 
   @Override
-  public double[] apply(Map<String, Object> input) {
+  public Map.Entry<double[], Double> apply(Map<String, Object> input) {
     Iterable<String> sentence = SentenceUtil.INSTANCE.toSentence(input, context, schema, true);
     return apply(sentence);
   }

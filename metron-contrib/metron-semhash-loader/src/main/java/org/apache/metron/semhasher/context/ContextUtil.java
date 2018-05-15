@@ -36,33 +36,32 @@ public enum ContextUtil {
   INSTANCE;
 
   public Context generateContext(JavaRDD<Map<String, Object>> input, Config config) {
-    JavaPairRDD<String, Tuple2<String, Object>> contextualized = input.flatMapToPair(new ContextMapper(config));
-    JavaPairRDD<String, Object> ret = contextualized.reduceByKey(new ContextReducer(config)).mapValues(x->x._2);
+    JavaPairRDD<String, KV> contextualized = input.flatMapToPair(new ContextMapper(config));
+    JavaPairRDD<String, KV> ret = contextualized.reduceByKey(new ContextReducer(config));
     Context context = new Context(new HashMap<>());
-    for(Tuple2<String, Object> t : ret.collect()) {
-      context.getContext().put(t._1, t._2);
+    for(Tuple2<String, KV> t : ret.collect()) {
+      context.getContext().put(t._1, t._2.getValue());
     }
     return context;
   }
 
-  private static class ContextMapper implements PairFlatMapFunction<Map<String,Object>, String, Tuple2<String, Object> > {
+  private static class ContextMapper implements PairFlatMapFunction<Map<String,Object>, String, KV > {
     private Config config;
     public ContextMapper(Config config) {
       this.config = config;
     }
     @Override
-    public Iterable<Tuple2<String, Tuple2<String, Object> >> call(Map<String, Object> message) throws Exception {
-      List<Tuple2<String, Tuple2<String, Object>>> ret = new ArrayList<>();
+    public Iterable<Tuple2<String, KV >> call(Map<String, Object> message) throws Exception {
+      List<Tuple2<String, KV>> ret = new ArrayList<>();
       for(Map.Entry<String, FieldTransformation> kv : config.getSchema().entrySet() ) {
         String field = kv.getKey();
         Object value = message.get(field);
         if(value != null) {
           FieldTransformation transform = kv.getValue();
-          Optional<Object> context = transform.getType().init();
-          if (context.isPresent()) {
-            Object mapped = transform.getType().map(value, context.get());
-            if(mapped != null) {
-              ret.add(new Tuple2<>(field, new Tuple2<>(field, mapped)));
+          Map<String, Object> mapped = transform.getType().map(field, value, config.getSchema(), message);
+          if(mapped != null) {
+            for(Map.Entry<String, Object> mappedKv : mapped.entrySet()) {
+              ret.add(new Tuple2<>(mappedKv.getKey(), new KV(field, mappedKv.getValue(), mappedKv.getKey())));
             }
           }
         }
@@ -71,18 +70,42 @@ public enum ContextUtil {
     }
   }
 
-  private static class ContextReducer implements Function2<Tuple2<String, Object>, Tuple2<String, Object>, Tuple2<String, Object>> {
+  private static class KV {
+    private String field;
+    private String contextField;
+    private Object value;
+
+    public KV(String field, Object value, String contextField) {
+      this.field = field;
+      this.value = value;
+      this.contextField = contextField;
+    }
+
+    public String getField() {
+      return field;
+    }
+
+    public Object getValue() {
+      return value;
+    }
+
+    public String getContextField() {
+      return contextField;
+    }
+  }
+
+  private static class ContextReducer implements Function2<KV, KV, KV> {
     private Config config;
     public ContextReducer(Config config) {
       this.config = config;
     }
 
     @Override
-    public Tuple2<String, Object> call(Tuple2<String, Object> left, Tuple2<String, Object> right) throws Exception {
-      String field = left._1;
+    public KV call(KV left, KV right) throws Exception {
+      String field = left.getField();
       FieldTransformation transform = config.getSchema().get(field);
-      Object reduction = transform.getType().reduce(left._2, right._2);
-      return new Tuple2<>(field, reduction);
+      Object reduction = transform.getType().reduce(left.getValue(), right.getValue());
+      return new KV(left.getField(), reduction, left.getContextField());
     }
   }
 }

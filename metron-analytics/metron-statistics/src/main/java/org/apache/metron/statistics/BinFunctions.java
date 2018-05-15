@@ -43,11 +43,13 @@ public class BinFunctions {
   )
   public static class Bin extends BaseStellarFunction {
 
+    private static final double EPSILON = 1e-6;
+
     public static int getBin(double value, int numBins, Function<Integer, Double> boundFunc) {
       double lastBound = Double.NEGATIVE_INFINITY;
       for(int bin = 0; bin < numBins;++bin) {
         double bound = boundFunc.apply(bin);
-        if(lastBound > bound ) {
+        if(lastBound != Double.NEGATIVE_INFINITY && lastBound > bound && Math.abs(lastBound - bound) >= EPSILON) {
           throw new IllegalStateException("Your bins must be non-decreasing: " + lastBound + " > " + bound);
         }
         if(value <= bound) {

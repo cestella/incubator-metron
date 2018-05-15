@@ -215,12 +215,12 @@ public class CLI {
     return new JavaSparkContext(conf);
   }
 
-  public static SemanticHasher create(JavaRDD<byte[]> inputData, Config config) {
+  public static SemanticHasher create(JavaSparkContext sc, JavaRDD<byte[]> inputData, Config config) {
     JavaRDD<Map<String, Object>> transformedInputData = TransformUtil.INSTANCE.transform(config, inputData);
     transformedInputData.cache();
     Context context = ContextUtil.INSTANCE.generateContext(transformedInputData, config);
     Word2VecTrainer trainer = new Word2VecTrainer();
-    VectorizerModel vecModel = trainer.train(config, context, transformedInputData);
+    VectorizerModel vecModel = trainer.train(sc, config, context, transformedInputData);
 
     LSHBinner binningModel = LSHBinner.create(vecModel, config.getBinningConfig());
     SemanticHasher ret = new SemanticHasher(vecModel, binningModel);
@@ -239,7 +239,7 @@ public class CLI {
     List<String> input = (List<String>)params.get(HashOptions.INPUT).get();
     Optional<Integer> partitions = Optional.ofNullable((Integer)params.get(HashOptions.PARTITIONS).get());
     JavaRDD<byte[]> trainingData = LoadUtil.INSTANCE.rawRead(sc, input, partitions);
-    SemanticHasher binner = create(trainingData, config);
+    SemanticHasher binner = create(sc, trainingData, config);
     String output = (String) params.get(HashOptions.OUTPUT).get();
     try(OutputStream os = new FileOutputStream(new File(output))) {
       IOUtils.write(SerDeUtils.toBytes(binner), os);

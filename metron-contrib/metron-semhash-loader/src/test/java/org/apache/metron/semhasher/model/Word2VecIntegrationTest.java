@@ -198,13 +198,50 @@ public class Word2VecIntegrationTest {
   public void shutdown() {
     sc.stop();
   }
+/**
+   * {
+   *   "schema" : {
+   *    "duration" : "NUMERIC",
+   *    "destination_port" : "TEXT",
+   *    "protocol" : "TEXT",
+   *    "packet_count" : "NUMERIC",
+   *    "byte_count" : "NUMERIC"
+   *              },
+   *   "parser" : "org.apache.metron.parsers.csv.CSVParser",
+   *   "parserConfig" : {
+   *     "columns" : {
+   *      "time" : 0,
+   *      "duration" : 1,
+   *      "source_computer" : 2,
+   *      "source_port" : 3,
+   *      "destination_computer" : 4,
+   *      "destination_port" : 5,
+   *      "protocol" : 6,
+   *      "packet_count" : 7,
+   *      "byte_count" : 8
+   *      }
+   *   },
+   *   "vectorizerConfig" : {
+   *     "dimension" : 1000,
+   *     "minCount" : 10,
+   *     "sampleSize" : 500
+   *   },
+   *   "binningConfig" : {
+   *      "stages" : [50, 3, 25],
+   *      "buckets" : [100, 50],
+   *      "distance" : 0.9,
+   *      "falsePositives" : 0.9,
+   *      "error" : 1.0342
+   *   }
+   * }
+   */
+  @Multiline
+  public static String configJson_specific;
 
   /**
    * {
    *   "schema" : {
-   *    "duration" : "NUMERIC",
    *    "source_computer" : "TEXT",
-   *    "source_port" : "TEXT",
    *    "destination_computer" : "TEXT",
    *    "destination_port" : "TEXT",
    *    "protocol" : "TEXT",
@@ -227,14 +264,16 @@ public class Word2VecIntegrationTest {
    *   },
    *   "vectorizerConfig" : {
    *     "dimension" : 200,
-   *     "minCount" : 10,
-   *     "sampleSize" : 500
+   *     "minCount" : 3,
+   *     "sampleSize" : 500,
+   *     "windowSize" : 25
    *   },
    *   "binningConfig" : {
-   *      "stages" : [3, 25, 50],
-   *      "buckets" : [50, 100],
+   *      "stages" : [50, 3, 25],
+   *      "buckets" : [100, 50],
    *      "distance" : 0.9,
-   *      "error" : 0.0342
+   *      "falsePositives" : 0.9,
+   *      "error" : 1.0342
    *   }
    * }
    */
@@ -246,7 +285,7 @@ public class Word2VecIntegrationTest {
     Config config = JSONUtils.INSTANCE.load(configJson, Config.class);
     config.initialize();
     JavaRDD<byte[]> trainingData = LoadUtil.INSTANCE.rawRead(sc, ImmutableList.of(flows), Optional.of(10));
-    SemanticHasher binner = CLI.create(trainingData, config);
+    SemanticHasher binner = CLI.create(sc, trainingData, config);
     try(OutputStream os = new FileOutputStream(new File("/tmp/binner.ser"))) {
       IOUtils.write(SerDeUtils.toBytes(binner), os);
     }
