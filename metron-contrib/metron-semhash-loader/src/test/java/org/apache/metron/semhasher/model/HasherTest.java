@@ -293,9 +293,10 @@ public class HasherTest {
       hasher = SerDeUtils.fromBytes(IOUtils.toByteArray(fis), Object.class);
     }
     SemanticHasher h = (SemanticHasher)hasher;
-    VectorizerModel vModel = h.getVectorizerModel();
+    return h;
+    /*VectorizerModel vModel = h.getVectorizerModel();
     LSHBinner binner = new LSHBinner(new LSHSuperBit(10, 10, vModel.getDimension(), 0L), 7);
-    return new SemanticHasher(vModel, binner);
+    return new SemanticHasher(vModel, binner);*/
   }
 
 

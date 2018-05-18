@@ -40,6 +40,21 @@ public class DelegatingSemanticHasher implements Hasher {
   public enum Return implements Function<Map<String, Object>, Object> {
     VECTOR(m -> m == null?null:m.getOrDefault(VECTOR_KEY, null)),
     HASH(m -> m == null?null:m.getOrDefault(HASH_KEY, null)),
+    RANKED_HASH(m -> {
+      if(m == null) {
+        return null;
+      }
+      HashMap<String, Object> ret = new HashMap<>();
+      String hash = (String) m.getOrDefault(HASH_KEY, null);
+      Object rank = m.getOrDefault(RANK_KEY, null);
+      if(hash != null) {
+        ret.put(HASH_KEY, hash);
+      }
+      if(rank != null) {
+        ret.put(RANK_KEY, rank);
+      }
+      return ret;
+    }),
     ALL(m -> m)
     ;
     Function<Map<String, Object>, Object> func;

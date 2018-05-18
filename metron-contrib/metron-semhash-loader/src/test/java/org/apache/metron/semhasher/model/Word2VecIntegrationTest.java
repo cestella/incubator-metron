@@ -264,16 +264,14 @@ public class Word2VecIntegrationTest {
    *   },
    *   "vectorizerConfig" : {
    *     "dimension" : 200,
-   *     "minCount" : 3,
+   *     "minCount" : 2,
    *     "sampleSize" : 500,
    *     "windowSize" : 25
    *   },
    *   "binningConfig" : {
-   *      "stages" : [50, 3, 25],
-   *      "buckets" : [100, 50],
-   *      "distance" : 0.9,
-   *      "falsePositives" : 0.9,
-   *      "error" : 1.0342
+   *      "stages" : 10,
+   *      "buckets" : 10,
+   *      "bucketsInHash" : 7
    *   }
    * }
    */
