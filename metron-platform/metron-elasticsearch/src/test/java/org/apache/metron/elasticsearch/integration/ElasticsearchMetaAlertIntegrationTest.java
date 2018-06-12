@@ -76,9 +76,10 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
   /**
    {
    "properties": {
-   "alert": {
+   "metron_alert": {
    "type": "nested"
-   }
+   },
+   "guid" : { "type" : "text", "fielddata" : true }
    }
    }
    */
@@ -93,12 +94,12 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
    "type" : "keyword"
    },
    "ip_src_addr" : {
-   "type" : "keyword"
+   "type" : "text", "fielddata" : true
    },
    "score" : {
    "type" : "integer"
    },
-   "alert" : {
+   "metron_alert" : {
    "type" : "nested"
    }
    }
@@ -200,7 +201,7 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
     SearchResponse searchResponse = metaDao.search(new SearchRequest() {
       {
         setQuery(
-            "(ip_src_addr:192.168.1.1 AND ip_src_port:8009) OR (alert.ip_src_addr:192.168.1.1 AND alert.ip_src_port:8009)");
+            "(ip_src_addr:192.168.1.1 AND ip_src_port:8009) OR (metron_alert.ip_src_addr:192.168.1.1 AND metron_alert.ip_src_port:8009)");
         setIndices(Collections.singletonList(METAALERT_TYPE));
         setFrom(0);
         setSize(5);
@@ -220,7 +221,7 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
       {
         setQuery(
             "(ip_src_addr:192.168.1.1 AND ip_src_port:8010)"
-                + " OR (alert.ip_src_addr:192.168.1.1 AND alert.ip_src_port:8010)");
+                + " OR (metron_alert.ip_src_addr:192.168.1.1 AND metron_alert.ip_src_port:8010)");
         setIndices(queryIndices);
         setFrom(0);
         setSize(5);
@@ -243,7 +244,7 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
       {
         setQuery(
             "(ip_src_addr:192.168.1.3 AND ip_src_port:8008)"
-                + " OR (alert.ip_src_addr:192.168.1.3 AND alert.ip_src_port:8008)");
+                + " OR (metron_alert.ip_src_addr:192.168.1.3 AND metron_alert.ip_src_port:8008)");
         setIndices(queryIndices);
         setFrom(0);
         setSize(1);
