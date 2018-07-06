@@ -26,11 +26,13 @@ import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.ShardSearchFailure;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -43,9 +45,9 @@ public class ElasticsearchRequestSubmitter {
   /**
    * The Elasticsearch client.
    */
-  private TransportClient client;
+  private RestHighLevelClient client;
 
-  public ElasticsearchRequestSubmitter(TransportClient client) {
+  public ElasticsearchRequestSubmitter(RestHighLevelClient client) {
     this.client = client;
   }
 
@@ -60,12 +62,10 @@ public class ElasticsearchRequestSubmitter {
     // submit the search request
     org.elasticsearch.action.search.SearchResponse esResponse;
     try {
-      esResponse = client
-              .search(request)
-              .actionGet();
+      esResponse = client.search(request);
       LOG.debug("Got Elasticsearch response; response={}", esResponse.toString());
 
-    } catch (SearchPhaseExecutionException e) {
+    } catch (IOException | SearchPhaseExecutionException e) {
       String msg = String.format(
               "Failed to execute search; error='%s', search='%s'",
               ExceptionUtils.getRootCauseMessage(e),

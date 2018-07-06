@@ -31,7 +31,9 @@ import java.util.function.Function;
 import org.apache.metron.indexing.dao.RetrieveLatestDao;
 import org.apache.metron.indexing.dao.search.GetRequest;
 import org.apache.metron.indexing.dao.update.Document;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -41,9 +43,9 @@ import org.elasticsearch.search.SearchHits;
 
 public class ElasticsearchRetrieveLatestDao implements RetrieveLatestDao {
 
-  private TransportClient transportClient;
+  private RestHighLevelClient transportClient;
 
-  public ElasticsearchRetrieveLatestDao(TransportClient transportClient) {
+  public ElasticsearchRetrieveLatestDao(RestHighLevelClient transportClient) {
     this.transportClient = transportClient;
   }
 
@@ -113,8 +115,9 @@ public class ElasticsearchRetrieveLatestDao implements RetrieveLatestDao {
     for (String guid : guids) {
       query = idsQuery.addIds(guid);
     }
-
-    SearchRequestBuilder request = transportClient.prepareSearch()
+    SearchRequest request = new SearchRequest();
+    SearchSource
+    SearchRequestBuilder request = new SearchRequestBuilder();
         .setQuery(query)
         .setSize(guids.size());
     org.elasticsearch.action.search.SearchResponse response = request.get();

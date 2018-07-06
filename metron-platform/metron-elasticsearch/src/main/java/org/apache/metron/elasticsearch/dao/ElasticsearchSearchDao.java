@@ -52,6 +52,7 @@ import org.apache.metron.indexing.dao.search.SortField;
 import org.apache.metron.indexing.dao.search.SortOrder;
 import org.apache.metron.indexing.dao.update.Document;
 import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.mapper.LegacyIpFieldMapper;
 import org.elasticsearch.index.query.IdsQueryBuilder;
@@ -88,12 +89,12 @@ public class ElasticsearchSearchDao implements SearchDao {
    */
   private static final String SORT_MISSING_FIRST = "_first";
 
-  private transient TransportClient client;
+  private transient RestHighLevelClient client;
   private AccessConfig accessConfig;
   private ElasticsearchColumnMetadataDao columnMetadataDao;
   private ElasticsearchRequestSubmitter requestSubmitter;
 
-  public ElasticsearchSearchDao(TransportClient client,
+  public ElasticsearchSearchDao(RestHighLevelClient client,
       AccessConfig accessConfig,
       ElasticsearchColumnMetadataDao columnMetadataDao,
       ElasticsearchRequestSubmitter requestSubmitter) {
