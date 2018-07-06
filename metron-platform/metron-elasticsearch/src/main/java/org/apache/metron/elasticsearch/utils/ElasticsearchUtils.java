@@ -27,6 +27,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,7 +38,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.utils.HDFSUtils;
 import org.apache.metron.common.utils.ReflectionUtils;
@@ -47,13 +56,14 @@ import org.apache.metron.netty.utils.NettyRuntimeWrapper;
 import org.apache.metron.stellar.common.utils.ConversionUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,11 +140,35 @@ public class ElasticsearchUtils {
    * @param globalConfiguration Metron global config
    * @return
    */
-  public static TransportClient getClient(Map<String, Object> globalConfiguration) {
-    Set<String> customESSettings = new HashSet<>();
-    customESSettings.addAll(Arrays.asList("es.client.class", USERNAME_CONFIG_KEY, PWD_FILE_CONFIG_KEY));
-    Settings.Builder settingsBuilder = Settings.builder();
+  public static RestHighLevelClient getClient(Map<String, Object> globalConfiguration) {
     Map<String, String> esSettings = getEsSettings(globalConfiguration);
+    Optional<Map.Entry<String, String>> credentials = getCredentials(esSettings);
+    Set<String> customESSettings = new HashSet<>();
+
+
+    RestClientBuilder builder = null;
+    List<HostnamePort> hps = getIps(globalConfiguration);
+    {
+      HttpHost[] posts = new HttpHost[hps.size()];
+      int i = 0;
+      for (HostnamePort hp : hps) {
+        posts[i++] = new HttpHost(hp.hostname, hp.port);
+      }
+      builder = RestClient.builder(posts);
+    }
+    if(credentials.isPresent()) {
+      final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY,
+              new UsernamePasswordCredentials(credentials.get().getKey(), credentials.get().getValue()));
+      builder = builder.setHttpClientConfigCallback(
+              httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+      );
+    }
+
+    RestHighLevelClient client = new RestHighLevelClient(builder.build());
+    return client;
+    /*customESSettings.addAll(Arrays.asList("es.client.class", USERNAME_CONFIG_KEY, PWD_FILE_CONFIG_KEY));
+    Settings.Builder settingsBuilder = Settings.builder();
     for (Map.Entry<String, String> entry : esSettings.entrySet()) {
       String key = entry.getKey();
       String value = entry.getValue();
@@ -162,13 +196,29 @@ public class ElasticsearchUtils {
       return client;
     } catch (UnknownHostException exception) {
       throw new RuntimeException(exception);
-    }
+    }*/
   }
 
   private static Map<String, String> getEsSettings(Map<String, Object> config) {
     return ConversionUtils
         .convertMap((Map<String, Object>) config.getOrDefault("es.client.settings", new HashMap<String, Object>()),
             String.class);
+  }
+
+  private static Optional<Map.Entry<String, String>> getCredentials(Map<String, String> esSettings) {
+    Optional<Map.Entry<String, String>> ret = Optional.empty();
+    if (esSettings.containsKey(PWD_FILE_CONFIG_KEY)) {
+
+      if (!esSettings.containsKey(USERNAME_CONFIG_KEY) || StringUtils.isEmpty(esSettings.get(USERNAME_CONFIG_KEY))) {
+        throw new IllegalArgumentException("X-pack username is required and cannot be empty");
+      }
+      String user = esSettings.get(USERNAME_CONFIG_KEY);
+      String password = esSettings.containsKey(PWD_FILE_CONFIG_KEY)?esSettings.get(getPasswordFromFile(esSettings.get(PWD_FILE_CONFIG_KEY))):null;
+      if(user != null && password != null) {
+        return Optional.of(new AbstractMap.SimpleImmutableEntry<String, String>(user, password));
+      }
+    }
+    return ret;
   }
 
   /*
