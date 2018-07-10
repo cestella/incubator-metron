@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.indexing.dao.RetrieveLatestDao;
 import org.apache.metron.indexing.dao.search.GetRequest;
 import org.apache.metron.indexing.dao.update.Document;
@@ -40,23 +42,24 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class ElasticsearchRetrieveLatestDao implements RetrieveLatestDao {
 
-  private RestHighLevelClient transportClient;
+  private ElasticsearchClient transportClient;
 
-  public ElasticsearchRetrieveLatestDao(RestHighLevelClient transportClient) {
+  public ElasticsearchRetrieveLatestDao(ElasticsearchClient transportClient) {
     this.transportClient = transportClient;
   }
 
   @Override
-  public Document getLatest(String guid, String sensorType) {
+  public Document getLatest(String guid, String sensorType) throws IOException {
     Optional<Document> doc = searchByGuid(guid, sensorType, hit -> toDocument(guid, hit));
     return doc.orElse(null);
   }
 
   @Override
-  public Iterable<Document> getAllLatest(List<GetRequest> getRequests) {
+  public Iterable<Document> getAllLatest(List<GetRequest> getRequests) throws IOException {
     Collection<String> guids = new HashSet<>();
     Collection<String> sensorTypes = new HashSet<>();
     for (GetRequest getRequest : getRequests) {
@@ -82,7 +85,7 @@ public class ElasticsearchRetrieveLatestDao implements RetrieveLatestDao {
   }
 
   <T> Optional<T> searchByGuid(String guid, String sensorType,
-      Function<SearchHit, Optional<T>> callback) {
+      Function<SearchHit, Optional<T>> callback) throws IOException {
     Collection<String> sensorTypes = sensorType != null ? Collections.singleton(sensorType) : null;
     List<T> results = searchByGuids(Collections.singleton(guid), sensorTypes, callback);
     if (results.size() > 0) {
@@ -98,7 +101,7 @@ public class ElasticsearchRetrieveLatestDao implements RetrieveLatestDao {
    * If more than one hit happens, the first one will be returned.
    */
   <T> List<T> searchByGuids(Collection<String> guids, Collection<String> sensorTypes,
-      Function<SearchHit, Optional<T>> callback) {
+      Function<SearchHit, Optional<T>> callback) throws IOException {
     if (guids == null || guids.isEmpty()) {
       return Collections.emptyList();
     }
@@ -116,11 +119,12 @@ public class ElasticsearchRetrieveLatestDao implements RetrieveLatestDao {
       query = idsQuery.addIds(guid);
     }
     SearchRequest request = new SearchRequest();
-    SearchSource
-    SearchRequestBuilder request = new SearchRequestBuilder();
-        .setQuery(query)
-        .setSize(guids.size());
-    org.elasticsearch.action.search.SearchResponse response = request.get();
+    SearchSourceBuilder builder = new SearchSourceBuilder();
+    builder.query(query);
+    builder.size(guids.size());
+    request.source(builder);
+
+    org.elasticsearch.action.search.SearchResponse response = transportClient.getHighLevelClient().search(request);
     SearchHits hits = response.getHits();
     List<T> results = new ArrayList<>();
     for (SearchHit hit : hits) {

@@ -18,6 +18,7 @@
 
 package org.apache.metron.elasticsearch.dao;
 
+import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.indexing.dao.ColumnMetadataDao;
 import org.apache.metron.indexing.dao.search.FieldType;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
@@ -65,12 +66,12 @@ public class ElasticsearchColumnMetadataDao implements ColumnMetadataDao {
   /**
    * An Elasticsearch administrative client.
    */
-  private transient RestHighLevelClient adminClient;
+  private transient ElasticsearchClient adminClient;
 
   /**
    * @param adminClient The Elasticsearch admin client.
    */
-  public ElasticsearchColumnMetadataDao(RestHighLevelClient adminClient) {
+  public ElasticsearchColumnMetadataDao(ElasticsearchClient adminClient) {
     this.adminClient = adminClient;
   }
 

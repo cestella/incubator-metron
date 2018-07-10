@@ -20,6 +20,7 @@ package org.apache.metron.elasticsearch.dao;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.elasticsearch.utils.ElasticsearchUtils;
 import org.apache.metron.indexing.dao.search.InvalidSearchException;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
@@ -45,9 +46,9 @@ public class ElasticsearchRequestSubmitter {
   /**
    * The Elasticsearch client.
    */
-  private RestHighLevelClient client;
+  private ElasticsearchClient client;
 
-  public ElasticsearchRequestSubmitter(RestHighLevelClient client) {
+  public ElasticsearchRequestSubmitter(ElasticsearchClient client) {
     this.client = client;
   }
 
@@ -62,7 +63,7 @@ public class ElasticsearchRequestSubmitter {
     // submit the search request
     org.elasticsearch.action.search.SearchResponse esResponse;
     try {
-      esResponse = client.search(request);
+      esResponse = client.getHighLevelClient().search(request);
       LOG.debug("Got Elasticsearch response; response={}", esResponse.toString());
 
     } catch (IOException | SearchPhaseExecutionException e) {

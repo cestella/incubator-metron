@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.elasticsearch.utils.ElasticsearchUtils;
 import org.apache.metron.indexing.dao.AccessConfig;
 import org.apache.metron.indexing.dao.search.AlertComment;
@@ -49,11 +51,11 @@ public class ElasticsearchUpdateDao implements UpdateDao {
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private transient RestHighLevelClient client;
+  private transient ElasticsearchClient client;
   private AccessConfig accessConfig;
   private ElasticsearchRetrieveLatestDao retrieveLatestDao;
 
-  public ElasticsearchUpdateDao(RestHighLevelClient client,
+  public ElasticsearchUpdateDao(ElasticsearchClient client,
       AccessConfig accessConfig,
       ElasticsearchRetrieveLatestDao searchDao) {
     this.client = client;
@@ -70,7 +72,7 @@ public class ElasticsearchUpdateDao implements UpdateDao {
 
     IndexRequest indexRequest = buildIndexRequest(update, sensorType, indexName);
     try {
-      IndexResponse response = client.index(indexRequest);
+      IndexResponse response = client.getHighLevelClient().index(indexRequest);
 
       ShardInfo shardInfo = response.getShardInfo();
       int failed = shardInfo.getFailed();
@@ -104,7 +106,7 @@ public class ElasticsearchUpdateDao implements UpdateDao {
       bulkRequestBuilder.add(indexRequest);
     }
 
-    BulkResponse bulkResponse = client.bulk(bulkRequestBuilder);
+    BulkResponse bulkResponse = client.getHighLevelClient().bulk(bulkRequestBuilder);
     if (bulkResponse.hasFailures()) {
       LOG.error("Bulk Request has failures: {}", bulkResponse.buildFailureMessage());
       throw new IOException(
@@ -175,13 +177,13 @@ public class ElasticsearchUpdateDao implements UpdateDao {
     update(newVersion, Optional.empty());
   }
 
-  protected String getIndexName(Document update, Optional<String> index, String indexPostFix) {
+  protected String getIndexName(Document update, Optional<String> index, String indexPostFix) throws IOException {
     return index.orElse(getIndexName(update.getGuid(), update.getSensorType())
         .orElse(ElasticsearchUtils.getIndexName(update.getSensorType(), indexPostFix, null))
     );
   }
 
-  protected Optional<String> getIndexName(String guid, String sensorType) {
+  protected Optional<String> getIndexName(String guid, String sensorType) throws IOException {
     return retrieveLatestDao.searchByGuid(guid,
         sensorType,
         hit -> Optional.ofNullable(hit.getIndex())

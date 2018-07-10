@@ -23,6 +23,7 @@ import org.apache.metron.common.field.FieldNameConverter;
 import org.apache.metron.common.field.FieldNameConverters;
 import org.apache.metron.common.writer.BulkMessageWriter;
 import org.apache.metron.common.writer.BulkWriterResponse;
+import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.elasticsearch.utils.ElasticsearchUtils;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.tuple.Tuple;
@@ -56,7 +57,7 @@ public class ElasticsearchWriter implements BulkMessageWriter<JSONObject>, Seria
   /**
    * The Elasticsearch client.
    */
-  private transient RestHighLevelClient client;
+  private transient ElasticsearchClient client;
 
   /**
    * A simple data formatter used to build the appropriate Elasticsearch index name.
@@ -103,7 +104,7 @@ public class ElasticsearchWriter implements BulkMessageWriter<JSONObject>, Seria
       bulkRequest.add(indexRequest);
     }
 
-    BulkResponse bulkResponse = client.bulk(bulkRequest);
+    BulkResponse bulkResponse = client.getHighLevelClient().bulk(bulkRequest);
     return buildWriteReponse(tuples, bulkResponse);
   }
 
@@ -142,7 +143,7 @@ public class ElasticsearchWriter implements BulkMessageWriter<JSONObject>, Seria
 
   @Override
   public void close() throws Exception {
-    //TODO-ES: Figure out how to close this damned thing.
+    client.close();
   }
 
   /**

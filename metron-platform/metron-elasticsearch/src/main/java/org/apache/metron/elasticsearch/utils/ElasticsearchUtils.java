@@ -143,7 +143,7 @@ public class ElasticsearchUtils {
    * @param globalConfiguration Metron global config
    * @return
    */
-  public static RestHighLevelClient getClient(Map<String, Object> globalConfiguration) {
+  public static ElasticsearchClient getClient(Map<String, Object> globalConfiguration) {
     Map<String, String> esSettings = getEsSettings(globalConfiguration);
     Optional<Map.Entry<String, String>> credentials = getCredentials(esSettings);
     Set<String> customESSettings = new HashSet<>();
@@ -167,9 +167,10 @@ public class ElasticsearchUtils {
               httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
       );
     }
+    RestClient lowLevelClient = builder.build();
+    RestHighLevelClient client = new RestHighLevelClient(lowLevelClient);
+    return new ElasticsearchClient(lowLevelClient, client);
 
-    RestHighLevelClient client = new RestHighLevelClient(builder.build());
-    return client;
     /*customESSettings.addAll(Arrays.asList("es.client.class", USERNAME_CONFIG_KEY, PWD_FILE_CONFIG_KEY));
     Settings.Builder settingsBuilder = Settings.builder();
     for (Map.Entry<String, String> entry : esSettings.entrySet()) {
@@ -392,33 +393,25 @@ public class ElasticsearchUtils {
       QueryBuilder qb,
       String index,
       int pageSize
-  ) {
-    SearchRequest request = new SearchRequest();
+  ) throws IOException {
+    org.elasticsearch.action.search.SearchRequest request = new org.elasticsearch.action.search.SearchRequest();
     SearchSourceBuilder builder = new SearchSourceBuilder();
     builder.query(qb);
     builder.size(pageSize);
+    builder.fetchSource(true);
     builder.storedField("*");
-    request.setIndices(ImmutableList.of(index));
+    request.source(builder);
+    request.indices(index);
 
-    SearchRequestBuilder searchRequestBuilder = transportClient
-        .prepareSearch(index)
-        .addStoredField("*")
-        .setFetchSource(true)
-        .setQuery(qb)
-        .setSize(pageSize);
-    org.elasticsearch.action.search.SearchResponse esResponse = searchRequestBuilder
-        .execute()
-        .actionGet();
+    org.elasticsearch.action.search.SearchResponse esResponse = transportClient.search(request);
     List<SearchResult> allResults = getSearchResults(esResponse);
     long total = esResponse.getHits().getTotalHits();
     if (total > pageSize) {
       int pages = (int) (total / pageSize) + 1;
       for (int i = 1; i < pages; i++) {
         int from = i * pageSize;
-        searchRequestBuilder.setFrom(from);
-        esResponse = searchRequestBuilder
-            .execute()
-            .actionGet();
+        builder.from(from);
+        esResponse = transportClient.search(request);
         allResults.addAll(getSearchResults(esResponse));
       }
     }

@@ -22,6 +22,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.elasticsearch.utils.ElasticsearchUtils;
 import org.apache.metron.indexing.dao.AccessConfig;
 import org.apache.metron.indexing.dao.IndexDao;
@@ -48,7 +50,7 @@ public class ElasticsearchDao implements IndexDao {
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private transient RestHighLevelClient client;
+  private transient ElasticsearchClient client;
   private ElasticsearchSearchDao searchDao;
   private ElasticsearchUpdateDao updateDao;
   private ElasticsearchRetrieveLatestDao retrieveLatestDao;
@@ -65,7 +67,7 @@ public class ElasticsearchDao implements IndexDao {
 
   private AccessConfig accessConfig;
 
-  protected ElasticsearchDao(RestHighLevelClient client,
+  protected ElasticsearchDao(ElasticsearchClient client,
       AccessConfig config,
       ElasticsearchSearchDao searchDao,
       ElasticsearchUpdateDao updateDao,
@@ -128,13 +130,13 @@ public class ElasticsearchDao implements IndexDao {
   }
 
   @Override
-  public Document getLatest(final String guid, final String sensorType) {
+  public Document getLatest(final String guid, final String sensorType) throws IOException {
     return retrieveLatestDao.getLatest(guid, sensorType);
   }
 
   @Override
   public Iterable<Document> getAllLatest(
-      final List<GetRequest> getRequests) {
+      final List<GetRequest> getRequests) throws IOException {
     return retrieveLatestDao.getAllLatest(getRequests);
   }
 
@@ -189,7 +191,7 @@ public class ElasticsearchDao implements IndexDao {
     this.updateDao.removeCommentFromAlert(request, latest);
   }
 
-  protected Optional<String> getIndexName(String guid, String sensorType) {
+  protected Optional<String> getIndexName(String guid, String sensorType) throws IOException {
     return updateDao.getIndexName(guid, sensorType);
   }
 
@@ -203,7 +205,7 @@ public class ElasticsearchDao implements IndexDao {
     return searchDao.group(groupRequest, queryBuilder);
   }
 
-  public RestHighLevelClient getClient() {
+  public ElasticsearchClient getClient() {
     return this.client;
   }
 }
