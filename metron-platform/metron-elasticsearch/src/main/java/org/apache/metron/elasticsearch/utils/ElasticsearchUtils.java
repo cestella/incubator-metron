@@ -50,6 +50,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.metron.common.configuration.writer.WriterConfiguration;
 import org.apache.metron.common.utils.HDFSUtils;
 import org.apache.metron.common.utils.ReflectionUtils;
+import org.apache.metron.indexing.dao.search.SearchRequest;
 import org.apache.metron.indexing.dao.search.SearchResponse;
 import org.apache.metron.indexing.dao.search.SearchResult;
 import org.apache.metron.netty.utils.NettyRuntimeWrapper;
@@ -64,6 +65,8 @@ import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.query.QuerySearchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -385,11 +388,18 @@ public class ElasticsearchUtils {
    * @param qb A QueryBuilder that provides the query to be run.
    * @return A SearchResponse containing the appropriate results.
    */
-  public static  SearchResponse queryAllResults(TransportClient transportClient,
+  public static  SearchResponse queryAllResults(RestHighLevelClient transportClient,
       QueryBuilder qb,
       String index,
       int pageSize
   ) {
+    SearchRequest request = new SearchRequest();
+    SearchSourceBuilder builder = new SearchSourceBuilder();
+    builder.query(qb);
+    builder.size(pageSize);
+    builder.storedField("*");
+    request.setIndices(ImmutableList.of(index));
+
     SearchRequestBuilder searchRequestBuilder = transportClient
         .prepareSearch(index)
         .addStoredField("*")

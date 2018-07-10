@@ -22,6 +22,7 @@ import org.apache.metron.indexing.dao.ColumnMetadataDao;
 import org.apache.metron.indexing.dao.search.FieldType;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.client.AdminClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.slf4j.Logger;
@@ -64,12 +65,12 @@ public class ElasticsearchColumnMetadataDao implements ColumnMetadataDao {
   /**
    * An Elasticsearch administrative client.
    */
-  private transient AdminClient adminClient;
+  private transient RestHighLevelClient adminClient;
 
   /**
    * @param adminClient The Elasticsearch admin client.
    */
-  public ElasticsearchColumnMetadataDao(AdminClient adminClient) {
+  public ElasticsearchColumnMetadataDao(RestHighLevelClient adminClient) {
     this.adminClient = adminClient;
   }
 
@@ -82,6 +83,7 @@ public class ElasticsearchColumnMetadataDao implements ColumnMetadataDao {
 
     String[] latestIndices = getLatestIndices(indices);
     if (latestIndices.length > 0) {
+
       ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = adminClient
               .indices()
               .getMappings(new GetMappingsRequest().indices(latestIndices))

@@ -65,7 +65,7 @@ public class ElasticsearchDao implements IndexDao {
 
   private AccessConfig accessConfig;
 
-  protected ElasticsearchDao(TransportClient client,
+  protected ElasticsearchDao(RestHighLevelClient client,
       AccessConfig config,
       ElasticsearchSearchDao searchDao,
       ElasticsearchUpdateDao updateDao,
@@ -100,7 +100,7 @@ public class ElasticsearchDao implements IndexDao {
       this.client = ElasticsearchUtils
           .getClient(config.getGlobalConfigSupplier().get());
       this.accessConfig = config;
-      this.columnMetadataDao = new ElasticsearchColumnMetadataDao(this.client.admin());
+      this.columnMetadataDao = new ElasticsearchColumnMetadataDao(this.client);
       this.requestSubmitter = new ElasticsearchRequestSubmitter(this.client);
       this.searchDao = new ElasticsearchSearchDao(client, accessConfig, columnMetadataDao,
           requestSubmitter);
@@ -203,7 +203,7 @@ public class ElasticsearchDao implements IndexDao {
     return searchDao.group(groupRequest, queryBuilder);
   }
 
-  public TransportClient getClient() {
+  public RestHighLevelClient getClient() {
     return this.client;
   }
 }
