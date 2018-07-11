@@ -335,10 +335,7 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
 
   @Override
   protected void setupTypings() {
-    ((ElasticsearchDao) esDao).getClient().admin().indices().preparePutMapping(INDEX)
-            .setType("test_doc")
-            .setSource(nestedAlertMapping)
-            .get();
+    ((ElasticsearchDao) esDao).getClient().putMapping(INDEX, "test_doc", nestedAlertMapping);
   }
 
   @Override

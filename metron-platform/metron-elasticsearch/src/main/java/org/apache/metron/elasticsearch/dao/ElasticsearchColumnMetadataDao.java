@@ -21,7 +21,10 @@ package org.apache.metron.elasticsearch.dao;
 import org.apache.metron.elasticsearch.utils.ElasticsearchClient;
 import org.apache.metron.indexing.dao.ColumnMetadataDao;
 import org.apache.metron.indexing.dao.search.FieldType;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
@@ -85,11 +88,7 @@ public class ElasticsearchColumnMetadataDao implements ColumnMetadataDao {
     String[] latestIndices = getLatestIndices(indices);
     if (latestIndices.length > 0) {
 
-      ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = adminClient
-              .indices()
-              .getMappings(new GetMappingsRequest().indices(latestIndices))
-              .actionGet()
-              .getMappings();
+      ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>> mappings = adminClient.getMappings(latestIndices);
 
       // for each index
       for (Object key : mappings.keys().toArray()) {
@@ -172,12 +171,8 @@ public class ElasticsearchColumnMetadataDao implements ColumnMetadataDao {
   String[] getLatestIndices(List<String> includeIndices) {
     LOG.debug("Getting latest indices; indices={}", includeIndices);
     Map<String, String> latestIndices = new HashMap<>();
-    String[] indices = adminClient
-            .indices()
-            .prepareGetIndex()
-            .setFeatures()
-            .get()
-            .getIndices();
+
+    String[] indices = adminClient.getIndices();
 
     for (String index : indices) {
       int prefixEnd = index.indexOf(INDEX_NAME_DELIMITER);
