@@ -28,6 +28,7 @@ import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +84,7 @@ public class ElasticsearchColumnMetadataDaoTest {
   }
 
   @Test
-  public void testGetOneLatestIndex() {
+  public void testGetOneLatestIndex() throws IOException {
 
     // setup
     String[] existingIndices = new String[] {
@@ -106,7 +107,7 @@ public class ElasticsearchColumnMetadataDaoTest {
   }
 
   @Test
-  public void testGetLatestIndices() {
+  public void testGetLatestIndices() throws IOException {
     // setup
     String[] existingIndices = new String[] {
             "bro_index_2017.10.03.19",
@@ -128,7 +129,7 @@ public class ElasticsearchColumnMetadataDaoTest {
   }
 
   @Test
-  public void testLatestIndicesWhereNoneExist() {
+  public void testLatestIndicesWhereNoneExist() throws IOException {
 
     // setup - there are no existing indices
     String[] existingIndices = new String[] {};
