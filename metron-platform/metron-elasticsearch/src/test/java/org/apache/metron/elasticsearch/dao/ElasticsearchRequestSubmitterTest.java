@@ -49,11 +49,9 @@ public class ElasticsearchRequestSubmitterTest {
     // mocks
     RestHighLevelClient highLevelClient = mock(RestHighLevelClient.class);
     ElasticsearchClient client = new ElasticsearchClient(mock(RestClient.class), highLevelClient);
-    ActionFuture future = Mockito.mock(ActionFuture.class);
 
     // the client should return the given search response
-    when(highLevelClient.search(any(), any())).thenReturn(response);
-    when(future.actionGet()).thenReturn(response);
+    when(highLevelClient.search(any())).thenReturn(response);
 
     return new ElasticsearchRequestSubmitter(client);
   }

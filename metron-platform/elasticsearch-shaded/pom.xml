@@ -165,10 +165,6 @@
                                     <shadedPattern>org.apache.metron.io.netty</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.logging.log4j</pattern>
-                                    <shadedPattern>org.apache.metron.logging.log4j</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.google.common</pattern>
                                     <shadedPattern>org.apache.metron.guava.elasticsearch-shaded</shadedPattern>
                                 </relocation>

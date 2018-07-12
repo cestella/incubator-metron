@@ -144,7 +144,7 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
     Map<String, Object> globalConfig = new HashMap<String, Object>() {
       {
         put("es.clustername", "metron");
-        put("es.port", "9300");
+        put("es.port", "9200");
         put("es.ip", "localhost");
         put("es.date.format", DATE_FORMAT);
       }
@@ -334,7 +334,7 @@ public class ElasticsearchMetaAlertIntegrationTest extends MetaAlertIntegrationT
   }
 
   @Override
-  protected void setupTypings() {
+  protected void setupTypings() throws IOException {
     ((ElasticsearchDao) esDao).getClient().putMapping(INDEX, "test_doc", nestedAlertMapping);
   }
 
