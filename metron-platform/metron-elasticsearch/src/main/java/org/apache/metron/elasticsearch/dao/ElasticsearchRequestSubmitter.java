@@ -66,7 +66,7 @@ public class ElasticsearchRequestSubmitter {
       esResponse = client.getHighLevelClient().search(request);
       LOG.debug("Got Elasticsearch response; response={}", esResponse.toString());
 
-    } catch (IOException | SearchPhaseExecutionException e) {
+    } catch (Exception e) {
       String msg = String.format(
               "Failed to execute search; error='%s', search='%s'",
               ExceptionUtils.getRootCauseMessage(e),

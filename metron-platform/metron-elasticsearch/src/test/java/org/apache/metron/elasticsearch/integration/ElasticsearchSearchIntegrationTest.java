@@ -200,7 +200,7 @@ public class ElasticsearchSearchIntegrationTest extends SearchIntegrationTest {
     config.setGlobalConfigSupplier( () ->
             new HashMap<String, Object>() {{
               put("es.clustername", "metron");
-              put("es.port", "9300");
+              put("es.port", "9200");
               put("es.ip", "localhost");
               put("es.date.format", dateFormat);
             }}
