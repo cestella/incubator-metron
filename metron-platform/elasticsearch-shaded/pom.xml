@@ -75,6 +75,12 @@
             <version>${global_elasticsearch_version}</version>
             <exclusions>
                 <exclusion>
+                    <!--
+                    TODO: This shouldn't be required, but the Shade services resources transformer is botching the services
+                    file in META-INF.  You should not merge before figuring out if there's a way to avoid the
+                    botched merge.  One way to do this is to create a new resources transformer that handles the merge
+                    properly.  I have NO idea if excluding this matters.
+                    -->
                     <groupId>org.elasticsearch.plugin</groupId>
                     <artifactId>aggs-matrix-stats-client</artifactId>
                 </exclusion>
